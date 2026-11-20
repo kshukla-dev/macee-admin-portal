@@ -1,0 +1,1097 @@
+'use client';
+
+import React, { useEffect, useState, useMemo } from 'react';
+import { Topbar } from '@/components/Topbar';
+import { Modal } from '@/components/Modal';
+import {
+  HelpCircle,
+  Plus,
+  Search,
+  Tag,
+  Edit2,
+  Trash2,
+  CheckCircle2,
+  ChevronDown,
+  ChevronUp,
+  FolderOpen,
+  BookOpen,
+  ShieldCheck,
+  Sparkles,
+  ExternalLink,
+  RefreshCw,
+  Globe,
+  Building2,
+  Briefcase,
+  Users,
+  FolderGit2,
+  PhoneCall,
+  Languages,
+  Check,
+  Layers,
+  FileCode2,
+} from 'lucide-react';
+
+export interface FaqItem {
+  id: string;
+  page: string;
+  pageName: string;
+  categoryId: number;
+  categoryName: string;
+  question: string;
+  answer: string;
+  question_nl?: string;
+  answer_nl?: string;
+  tag?: string;
+  order?: number;
+  active?: boolean;
+}
+
+export interface FaqPageDef {
+  id: string;
+  name: string;
+  categoryId: number;
+  categoryName: string;
+  route: string;
+  description: string;
+}
+
+interface PageMeta {
+  id: string;
+  name: string;
+  label: string;
+  icon: any;
+  route: string;
+  constName: string;
+  color: string;
+  bgLight: string;
+  borderLight: string;
+  description: string;
+}
+
+const PAGE_TABS: PageMeta[] = [
+  {
+    id: 'all',
+    name: 'All Pages',
+    label: 'All Pages',
+    icon: Globe,
+    route: '/faqs',
+    constName: 'ALL_FAQS_EN',
+    color: 'text-slate-800',
+    bgLight: 'bg-slate-100',
+    borderLight: 'border-slate-200',
+    description: 'Complete centralized FAQ directory across all website pages and services.',
+  },
+  {
+    id: 'home',
+    name: 'Home Page',
+    label: 'Home Page',
+    icon: Building2,
+    route: '/',
+    constName: 'HOME_FAQS',
+    color: 'text-blue-700',
+    bgLight: 'bg-blue-50',
+    borderLight: 'border-blue-200',
+    description: 'Workforce Desk, SLA models, compliance accreditations and fast deployment.',
+  },
+  {
+    id: 'about',
+    name: 'About Page',
+    label: 'About Us',
+    icon: BookOpen,
+    route: '/about',
+    constName: 'ABOUT_FAQS',
+    color: 'text-purple-700',
+    bgLight: 'bg-purple-50',
+    borderLight: 'border-purple-200',
+    description: '30+ years experience, Arnhem HQ, SNA NEN 4400-1 chain liability protection.',
+  },
+  {
+    id: 'clients',
+    name: 'Clients Page',
+    label: 'Clients & Hiring',
+    icon: Briefcase,
+    route: '/clients',
+    constName: 'CLIENTS_FAQS',
+    color: 'text-amber-700',
+    bgLight: 'bg-amber-50',
+    borderLight: 'border-amber-200',
+    description: '48-72h candidate delivery SLA, quality replacement guarantee, MSP desks.',
+  },
+  {
+    id: 'professionals',
+    name: 'Professionals Page',
+    label: 'Professionals & Expats',
+    icon: Users,
+    route: '/professionals',
+    constName: 'PROFESSIONALS_FAQS',
+    color: 'text-emerald-700',
+    bgLight: 'bg-emerald-50',
+    borderLight: 'border-emerald-200',
+    description: '30% tax ruling application support, secondment, family settling & fast pay cycles.',
+  },
+  {
+    id: 'projects',
+    name: 'Projects Page',
+    label: 'Projects & Jobs',
+    icon: FolderGit2,
+    route: '/projects',
+    constName: 'PROJECTS_FAQS',
+    color: 'text-cyan-700',
+    bgLight: 'bg-cyan-50',
+    borderLight: 'border-cyan-200',
+    description: 'CV format guidelines, OTYS applicant review workflows, hybrid & remote policies.',
+  },
+  {
+    id: 'compliance',
+    name: 'Compliance & Legal',
+    label: 'Compliance & Wet DBA',
+    icon: ShieldCheck,
+    route: '/faqs#compliance',
+    constName: 'COMPLIANCE_FAQS',
+    color: 'text-rose-700',
+    bgLight: 'bg-rose-50',
+    borderLight: 'border-rose-200',
+    description: 'Wet DBA false-employment elimination, verified G-Account tax indemnity and WAADI.',
+  },
+  {
+    id: 'contact',
+    name: 'Contact Page',
+    label: 'Contact & Desk',
+    icon: PhoneCall,
+    route: '/contact',
+    constName: 'CONTACT_FAQS',
+    color: 'text-indigo-700',
+    bgLight: 'bg-indigo-50',
+    borderLight: 'border-indigo-200',
+    description: '24-hour response SLAs, Arnhem office visits, and urgent emergency placements.',
+  },
+];
+
+const SUGGESTED_TAGS_BY_PAGE: Record<string, string[]> = {
+  home: [
+    'Turnkey Workforce Management',
+    'SNA NEN 4400-1 Certified',
+    'Flexible Engagement Models',
+    'Specialized Domain Verticals',
+    'Rapid 48-72h Deployment',
+  ],
+  about: [
+    '30+ Years Industry Experience',
+    'Chain Liability Protection',
+    'Arnhem Headquarters & National Reach',
+    'Dedicated Account Managers',
+  ],
+  clients: [
+    '48 - 72 Hour Turnaround',
+    'Placement & Quality Guarantee',
+    'Wet DBA & Fiscal Risk Elimination',
+    'MSP & Vendor Consolidation',
+    'Transparent Milestone Pricing',
+  ],
+  professionals: [
+    'Onboarding & Relocation Guidance',
+    '30% Tax Ruling Support',
+    'Family Relocation Assistance',
+    'Flexible Contracting Choices',
+    'Guaranteed On-Time Invoicing',
+  ],
+  projects: [
+    'PDF / DOCX Recommended',
+    '24 - 48 Hour Recruiter Review',
+    'Flexible Hybrid Options',
+    'Job Alerts & Open Registration',
+    'Live OTYS Desk Synchronization',
+  ],
+  compliance: [
+    'Wet DBA & Fiscal Safety',
+    'G-Account Tax Indemnity',
+    'WAADI Registered',
+  ],
+  contact: [
+    'Response Within 24 Business Hours',
+    'Willemsplein 44, Arnhem',
+    'Emergency Staffing Desk',
+    'Free & Confidential Assessment',
+  ],
+};
+
+export default function FaqManagementPage() {
+  const [items, setItems] = useState<FaqItem[]>([]);
+  const [activeTab, setActiveTab] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
+  const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false);
+  const [syncMessage, setSyncMessage] = useState<string | null>(null);
+
+  // Accordion Expand State
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  // Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<FaqItem | null>(null);
+  const [modalTab, setModalTab] = useState<'en' | 'nl'>('en');
+  const [saving, setSaving] = useState(false);
+
+  // Form Fields
+  const [formPage, setFormPage] = useState<string>('home');
+  const [formTag, setFormTag] = useState<string>('');
+  const [formOrder, setFormOrder] = useState<number>(1);
+  const [formActive, setFormActive] = useState<boolean>(true);
+  const [formQuestion, setFormQuestion] = useState<string>('');
+  const [formAnswer, setFormAnswer] = useState<string>('');
+  const [formQuestionNl, setFormQuestionNl] = useState<string>('');
+  const [formAnswerNl, setFormAnswerNl] = useState<string>('');
+
+  useEffect(() => {
+    fetchFaqs();
+  }, []);
+
+  const fetchFaqs = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch('/api/faqs');
+      const data = await res.json();
+      setItems(data.items || []);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Counts per page
+  const pageCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: items.length };
+    PAGE_TABS.forEach((tab) => {
+      if (tab.id !== 'all') {
+        counts[tab.id] = items.filter((i) => i.page === tab.id).length;
+      }
+    });
+    return counts;
+  }, [items]);
+
+  // Filtered Items
+  const filteredItems = useMemo(() => {
+    return items.filter((item) => {
+      // Tab filter
+      if (activeTab !== 'all' && item.page !== activeTab) {
+        return false;
+      }
+
+      // Status filter
+      if (statusFilter === 'active' && item.active === false) return false;
+      if (statusFilter === 'inactive' && item.active !== false) return false;
+
+      // Search query
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const matchesQuestion = item.question.toLowerCase().includes(q);
+        const matchesAnswer = item.answer.toLowerCase().includes(q);
+        const matchesTag = item.tag ? item.tag.toLowerCase().includes(q) : false;
+        const matchesNl = item.question_nl ? item.question_nl.toLowerCase().includes(q) : false;
+        const matchesPage = item.pageName ? item.pageName.toLowerCase().includes(q) : false;
+        if (!matchesQuestion && !matchesAnswer && !matchesTag && !matchesNl && !matchesPage) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [items, activeTab, statusFilter, searchQuery]);
+
+  const currentTabMeta = useMemo(() => {
+    return PAGE_TABS.find((t) => t.id === activeTab) || PAGE_TABS[0];
+  }, [activeTab]);
+
+  const handleOpenAdd = (defaultPage?: string) => {
+    setEditingItem(null);
+    const targetPage = defaultPage && defaultPage !== 'all' ? defaultPage : activeTab !== 'all' ? activeTab : 'home';
+    setFormPage(targetPage);
+    const pageItems = items.filter((i) => i.page === targetPage);
+    setFormOrder(pageItems.length + 1);
+    setFormActive(true);
+    setFormTag(SUGGESTED_TAGS_BY_PAGE[targetPage]?.[0] || 'General');
+    setFormQuestion('');
+    setFormAnswer('');
+    setFormQuestionNl('');
+    setFormAnswerNl('');
+    setModalTab('en');
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEdit = (item: FaqItem) => {
+    setEditingItem(item);
+    setFormPage(item.page || 'home');
+    setFormTag(item.tag || '');
+    setFormOrder(item.order || 1);
+    setFormActive(item.active !== false);
+    setFormQuestion(item.question);
+    setFormAnswer(item.answer);
+    setFormQuestionNl(item.question_nl || '');
+    setFormAnswerNl(item.answer_nl || '');
+    setModalTab('en');
+    setIsModalOpen(true);
+  };
+
+  const handleSaveFaq = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setSaving(true);
+      const payload = {
+        id: editingItem ? editingItem.id : undefined,
+        page: formPage,
+        tag: formTag,
+        order: Number(formOrder),
+        active: formActive,
+        question: formQuestion,
+        answer: formAnswer,
+        question_nl: formQuestionNl || formQuestion,
+        answer_nl: formAnswerNl || formAnswer,
+      };
+
+      const method = editingItem ? 'PUT' : 'POST';
+      const res = await fetch('/api/faqs', {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setIsModalOpen(false);
+        fetchFaqs();
+        setSyncMessage(`✓ Saved and synchronized to ${formPage.toUpperCase()} page on Macee website!`);
+        setTimeout(() => setSyncMessage(null), 4500);
+      } else {
+        alert(data.error || 'Failed to save FAQ');
+      }
+    } catch (e) {
+      alert('Failed to save FAQ');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteFaq = async (id: string, questionTitle: string) => {
+    if (!confirm(`Are you sure you want to delete this FAQ?\n\n"${questionTitle}"`)) return;
+    try {
+      const res = await fetch(`/api/faqs?id=${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        setItems((prev) => prev.filter((item) => item.id !== id));
+        setSyncMessage('✓ FAQ deleted and updated on Macee website.');
+        setTimeout(() => setSyncMessage(null), 4000);
+      }
+    } catch (e) {
+      alert('Failed to delete FAQ');
+    }
+  };
+
+  const handleToggleActive = async (item: FaqItem) => {
+    try {
+      const updatedStatus = item.active === false ? true : false;
+      const res = await fetch('/api/faqs', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: item.id, active: updatedStatus }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setItems((prev) =>
+          prev.map((i) => (i.id === item.id ? { ...i, active: updatedStatus } : i))
+        );
+        setSyncMessage(`✓ Question status set to ${updatedStatus ? 'Active' : 'Inactive'} and synced.`);
+        setTimeout(() => setSyncMessage(null), 3500);
+      }
+    } catch (e) {
+      alert('Failed to update status');
+    }
+  };
+
+  const handleManualSync = async () => {
+    try {
+      setSyncing(true);
+      const res = await fetch('/api/sync', { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        setSyncMessage('✓ All page FAQs successfully synchronized to pageFaqs.ts and allFaqs.ts!');
+        setTimeout(() => setSyncMessage(null), 5000);
+      } else {
+        alert('Sync error: ' + (data.errors?.join(', ') || 'Unknown error'));
+      }
+    } catch (e) {
+      alert('Failed to trigger manual sync');
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const getPageMeta = (pageKey: string) => {
+    return PAGE_TABS.find((t) => t.id === pageKey) || PAGE_TABS[1];
+  };
+
+  return (
+    <div className="min-h-screen bg-[#F8FAFC]">
+      <Topbar
+        breadcrumbs={[
+          { label: 'Dashboard', href: '/dashboard' },
+          { label: 'FAQs' },
+        ]}
+        searchPlaceholder="Search questions across all pages..."
+        onSearch={(q) => setSearchQuery(q)}
+      />
+
+      <div className="p-6 sm:p-8 lg:p-10 max-w-[1440px] mx-auto space-y-6">
+        {/* Page Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/80">
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-serif text-[#111827] tracking-tight">
+              FAQs
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+              Manage page-specific FAQs for Home, About, Clients, Professionals, Projects, Compliance, and Contact with instant website sync.
+            </p>
+          </div>
+
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={handleManualSync}
+              disabled={syncing}
+              className="inline-flex items-center space-x-2 px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 hover:border-slate-300 text-slate-700 text-xs font-semibold shadow-2xs hover:bg-slate-50 transition-all shrink-0"
+              title="Sync all page FAQs to macee-_update_contant"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 text-slate-500 ${syncing ? 'animate-spin text-[#E30613]' : ''}`} />
+              <span>{syncing ? 'Syncing...' : 'Sync to Website'}</span>
+            </button>
+
+            <button
+              onClick={() => handleOpenAdd(activeTab)}
+              className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl bg-[#E30613] hover:bg-[#b80510] text-white text-xs font-semibold shadow-xs transition-all shrink-0"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Add FAQ</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Sync Toast / Banner */}
+        {syncMessage && (
+          <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium flex items-center justify-between shadow-2xs animate-fadeIn">
+            <div className="flex items-center space-x-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>{syncMessage}</span>
+            </div>
+            <button onClick={() => setSyncMessage(null)} className="text-emerald-700 hover:text-emerald-900 text-xs font-bold px-2 py-0.5">
+              Dismiss
+            </button>
+          </div>
+        )}
+
+        {/* 4 KPI Summary Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+          <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
+            <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
+              <HelpCircle className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-xs font-medium text-slate-500">Total Questions</p>
+              <div className="flex items-baseline space-x-2 mt-0.5">
+                <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                  {items.length}
+                </span>
+                <span className="text-xs font-semibold text-emerald-600">All Live</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
+            <div className="w-12 h-12 rounded-full bg-purple-50 text-purple-700 flex items-center justify-center shrink-0">
+              <Layers className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-xs font-medium text-slate-500">Target Pages</p>
+              <div className="flex items-baseline space-x-2 mt-0.5">
+                <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                  7 Pages
+                </span>
+                <span className="text-[11px] text-slate-400 font-medium">Home to Contact</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
+            <div className="w-12 h-12 rounded-full bg-blue-50 text-blue-700 flex items-center justify-center shrink-0">
+              <Languages className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-xs font-medium text-slate-500">Bilingual Support</p>
+              <div className="flex items-baseline space-x-2 mt-0.5">
+                <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                  EN + NL
+                </span>
+                <span className="text-xs font-semibold text-blue-600">Dutch Ready</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
+            <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+              <FileCode2 className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-xs font-medium text-slate-500">Direct Code Export</p>
+              <div className="flex items-baseline space-x-2 mt-0.5">
+                <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                  pageFaqs.ts
+                </span>
+                <span className="text-[11px] text-emerald-600 font-medium">Synced</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* PAGE FILTER TABS BAR */}
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-2xs p-2">
+          <div className="flex items-center space-x-1.5 overflow-x-auto pb-1 scrollbar-none">
+            {PAGE_TABS.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              const count = pageCounts[tab.id] || 0;
+
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`inline-flex items-center space-x-2 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap shrink-0 ${
+                    isActive
+                      ? 'bg-[#111827] text-white shadow-2xs font-semibold'
+                      : 'text-slate-600 hover:text-[#111827] hover:bg-slate-100/80'
+                  }`}
+                >
+                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                  <span>{tab.label}</span>
+                  <span
+                    className={`ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
+                      isActive
+                        ? 'bg-white/20 text-white'
+                        : 'bg-slate-200/70 text-slate-600'
+                    }`}
+                  >
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Selected Page Context Banner */}
+        {activeTab !== 'all' && (
+          <div className={`p-4 rounded-2xl border ${currentTabMeta.borderLight} ${currentTabMeta.bgLight} flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fadeIn`}>
+            <div className="flex items-start space-x-3">
+              <div className={`p-2 rounded-xl bg-white shadow-2xs ${currentTabMeta.color}`}>
+                {React.createElement(currentTabMeta.icon, { className: 'w-4 h-4' })}
+              </div>
+              <div>
+                <div className="flex items-center space-x-2">
+                  <h3 className="text-sm font-bold text-[#111827]">
+                    {currentTabMeta.name} Questions
+                  </h3>
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-white/80 border border-slate-200/60 text-slate-700">
+                    export const {currentTabMeta.constName}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-600 mt-0.5">
+                  {currentTabMeta.description} Live Route: <span className="font-semibold text-slate-800">{currentTabMeta.route}</span>
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => handleOpenAdd(activeTab)}
+              className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-slate-300 text-slate-800 text-xs font-semibold shadow-2xs hover:bg-slate-50 transition-all shrink-0 self-start sm:self-auto"
+            >
+              <Plus className="w-3.5 h-3.5 text-[#E30613]" />
+              <span>Add to {currentTabMeta.label}</span>
+            </button>
+          </div>
+        )}
+
+        {/* Secondary Filter & Search Toolbar */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <div className="relative flex-1 max-w-md">
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              placeholder={`Search ${activeTab === 'all' ? 'all' : currentTabMeta.label} questions, tags, or answers...`}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-white border border-slate-200/90 rounded-xl pl-8 pr-3 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#E30613] shadow-2xs"
+            />
+          </div>
+
+          <div className="flex items-center space-x-2 shrink-0">
+            <div className="flex items-center space-x-1 bg-white border border-slate-200/90 rounded-xl p-1 shadow-2xs text-xs">
+              <button
+                onClick={() => setStatusFilter('all')}
+                className={`px-2.5 py-1 rounded-lg font-medium transition-colors ${
+                  statusFilter === 'all' ? 'bg-[#111827] text-white' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                All Status
+              </button>
+              <button
+                onClick={() => setStatusFilter('active')}
+                className={`px-2.5 py-1 rounded-lg font-medium transition-colors ${
+                  statusFilter === 'active' ? 'bg-emerald-600 text-white' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Active Only
+              </button>
+              <button
+                onClick={() => setStatusFilter('inactive')}
+                className={`px-2.5 py-1 rounded-lg font-medium transition-colors ${
+                  statusFilter === 'inactive' ? 'bg-slate-700 text-white' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Draft / Inactive
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* FAQs LIST / TABLE (Editorial Style) */}
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-2xs overflow-hidden">
+          {loading ? (
+            <div className="p-16 text-center text-slate-400 text-xs">
+              Loading page questions...
+            </div>
+          ) : filteredItems.length === 0 ? (
+            <div className="p-16 text-center space-y-3">
+              <HelpCircle className="w-8 h-8 text-slate-300 mx-auto" />
+              <p className="text-xs text-slate-500 font-medium">
+                No questions found for the current filter.
+              </p>
+              <button
+                onClick={() => handleOpenAdd(activeTab)}
+                className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-[#E30613] text-white text-xs font-semibold shadow-xs"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Add First Question</span>
+              </button>
+            </div>
+          ) : (
+            <div className="divide-y divide-slate-100">
+              {filteredItems.map((item, idx) => {
+                const isExpanded = expandedId === item.id;
+                const pageMeta = getPageMeta(item.page);
+
+                return (
+                  <div
+                    key={item.id}
+                    className={`transition-colors ${isExpanded ? 'bg-slate-50/70' : 'hover:bg-slate-50/40'}`}
+                  >
+                    <div className="p-5 flex items-start justify-between gap-4">
+                      {/* Left: Expand button & Question Info */}
+                      <button
+                        onClick={() => setExpandedId(isExpanded ? null : item.id)}
+                        className="flex-1 text-left flex items-start space-x-3.5 group cursor-pointer"
+                      >
+                        <div className="mt-1 text-slate-400 group-hover:text-[#E30613] transition-colors shrink-0">
+                          {isExpanded ? (
+                            <ChevronUp className="w-4 h-4 text-[#E30613]" />
+                          ) : (
+                            <ChevronDown className="w-4 h-4" />
+                          )}
+                        </div>
+
+                        <div className="space-y-1.5 flex-1 min-w-0">
+                          {/* Badges bar */}
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-[10px] font-mono font-bold text-slate-400">
+                              #{item.order || idx + 1}
+                            </span>
+
+                            {/* Target Page Badge */}
+                            <span
+                              className={`inline-flex items-center space-x-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full border ${pageMeta.bgLight} ${pageMeta.color} ${pageMeta.borderLight}`}
+                            >
+                              <span>{pageMeta.label}</span>
+                            </span>
+
+                            {/* Topic / Tag Badge */}
+                            {item.tag && (
+                              <span className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">
+                                {item.tag}
+                              </span>
+                            )}
+
+                            {/* Active pill */}
+                            {item.active !== false ? (
+                              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                Live
+                              </span>
+                            ) : (
+                              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200">
+                                Draft
+                              </span>
+                            )}
+
+                            {/* Bilingual Indicator */}
+                            {item.question_nl && item.answer_nl && (
+                              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                                EN + NL
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Question Title */}
+                          <h4 className="text-sm sm:text-base font-bold text-[#111827] group-hover:text-[#E30613] transition-colors font-serif">
+                            {item.question}
+                          </h4>
+
+                          {/* Short preview if not expanded */}
+                          {!isExpanded && (
+                            <p className="text-xs text-slate-500 line-clamp-1 pr-6 font-normal">
+                              {item.answer}
+                            </p>
+                          )}
+                        </div>
+                      </button>
+
+                      {/* Right: Actions */}
+                      <div className="flex items-center space-x-1 shrink-0 pt-1">
+                        <button
+                          onClick={() => handleToggleActive(item)}
+                          className={`text-xs font-semibold px-2.5 py-1 rounded-lg transition-colors ${
+                            item.active !== false
+                              ? 'text-slate-500 hover:text-amber-600 hover:bg-amber-50'
+                              : 'text-emerald-600 hover:bg-emerald-50'
+                          }`}
+                          title={item.active !== false ? 'Deactivate Question' : 'Activate Question'}
+                        >
+                          {item.active !== false ? 'Deactivate' : 'Publish'}
+                        </button>
+
+                        <button
+                          onClick={() => handleOpenEdit(item)}
+                          className="inline-flex items-center space-x-1 text-xs font-semibold text-slate-700 hover:text-[#111827] px-2.5 py-1 rounded-lg hover:bg-slate-100 transition-colors"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                          <span>Edit</span>
+                        </button>
+
+                        <button
+                          onClick={() => handleDeleteFaq(item.id, item.question)}
+                          className="inline-flex items-center text-xs font-semibold text-rose-500 hover:text-rose-700 p-1.5 rounded-lg hover:bg-rose-50 transition-colors"
+                          title="Delete FAQ"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* EXPANDED ACCORDION VIEW */}
+                    {isExpanded && (
+                      <div className="px-6 pb-6 pt-2 border-t border-slate-100 space-y-4 animate-fadeIn">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {/* English Answer Box */}
+                          <div className="bg-white rounded-xl p-4 border border-slate-200/80 shadow-2xs space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider flex items-center space-x-1.5">
+                                <span className="w-2 h-2 rounded-full bg-blue-600 inline-block"></span>
+                                <span>English Answer (macee.com)</span>
+                              </span>
+                              <span className="text-[10px] text-slate-400 font-mono">Default</span>
+                            </div>
+                            <div className="text-xs text-slate-700 leading-relaxed whitespace-pre-wrap font-sans">
+                              {item.answer}
+                            </div>
+                          </div>
+
+                          {/* Dutch Translation Box */}
+                          <div className="bg-white rounded-xl p-4 border border-slate-200/80 shadow-2xs space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider flex items-center space-x-1.5">
+                                <span className="w-2 h-2 rounded-full bg-orange-600 inline-block"></span>
+                                <span>Nederlands (NL Vertaling)</span>
+                              </span>
+                              <span className="text-[10px] text-slate-400 font-mono">Dutch</span>
+                            </div>
+                            {item.question_nl && (
+                              <p className="text-xs font-bold text-[#111827] font-serif border-b border-slate-100 pb-1.5">
+                                {item.question_nl}
+                              </p>
+                            )}
+                            <div className="text-xs text-slate-700 leading-relaxed whitespace-pre-wrap font-sans">
+                              {item.answer_nl || item.answer}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Export & Routing Info Footer */}
+                        <div className="flex flex-wrap items-center justify-between text-[11px] text-slate-500 pt-2 border-t border-slate-100">
+                          <div className="flex items-center space-x-3">
+                            <span>
+                              Page: <strong className="text-slate-800">{item.pageName}</strong>
+                            </span>
+                            <span>•</span>
+                            <span>
+                              Route: <strong className="text-slate-800">{pageMeta.route}</strong>
+                            </span>
+                            <span>•</span>
+                            <span>
+                              Constant: <strong className="text-slate-800 font-mono">{pageMeta.constName}</strong>
+                            </span>
+                          </div>
+
+                          <button
+                            onClick={() => handleOpenEdit(item)}
+                            className="text-xs font-semibold text-[#E30613] hover:underline"
+                          >
+                            Edit this question & translations →
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ADD / EDIT MODAL */}
+      {isModalOpen && (
+        <Modal
+          isOpen={true}
+          onClose={() => setIsModalOpen(false)}
+          title={editingItem ? 'Edit FAQ Question' : 'Add New FAQ Question'}
+          subtitle={`Assign to a specific page on macee.com with instant live synchronization.`}
+          maxWidth="2xl"
+        >
+          <form onSubmit={handleSaveFaq} className="space-y-4">
+            {/* Page Destination & Status */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Target Website Page *
+                </label>
+                <select
+                  value={formPage}
+                  onChange={(e) => {
+                    const newPage = e.target.value;
+                    setFormPage(newPage);
+                    // Autofill suggested tag
+                    if (SUGGESTED_TAGS_BY_PAGE[newPage]?.[0]) {
+                      setFormTag(SUGGESTED_TAGS_BY_PAGE[newPage][0]);
+                    }
+                  }}
+                  className="w-full p-2.5 text-xs rounded-xl border border-slate-200 bg-white focus:outline-none focus:border-[#E30613] font-medium"
+                >
+                  <option value="home">Home Page (HOME_FAQS)</option>
+                  <option value="about">About Page (ABOUT_FAQS)</option>
+                  <option value="clients">Clients & Hiring Managers (CLIENTS_FAQS)</option>
+                  <option value="professionals">Professionals & Expats (PROFESSIONALS_FAQS)</option>
+                  <option value="projects">Projects & Jobs (PROJECTS_FAQS)</option>
+                  <option value="compliance">Compliance & Legal (COMPLIANCE_FAQS)</option>
+                  <option value="contact">Contact & Desk (CONTACT_FAQS)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Display Order
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  value={formOrder}
+                  onChange={(e) => setFormOrder(Number(e.target.value))}
+                  className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613]"
+                />
+              </div>
+            </div>
+
+            {/* Tag / Category Topic */}
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-xs font-bold text-slate-700">
+                  Topic Tag / Keyword
+                </label>
+                <span className="text-[10px] text-slate-400">Pill badge shown on cards</span>
+              </div>
+              <input
+                type="text"
+                value={formTag}
+                onChange={(e) => setFormTag(e.target.value)}
+                placeholder="e.g. Turnkey Workforce Management, SNA NEN 4400-1..."
+                className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613]"
+              />
+
+              {/* Tag suggestions */}
+              {SUGGESTED_TAGS_BY_PAGE[formPage] && (
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {SUGGESTED_TAGS_BY_PAGE[formPage].map((suggested) => (
+                    <button
+                      key={suggested}
+                      type="button"
+                      onClick={() => setFormTag(suggested)}
+                      className={`text-[10px] px-2 py-0.5 rounded-md border transition-colors ${
+                        formTag === suggested
+                          ? 'bg-[#111827] text-white border-[#111827]'
+                          : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                      }`}
+                    >
+                      {suggested}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Language Switcher Tabs */}
+            <div className="pt-2">
+              <div className="flex items-center space-x-2 border-b border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => setModalTab('en')}
+                  className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition-colors ${
+                    modalTab === 'en'
+                      ? 'border-[#E30613] text-[#111827]'
+                      : 'border-transparent text-slate-400 hover:text-slate-700'
+                  }`}
+                >
+                  🇬🇧 English Content (Default)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setModalTab('nl')}
+                  className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition-colors ${
+                    modalTab === 'nl'
+                      ? 'border-[#E30613] text-[#111827]'
+                      : 'border-transparent text-slate-400 hover:text-slate-700'
+                  }`}
+                >
+                  🇳🇱 Dutch Translation (Nederlands)
+                </button>
+              </div>
+            </div>
+
+            {/* English Content Fields */}
+            {modalTab === 'en' && (
+              <div className="space-y-3 pt-1 animate-fadeIn">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    English Question *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formQuestion}
+                    onChange={(e) => setFormQuestion(e.target.value)}
+                    placeholder="e.g. How does Macee guarantee 100% compliance with Dutch labor regulations?"
+                    className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613] font-medium"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    English Answer *
+                  </label>
+                  <textarea
+                    required
+                    rows={5}
+                    value={formAnswer}
+                    onChange={(e) => setFormAnswer(e.target.value)}
+                    placeholder="Detailed explanation with bullet points if applicable..."
+                    className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613] leading-relaxed font-sans"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Dutch Content Fields */}
+            {modalTab === 'nl' && (
+              <div className="space-y-3 pt-1 animate-fadeIn">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Dutch Question (Vraag in het Nederlands)
+                  </label>
+                  <input
+                    type="text"
+                    value={formQuestionNl}
+                    onChange={(e) => setFormQuestionNl(e.target.value)}
+                    placeholder="bijv. Hoe garandeert Macee 100% compliance met de Nederlandse arbeidswetgeving?"
+                    className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613] font-medium"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Dutch Answer (Antwoord in het Nederlands)
+                  </label>
+                  <textarea
+                    rows={5}
+                    value={formAnswerNl}
+                    onChange={(e) => setFormAnswerNl(e.target.value)}
+                    placeholder="Gedetailleerd antwoord voor Nederlandstalige bezoekers..."
+                    className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613] leading-relaxed font-sans"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Active Checkbox */}
+            <div className="flex items-center space-x-2 pt-1">
+              <input
+                type="checkbox"
+                id="faq-active"
+                checked={formActive}
+                onChange={(e) => setFormActive(e.target.checked)}
+                className="rounded text-[#E30613] focus:ring-[#E30613] w-4 h-4 cursor-pointer"
+              />
+              <label htmlFor="faq-active" className="text-xs text-slate-700 font-medium cursor-pointer">
+                Publish immediately on live website (active status)
+              </label>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+              <span className="text-[11px] text-slate-400">
+                Exports to <strong className="text-slate-600 font-mono">pageFaqs.ts</strong> and <strong className="text-slate-600 font-mono">allFaqs.ts</strong>
+              </span>
+
+              <div className="flex items-center space-x-2">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="px-5 py-2.5 rounded-xl bg-[#E30613] hover:bg-[#b80510] text-white text-xs font-semibold shadow-xs transition-all flex items-center space-x-1.5"
+                >
+                  {saving ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      <span>Saving & Syncing...</span>
+                    </>
+                  ) : (
+                    <span>{editingItem ? 'Update & Sync FAQ' : 'Create & Sync FAQ'}</span>
+                  )}
+                </button>
+              </div>
+            </div>
+          </form>
+        </Modal>
+      )}
+    </div>
+  );
+}

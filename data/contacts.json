@@ -1,0 +1,72 @@
+﻿[
+    {
+        "id":  "lead-1794987727816",
+        "firstName":  "Rajesh",
+        "lastName":  "Kumar",
+        "fullName":  "Rajesh Kumar",
+        "email":  "rajesh@example.com",
+        "phone":  "+31612345678",
+        "topic":  "HSM Visa",
+        "company":  "Fintech BV",
+        "message":  "Need senior developers",
+        "status":  "new",
+        "submittedAt":  "2026-11-18T07:42:07.816Z",
+        "notes":  "Source: Macee Website Form (11/18/2026, 1:12:07 PM)"
+    },
+    {
+        "id":  "lead-1001",
+        "firstName":  "Lucas",
+        "lastName":  "van Dijk",
+        "fullName":  "Lucas van Dijk",
+        "email":  "l.vandijk@asml-supplier.nl",
+        "phone":  "+31 (0)6 12 34 56 78",
+        "topic":  "Hiring External Specialists",
+        "company":  "TechVanguard BV",
+        "message":  "We need 3 Senior Full-Stack .NET \u0026 Azure developers for an urgent high-tech manufacturing project in Eindhoven. Can you provide profiles with NEN 4400-1 compliance within 72 hours?",
+        "status":  "new",
+        "submittedAt":  "2026-11-18T10:15:00.000Z",
+        "notes":  "Urgent enterprise requirement. Requires 30% ruling assistance for one Polish developer."
+    },
+    {
+        "id":  "lead-1002",
+        "firstName":  "Siddharth",
+        "lastName":  "Sharma",
+        "fullName":  "Siddharth Sharma",
+        "email":  "siddharth.cloud@gmail.com",
+        "phone":  "+31 (0)6 98 76 54 32",
+        "topic":  "HSM Visa \u0026 Expat Sponsorship",
+        "company":  "Independent Contractor",
+        "message":  "I am a Senior DevOps \u0026 Kubernetes Architect currently on an Indian passport with an offer in Amsterdam. Looking for IND Recognised Sponsorship and payroll management through Macee.",
+        "status":  "in-progress",
+        "submittedAt":  "2026-11-17T16:40:00.000Z",
+        "notes":  "Reviewed CV. Checked IND qualification criteria. Follow-up call scheduled with Nicky."
+    },
+    {
+        "id":  "lead-1003",
+        "firstName":  "Sophie",
+        "lastName":  "de Boer",
+        "fullName":  "Sophie de Boer",
+        "email":  "sophie@fintech-solutions.eu",
+        "phone":  "+31 (0)20 890 1234",
+        "topic":  "SNA NEN 4400-1 Compliance",
+        "company":  "Fintech Global Payments",
+        "message":  "We are preparing for our annual DNB compliance audit and would like to review our ZZP model agreements against Wet DBA guidelines.",
+        "status":  "contacted",
+        "submittedAt":  "2026-11-16T11:20:00.000Z",
+        "notes":  "Intro email sent with Macee Compliance Blueprint."
+    },
+    {
+        "id":  "lead-1004",
+        "firstName":  "Mark",
+        "lastName":  "Janssen",
+        "fullName":  "Mark Janssen",
+        "email":  "m.janssen@energymobility.nl",
+        "phone":  "+31 (0)6 55 44 33 22",
+        "topic":  "General Question",
+        "company":  "Energy Mobility Group",
+        "message":  "Interested in Macee\u0027s Managed Service Provider (MSP) and External Hiring Desk solutions for 45 contractors.",
+        "status":  "closed",
+        "submittedAt":  "2026-11-14T09:05:00.000Z",
+        "notes":  "Contract signed. Onboarding started."
+    }
+]

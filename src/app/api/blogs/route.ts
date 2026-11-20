@@ -1,0 +1,155 @@
+import { NextResponse } from 'next/server';
+import { readDataFile, writeDataFile } from '@/lib/storage';
+import { syncBlogsToWebsite } from '@/lib/syncEngine';
+
+export interface BlogPost {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  category: string;
+  author: string;
+  coverImage?: string;
+  tags: string[];
+  status: 'published' | 'draft';
+  readTime: string;
+  publishedAt: string;
+}
+
+function generateSlug(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-');
+}
+
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const status = searchParams.get('status');
+  const category = searchParams.get('category');
+  const search = searchParams.get('search')?.toLowerCase() || '';
+
+  let blogs = readDataFile<BlogPost[]>('blogs.json', []);
+
+  if (status && status !== 'all') {
+    blogs = blogs.filter((b) => b.status === status);
+  }
+
+  if (category && category !== 'all') {
+    blogs = blogs.filter((b) => b.category.toLowerCase() === category.toLowerCase());
+  }
+
+  if (search) {
+    blogs = blogs.filter(
+      (b) =>
+        b.title.toLowerCase().includes(search) ||
+        b.excerpt.toLowerCase().includes(search) ||
+        b.author.toLowerCase().includes(search) ||
+        b.tags.some((t) => t.toLowerCase().includes(search))
+    );
+  }
+
+  blogs.sort(
+    (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+  );
+
+  return NextResponse.json({ blogs });
+}
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    const blogs = readDataFile<BlogPost[]>('blogs.json', []);
+
+    const title = body.title || 'Untitled Post';
+    const slug = body.slug ? generateSlug(body.slug) : generateSlug(title);
+
+    const newBlog: BlogPost = {
+      id: `blog-${Date.now()}`,
+      slug,
+      title,
+      excerpt: body.excerpt || '',
+      content: body.content || '',
+      category: body.category || 'General',
+      author: body.author || 'Macee Editorial',
+      coverImage: body.coverImage || '/uploads/people-working-dsk.jpg',
+      tags: Array.isArray(body.tags)
+        ? body.tags
+        : (body.tags || '')
+            .split(',')
+            .map((t: string) => t.trim())
+            .filter(Boolean),
+      status: body.status === 'published' ? 'published' : 'draft',
+      readTime: body.readTime || '4 min read',
+      publishedAt: body.publishedAt || new Date().toISOString(),
+    };
+
+    blogs.unshift(newBlog);
+    writeDataFile('blogs.json', blogs);
+
+    // Auto-sync with Macee website
+    syncBlogsToWebsite(blogs);
+
+    return NextResponse.json({ success: true, blog: newBlog }, { status: 201 });
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed to create blog post' }, { status: 500 });
+  }
+}
+
+export async function PUT(request: Request) {
+  try {
+    const body = await request.json();
+    const { id } = body;
+    if (!id) return NextResponse.json({ error: 'Missing ID' }, { status: 400 });
+
+    const blogs = readDataFile<BlogPost[]>('blogs.json', []);
+    const index = blogs.findIndex((b) => b.id === id);
+
+    if (index === -1) {
+      return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
+    }
+
+    const updatedTags = Array.isArray(body.tags)
+      ? body.tags
+      : typeof body.tags === 'string'
+      ? body.tags.split(',').map((t: string) => t.trim()).filter(Boolean)
+      : blogs[index].tags;
+
+    blogs[index] = {
+      ...blogs[index],
+      ...body,
+      tags: updatedTags,
+      slug: body.slug ? generateSlug(body.slug) : blogs[index].slug,
+    };
+
+    writeDataFile('blogs.json', blogs);
+
+    // Auto-sync with Macee website
+    syncBlogsToWebsite(blogs);
+
+    return NextResponse.json({ success: true, blog: blogs[index] });
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed to update blog' }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    if (!id) return NextResponse.json({ error: 'Missing ID' }, { status: 400 });
+
+    let blogs = readDataFile<BlogPost[]>('blogs.json', []);
+    blogs = blogs.filter((b) => b.id !== id);
+    writeDataFile('blogs.json', blogs);
+
+    // Auto-sync with Macee website
+    syncBlogsToWebsite(blogs);
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed to delete blog' }, { status: 500 });
+  }
+}
