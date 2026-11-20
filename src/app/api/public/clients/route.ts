@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server';
-import { readDataFile } from '@/lib/storage';
+import { getStoredData } from '@/lib/storage';
+
+export const dynamic = 'force-dynamic';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
 export async function OPTIONS() {
@@ -11,6 +14,10 @@ export async function OPTIONS() {
 }
 
 export async function GET() {
-  const clients = readDataFile<any>('clients.json', {});
-  return NextResponse.json({ clients }, { headers: corsHeaders });
+  try {
+    const clients = await getStoredData<any>('clients', {});
+    return NextResponse.json({ clients }, { headers: corsHeaders });
+  } catch (err) {
+    return NextResponse.json({ clients: {} }, { status: 500, headers: corsHeaders });
+  }
 }

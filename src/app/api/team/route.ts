@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { readDataFile, writeDataFile } from '@/lib/storage';
+import { getStoredData, saveStoredData } from '@/lib/storage';
 import { syncTeamToWebsite } from '@/lib/syncEngine';
 
 export interface TeamMember {
@@ -16,15 +16,19 @@ export interface TeamMember {
 }
 
 export async function GET() {
-  const team = readDataFile<TeamMember[]>('team.json', []);
-  team.sort((a, b) => (a.order || 99) - (b.order || 99));
-  return NextResponse.json({ team });
+  try {
+    const team = await getStoredData<TeamMember[]>('team', []);
+    team.sort((a, b) => (a.order || 99) - (b.order || 99));
+    return NextResponse.json({ team });
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed to fetch team' }, { status: 500 });
+  }
 }
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const team = readDataFile<TeamMember[]>('team.json', []);
+    const team = await getStoredData<TeamMember[]>('team', []);
 
     const newMember: TeamMember = {
       id: `team-${Date.now()}`,
@@ -40,10 +44,12 @@ export async function POST(request: Request) {
     };
 
     team.push(newMember);
-    writeDataFile('team.json', team);
+    await saveStoredData('team', team);
 
-    // Auto-sync with Macee website
-    syncTeamToWebsite(team);
+    // Auto-sync with local Macee website if in local dev
+    try {
+      syncTeamToWebsite(team);
+    } catch { }
 
     return NextResponse.json({ success: true, member: newMember }, { status: 201 });
   } catch (error) {
@@ -57,7 +63,7 @@ export async function PUT(request: Request) {
     const { id } = body;
     if (!id) return NextResponse.json({ error: 'Missing ID' }, { status: 400 });
 
-    const team = readDataFile<TeamMember[]>('team.json', []);
+    const team = await getStoredData<TeamMember[]>('team', []);
     const index = team.findIndex((m) => m.id === id);
 
     if (index === -1) {
@@ -69,10 +75,12 @@ export async function PUT(request: Request) {
       ...body,
     };
 
-    writeDataFile('team.json', team);
+    await saveStoredData('team', team);
 
-    // Auto-sync with Macee website
-    syncTeamToWebsite(team);
+    // Auto-sync with local Macee website if in local dev
+    try {
+      syncTeamToWebsite(team);
+    } catch { }
 
     return NextResponse.json({ success: true, member: team[index] });
   } catch (error) {
@@ -86,12 +94,14 @@ export async function DELETE(request: Request) {
     const id = searchParams.get('id');
     if (!id) return NextResponse.json({ error: 'Missing ID' }, { status: 400 });
 
-    let team = readDataFile<TeamMember[]>('team.json', []);
+    let team = await getStoredData<TeamMember[]>('team', []);
     team = team.filter((m) => m.id !== id);
-    writeDataFile('team.json', team);
+    await saveStoredData('team', team);
 
-    // Auto-sync with Macee website
-    syncTeamToWebsite(team);
+    // Auto-sync with local Macee website if in local dev
+    try {
+      syncTeamToWebsite(team);
+    } catch { }
 
     return NextResponse.json({ success: true });
   } catch (error) {

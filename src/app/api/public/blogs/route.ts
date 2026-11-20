@@ -1,29 +1,24 @@
 import { NextResponse } from 'next/server';
-import { readDataFile } from '@/lib/storage';
+import { getStoredData } from '@/lib/storage';
+
+export const dynamic = 'force-dynamic';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
 export async function OPTIONS() {
   return NextResponse.json({}, { headers: corsHeaders });
 }
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const slug = searchParams.get('slug');
-
-  const blogs = readDataFile<any[]>('blogs.json', []);
-  const published = blogs.filter((b) => b.status === 'published');
-
-  if (slug) {
-    const post = published.find((b) => b.slug === slug);
-    if (!post) {
-      return NextResponse.json({ error: 'Post not found' }, { status: 404, headers: corsHeaders });
+    export async function GET() {
+      try {
+        const blogs = await getStoredData<any[]>('blogs', []);
+        const published = blogs.filter((b) => b.status === 'published');
+        return NextResponse.json({ blogs: published }, { headers: corsHeaders });
+      } catch (err) {
+        return NextResponse.json({ blogs: [] }, { status: 500, headers: corsHeaders });
+      }
     }
-    return NextResponse.json({ blog: post }, { headers: corsHeaders });
-  }
-
-  return NextResponse.json({ blogs: published }, { headers: corsHeaders });
-}

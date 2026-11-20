@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
-import { readDataFile, writeDataFile } from '@/lib/storage';
+import { getStoredData, saveStoredData } from '@/lib/storage';
 import { ContactSubmission } from '@/app/api/contacts/route';
+
+export const dynamic = 'force-dynamic';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -23,7 +25,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const contacts = readDataFile<ContactSubmission[]>('contacts.json', []);
+    const contacts = await getStoredData<ContactSubmission[]>('contacts', []);
 
     const firstName = body.firstName || (body.name ? body.name.split(' ')[0] : 'Visitor');
     const lastName = body.lastName || (body.name ? body.name.split(' ').slice(1).join(' ') : '');
@@ -45,20 +47,19 @@ export async function POST(request: Request) {
     };
 
     contacts.unshift(newContact);
-    writeDataFile('contacts.json', contacts);
+    await saveStoredData('contacts', contacts);
 
     return NextResponse.json(
       {
         success: true,
-        message: 'Inquiry successfully received by Macee CRM',
-        leadId: newContact.id,
+        message: 'Your inquiry has been successfully delivered to our team desk.',
+        id: newContact.id,
       },
       { status: 201, headers: corsHeaders }
     );
   } catch (error) {
-    console.error('Error handling public contact POST:', error);
     return NextResponse.json(
-      { error: 'Server error processing submission' },
+      { error: 'Failed to process inquiry' },
       { status: 500, headers: corsHeaders }
     );
   }

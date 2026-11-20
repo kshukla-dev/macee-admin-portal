@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server';
-import { readDataFile } from '@/lib/storage';
+import { getStoredData } from '@/lib/storage';
+
+export const dynamic = 'force-dynamic';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
 export async function OPTIONS() {
@@ -11,10 +14,14 @@ export async function OPTIONS() {
 }
 
 export async function GET() {
-  const team = readDataFile<any[]>('team.json', []);
-  const activeMembers = team
-    .filter((m) => m.active !== false)
-    .sort((a, b) => (a.order || 99) - (b.order || 99));
+  try {
+    const team = await getStoredData<any[]>('team', []);
+    const activeMembers = team
+      .filter((m) => m.active !== false)
+      .sort((a, b) => (a.order || 99) - (b.order || 99));
 
-  return NextResponse.json({ team: activeMembers }, { headers: corsHeaders });
+    return NextResponse.json({ team: activeMembers }, { headers: corsHeaders });
+  } catch (err) {
+    return NextResponse.json({ team: [] }, { status: 500, headers: corsHeaders });
+  }
 }

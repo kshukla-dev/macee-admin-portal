@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { readDataFile, writeDataFile } from '@/lib/storage';
+import { getStoredData, saveStoredData } from '@/lib/storage';
 import { syncFaqsToWebsite } from '@/lib/syncEngine';
 
 export interface FaqItem {
@@ -42,49 +42,53 @@ export interface FaqData {
 }
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const page = searchParams.get('page');
-  const categoryId = searchParams.get('categoryId');
-  const search = searchParams.get('search')?.toLowerCase() || '';
+  try {
+    const { searchParams } = new URL(request.url);
+    const page = searchParams.get('page');
+    const categoryId = searchParams.get('categoryId');
+    const search = searchParams.get('search')?.toLowerCase() || '';
 
-  const data = readDataFile<FaqData>('faqs.json', { pages: [], categories: [], items: [] });
-  let items = data.items || [];
+    const data = await getStoredData<FaqData>('faqs', { pages: [], categories: [], items: [] });
+    let items = data.items || [];
 
-  if (page && page !== 'all') {
-    items = items.filter((f) => f.page === page || (f as any).categoryKey === page);
+    if (page && page !== 'all') {
+      items = items.filter((f) => f.page === page || (f as any).categoryKey === page);
+    }
+
+    if (categoryId && categoryId !== 'all') {
+      items = items.filter((f) => String(f.categoryId) === categoryId);
+    }
+
+    if (search) {
+      items = items.filter(
+        (f) =>
+          f.question.toLowerCase().includes(search) ||
+          f.answer.toLowerCase().includes(search) ||
+          (f.question_nl && f.question_nl.toLowerCase().includes(search)) ||
+          (f.answer_nl && f.answer_nl.toLowerCase().includes(search)) ||
+          (f.tag && f.tag.toLowerCase().includes(search)) ||
+          (f.pageName && f.pageName.toLowerCase().includes(search)) ||
+          (f.categoryName && f.categoryName.toLowerCase().includes(search))
+      );
+    }
+
+    items.sort((a, b) => (a.order || 99) - (b.order || 99));
+
+    return NextResponse.json({
+      pages: data.pages || [],
+      categories: data.categories || [],
+      items,
+      total: (data.items || []).length,
+    });
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed to fetch FAQs' }, { status: 500 });
   }
-
-  if (categoryId && categoryId !== 'all') {
-    items = items.filter((f) => String(f.categoryId) === categoryId);
-  }
-
-  if (search) {
-    items = items.filter(
-      (f) =>
-        f.question.toLowerCase().includes(search) ||
-        f.answer.toLowerCase().includes(search) ||
-        (f.question_nl && f.question_nl.toLowerCase().includes(search)) ||
-        (f.answer_nl && f.answer_nl.toLowerCase().includes(search)) ||
-        (f.tag && f.tag.toLowerCase().includes(search)) ||
-        (f.pageName && f.pageName.toLowerCase().includes(search)) ||
-        (f.categoryName && f.categoryName.toLowerCase().includes(search))
-    );
-  }
-
-  items.sort((a, b) => (a.order || 99) - (b.order || 99));
-
-  return NextResponse.json({
-    pages: data.pages || [],
-    categories: data.categories || [],
-    items,
-    total: (data.items || []).length,
-  });
 }
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const data = readDataFile<FaqData>('faqs.json', { pages: [], categories: [], items: [] });
+    const data = await getStoredData<FaqData>('faqs', { pages: [], categories: [], items: [] });
 
     const pageKey = body.page || 'home';
     const pageMeta = (data.pages || []).find((p) => p.id === pageKey) || {
@@ -113,10 +117,12 @@ export async function POST(request: Request) {
 
     if (!data.items) data.items = [];
     data.items.push(newItem);
-    writeDataFile('faqs.json', data);
+    await saveStoredData('faqs', data);
 
-    // Auto-sync with Macee website
-    syncFaqsToWebsite(data);
+    // Auto-sync with local Macee website if in local dev
+    try {
+      syncFaqsToWebsite(data);
+    } catch { }
 
     return NextResponse.json({ success: true, item: newItem }, { status: 201 });
   } catch (error) {
@@ -130,7 +136,7 @@ export async function PUT(request: Request) {
     const { id } = body;
     if (!id) return NextResponse.json({ error: 'Missing ID' }, { status: 400 });
 
-    const data = readDataFile<FaqData>('faqs.json', { pages: [], categories: [], items: [] });
+    const data = await getStoredData<FaqData>('faqs', { pages: [], categories: [], items: [] });
     const index = (data.items || []).findIndex((f) => f.id === id);
 
     if (index === -1) {
@@ -154,10 +160,12 @@ export async function PUT(request: Request) {
     }
 
     data.items[index] = updatedItem;
-    writeDataFile('faqs.json', data);
+    await saveStoredData('faqs', data);
 
-    // Auto-sync with Macee website
-    syncFaqsToWebsite(data);
+    // Auto-sync with local Macee website if in local dev
+    try {
+      syncFaqsToWebsite(data);
+    } catch { }
 
     return NextResponse.json({ success: true, item: data.items[index] });
   } catch (error) {
@@ -171,12 +179,14 @@ export async function DELETE(request: Request) {
     const id = searchParams.get('id');
     if (!id) return NextResponse.json({ error: 'Missing ID' }, { status: 400 });
 
-    const data = readDataFile<FaqData>('faqs.json', { pages: [], categories: [], items: [] });
+    const data = await getStoredData<FaqData>('faqs', { pages: [], categories: [], items: [] });
     data.items = (data.items || []).filter((f) => f.id !== id);
-    writeDataFile('faqs.json', data);
+    await saveStoredData('faqs', data);
 
-    // Auto-sync with Macee website
-    syncFaqsToWebsite(data);
+    // Auto-sync with local Macee website if in local dev
+    try {
+      syncFaqsToWebsite(data);
+    } catch { }
 
     return NextResponse.json({ success: true });
   } catch (error) {
