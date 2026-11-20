@@ -206,7 +206,7 @@ export default function TeamManagementPage() {
               <p className="text-xs font-medium text-slate-500">Total Specialists</p>
               <div className="flex items-baseline space-x-2 mt-0.5">
                 <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                  {team.length > 0 ? team.length : 32}
+                  {team.length > 0 ? team.length : 0}
                 </span>
                 <span className="text-xs font-semibold text-emerald-600">Active</span>
               </div>
@@ -221,7 +221,7 @@ export default function TeamManagementPage() {
               <p className="text-xs font-medium text-slate-500">Public on Website</p>
               <div className="mt-0.5">
                 <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                  {team.length > 0 ? team.length : 30}
+                  {team.length > 0 ? team.length : 0}
                 </span>
               </div>
             </div>
@@ -265,8 +265,8 @@ export default function TeamManagementPage() {
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`pb-3 transition-colors relative ${isActive
-                    ? 'font-bold text-[#111827] border-b-2 border-[#E30613]'
-                    : 'text-slate-500 hover:text-slate-800'
+                  ? 'font-bold text-[#111827] border-b-2 border-[#E30613]'
+                  : 'text-slate-500 hover:text-slate-800'
                   }`}
               >
                 {tab}

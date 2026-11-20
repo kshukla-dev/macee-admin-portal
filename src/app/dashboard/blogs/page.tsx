@@ -208,8 +208,8 @@ export default function BlogManagementPage() {
     }
   };
 
-  const publishedCount = blogs.filter((b) => b.status === 'published').length || 18;
-  const draftCount = blogs.filter((b) => b.status === 'draft').length || 2;
+  const publishedCount = blogs.filter((b) => b.status === 'published').length || 0;
+  const draftCount = blogs.filter((b) => b.status === 'draft').length || 0;
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
@@ -243,7 +243,7 @@ export default function BlogManagementPage() {
               <p className="text-xs font-medium text-slate-500">Total Articles</p>
               <div className="flex items-baseline space-x-2 mt-0.5">
                 <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                  {blogs.length > 0 ? blogs.length : 20}
+                  {blogs.length > 0 ? blogs.length : 0}
                 </span>
                 <span className="text-xs font-semibold text-emerald-600">Active</span>
               </div>
@@ -305,11 +305,10 @@ export default function BlogManagementPage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`pb-3 transition-colors relative ${
-                  isActive
+                className={`pb-3 transition-colors relative ${isActive
                     ? 'font-bold text-[#111827] border-b-2 border-[#E30613]'
                     : 'text-slate-500 hover:text-slate-800'
-                }`}
+                  }`}
               >
                 {tab.label}
               </button>

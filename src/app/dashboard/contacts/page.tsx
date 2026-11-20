@@ -214,10 +214,10 @@ export default function ContactsManagementPage() {
   }, [contacts, activeTab, selectedService, selectedStatusFilter, searchQuery]);
 
   // Metric counts
-  const totalCount = contacts.length > 0 ? contacts.length : 248;
-  const newCount = contacts.filter((c) => c.status === 'new').length || 24;
-  const inProgressCount = contacts.filter((c) => c.status === 'in_progress').length || 68;
-  const convertedCount = contacts.filter((c) => c.status === 'converted').length || 156;
+  const totalCount = contacts.length > 0 ? contacts.length : 0;
+  const newCount = contacts.filter((c) => c.status === 'new').length || 0;
+  const inProgressCount = contacts.filter((c) => c.status === 'in_progress').length || 0;
+  const convertedCount = contacts.filter((c) => c.status === 'converted').length || 0;
 
   // Selection handlers
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -403,9 +403,6 @@ export default function ContactsManagementPage() {
                 <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
                   {totalCount}
                 </span>
-                <span className="text-xs font-semibold text-emerald-600">
-                  ↑ +12.5%
-                </span>
               </div>
             </div>
           </div>
@@ -472,8 +469,8 @@ export default function ContactsManagementPage() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`pb-3 transition-colors relative ${isActive
-                    ? 'font-bold text-[#111827] border-b-2 border-[#E30613]'
-                    : 'text-slate-500 hover:text-slate-800'
+                  ? 'font-bold text-[#111827] border-b-2 border-[#E30613]'
+                  : 'text-slate-500 hover:text-slate-800'
                   }`}
               >
                 {tab.label}
@@ -786,8 +783,8 @@ export default function ContactsManagementPage() {
                   key={page}
                   onClick={() => setCurrentPage(page)}
                   className={`w-7 h-7 rounded-lg text-xs font-semibold transition-all ${currentPage === page
-                      ? 'bg-[#0E1726] text-white shadow-2xs'
-                      : 'border border-slate-200 hover:bg-slate-50 text-slate-700'
+                    ? 'bg-[#0E1726] text-white shadow-2xs'
+                    : 'border border-slate-200 hover:bg-slate-50 text-slate-700'
                     }`}
                 >
                   {page}
@@ -831,8 +828,8 @@ export default function ContactsManagementPage() {
                 <button
                   onClick={() => handleStatusChange(selectedContact.id, 'new')}
                   className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${selectedContact.status === 'new'
-                      ? 'bg-sky-600 text-white'
-                      : 'bg-white border text-slate-700 hover:bg-slate-100'
+                    ? 'bg-sky-600 text-white'
+                    : 'bg-white border text-slate-700 hover:bg-slate-100'
                     }`}
                 >
                   New
@@ -840,8 +837,8 @@ export default function ContactsManagementPage() {
                 <button
                   onClick={() => handleStatusChange(selectedContact.id, 'in_progress')}
                   className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${selectedContact.status === 'in_progress'
-                      ? 'bg-amber-500 text-white'
-                      : 'bg-white border text-slate-700 hover:bg-slate-100'
+                    ? 'bg-amber-500 text-white'
+                    : 'bg-white border text-slate-700 hover:bg-slate-100'
                     }`}
                 >
                   In Progress
@@ -849,8 +846,8 @@ export default function ContactsManagementPage() {
                 <button
                   onClick={() => handleStatusChange(selectedContact.id, 'converted')}
                   className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${selectedContact.status === 'converted'
-                      ? 'bg-emerald-600 text-white'
-                      : 'bg-white border text-slate-700 hover:bg-slate-100'
+                    ? 'bg-emerald-600 text-white'
+                    : 'bg-white border text-slate-700 hover:bg-slate-100'
                     }`}
                 >
                   Converted

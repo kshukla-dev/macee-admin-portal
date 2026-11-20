@@ -230,7 +230,7 @@ export default function ClientsManagementPage() {
               <p className="text-xs font-medium text-slate-500">Accreditations</p>
               <div className="mt-0.5">
                 <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                  {certificationsList.length || 4}
+                  {certificationsList.length || 0}
                 </span>
               </div>
             </div>
@@ -244,7 +244,7 @@ export default function ClientsManagementPage() {
               <p className="text-xs font-medium text-slate-500">Sectors Supported</p>
               <div className="mt-0.5">
                 <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                  {industryTags.length || 10}
+                  {industryTags.length || 0}
                 </span>
               </div>
             </div>
@@ -278,8 +278,8 @@ export default function ClientsManagementPage() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`pb-3 transition-colors relative ${isActive
-                    ? 'font-bold text-[#111827] border-b-2 border-[#E30613]'
-                    : 'text-slate-500 hover:text-slate-800'
+                  ? 'font-bold text-[#111827] border-b-2 border-[#E30613]'
+                  : 'text-slate-500 hover:text-slate-800'
                   }`}
               >
                 {tab.label}
