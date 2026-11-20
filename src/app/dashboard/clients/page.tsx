@@ -121,12 +121,16 @@ export default function ClientsManagementPage() {
   const handleSaveCert = (e: React.FormEvent) => {
     e.preventDefault();
     const updatedCerts = [...certificationsList];
+    const existingCert = editingCertIndex !== null ? updatedCerts[editingCertIndex] : null;
+
     const newCert = {
+      id: existingCert?.id || `cert-${Date.now()}`,
       tag: certTag,
       title: certTitle,
       text: certText,
       image: certImage,
       accent: certAccent,
+      order: existingCert?.order || (updatedCerts.length + 1),
     };
 
     if (editingCertIndex !== null) {
@@ -321,16 +325,21 @@ export default function ClientsManagementPage() {
                       {/* Top Header: Tag, Logo & Actions */}
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex items-center space-x-3 min-w-0">
-                          {imgSrc && (
-                            <div className="h-12 w-20 bg-slate-50 border border-slate-200/80 rounded-xl p-1.5 flex items-center justify-center shrink-0 shadow-2xs">
+                          {imgSrc ? (
+                            <div className="h-12 w-20 bg-slate-50 border border-slate-200/80 rounded-xl p-1.5 flex items-center justify-center shrink-0 shadow-2xs overflow-hidden">
                               <img
                                 src={imgSrc}
                                 alt={cert.title}
                                 className="max-h-full max-w-full object-contain"
                                 onError={(e) => {
-                                  (e.currentTarget as HTMLElement).style.display = 'none';
+                                  e.currentTarget.onerror = null;
+                                  e.currentTarget.src = '/uploads/favicon-96x96.png';
                                 }}
                               />
+                            </div>
+                          ) : (
+                            <div className="h-12 w-12 bg-slate-100 border border-slate-200 rounded-xl flex items-center justify-center shrink-0 text-slate-400">
+                              <Award className="w-5 h-5 text-slate-400" />
                             </div>
                           )}
                           <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-[#F0F3FA] text-[#36427D] truncate">
