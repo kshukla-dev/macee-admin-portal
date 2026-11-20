@@ -11,8 +11,10 @@ import {
   User,
   LogOut,
   RefreshCw,
+  Menu,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useSidebar } from '@/context/SidebarContext';
 
 interface TopbarProps {
   breadcrumbs?: { label: string; href?: string }[];
@@ -31,6 +33,7 @@ export function Topbar({
   actionButton,
 }: TopbarProps) {
   const router = useRouter();
+  const { isCollapsed, toggleSidebar } = useSidebar();
   const [searchValue, setSearchValue] = useState('');
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
@@ -51,6 +54,16 @@ export function Topbar({
     <header className="h-16 bg-white border-b border-slate-100 px-6 sm:px-8 flex items-center justify-between sticky top-0 z-30">
       {/* Left: Breadcrumbs (Exact match to screenshot: 🏠 > Section / Page) */}
       <div className="flex items-center space-x-2 text-xs text-slate-500 font-medium">
+        <button
+          type="button"
+          onClick={toggleSidebar}
+          title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-label="Toggle sidebar"
+          className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors mr-1 cursor-pointer"
+        >
+          <Menu className="w-4 h-4" />
+        </button>
+
         <Link
           href="/dashboard"
           className="text-slate-400 hover:text-slate-600 transition-colors p-1"
