@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Topbar } from '@/components/Topbar';
 import { Modal } from '@/components/Modal';
+import { ImagePicker } from '@/components/ImagePicker';
 import {
   Building2,
   Award,
@@ -99,7 +100,7 @@ export default function ClientsManagementPage() {
     setCertTag('Certification');
     setCertTitle('');
     setCertText('');
-    setCertImage('/images/certification-badge.png');
+    setCertImage('/uploads/NEN-4400-1.png');
     setCertAccent(false);
     setCertModalOpen(true);
   };
@@ -111,7 +112,8 @@ export default function ClientsManagementPage() {
     setCertTag(cert.tag || 'Certification');
     setCertTitle(cert.title || '');
     setCertText(cert.text || '');
-    setCertImage(cert.image || '/images/certification-badge.png');
+    const imgVal = typeof cert.image === 'string' ? cert.image : cert.image?.src || '';
+    setCertImage(imgVal || '');
     setCertAccent(!!cert.accent);
     setCertModalOpen(true);
   };
@@ -306,41 +308,69 @@ export default function ClientsManagementPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {certificationsList.map((cert: any, idx: number) => (
-                <div
-                  key={idx}
-                  className={`bg-white rounded-2xl p-6 border shadow-2xs transition-all relative ${
-                    cert.accent ? 'border-[#E30613]/50 ring-1 ring-[#E30613]/20' : 'border-slate-100'
-                  }`}
-                >
-                  <div className="flex items-start justify-between">
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-[#F0F3FA] text-[#36427D]">
-                      {cert.tag || 'Accreditation'}
-                    </span>
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => handleOpenEditCert(idx)}
-                        className="text-slate-500 hover:text-[#111827] text-xs font-medium"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDeleteCert(idx)}
-                        className="text-rose-500 hover:text-rose-700 text-xs font-medium"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
+              {certificationsList.map((cert: any, idx: number) => {
+                const imgSrc = typeof cert.image === 'string' ? cert.image : cert.image?.src;
+                return (
+                  <div
+                    key={idx}
+                    className={`bg-white rounded-2xl p-6 border shadow-2xs transition-all relative flex flex-col justify-between ${
+                      cert.accent ? 'border-[#E30613]/50 ring-1 ring-[#E30613]/20' : 'border-slate-100'
+                    }`}
+                  >
+                    <div>
+                      {/* Top Header: Tag, Logo & Actions */}
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-center space-x-3 min-w-0">
+                          {imgSrc && (
+                            <div className="h-12 w-20 bg-slate-50 border border-slate-200/80 rounded-xl p-1.5 flex items-center justify-center shrink-0 shadow-2xs">
+                              <img
+                                src={imgSrc}
+                                alt={cert.title}
+                                className="max-h-full max-w-full object-contain"
+                                onError={(e) => {
+                                  (e.currentTarget as HTMLElement).style.display = 'none';
+                                }}
+                              />
+                            </div>
+                          )}
+                          <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-[#F0F3FA] text-[#36427D] truncate">
+                            {cert.tag || 'Accreditation'}
+                          </span>
+                        </div>
 
-                  <h4 className="text-base font-bold text-[#111827] mt-3 font-sans">
-                    {cert.title}
-                  </h4>
-                  <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                    {cert.text}
-                  </p>
-                </div>
-              ))}
+                        <div className="flex items-center space-x-2 shrink-0">
+                          <button
+                            onClick={() => handleOpenEditCert(idx)}
+                            className="text-slate-500 hover:text-[#111827] text-xs font-semibold px-2 py-1 rounded-md hover:bg-slate-100 transition-colors"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeleteCert(idx)}
+                            className="text-rose-500 hover:text-rose-700 text-xs font-semibold px-2 py-1 rounded-md hover:bg-rose-50 transition-colors"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+
+                      <h4 className="text-base font-bold text-[#111827] mt-3.5 font-sans">
+                        {cert.title}
+                      </h4>
+                      <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+                        {cert.text}
+                      </p>
+                    </div>
+
+                    {imgSrc && (
+                      <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+                        <span className="truncate max-w-[260px] font-mono text-[10px] text-slate-500">{imgSrc}</span>
+                        <span className="text-emerald-600 font-semibold text-[10px]">✓ Logo Attached</span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
@@ -458,6 +488,17 @@ export default function ClientsManagementPage() {
                 onChange={(e) => setCertText(e.target.value)}
                 placeholder="Details of certification and legal standing..."
                 className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613]"
+              />
+            </div>
+
+            <div>
+              <ImagePicker
+                value={certImage}
+                onChange={(newUrl) => setCertImage(newUrl)}
+                label="Accreditation Logo / Badge Image"
+                helperText="Upload official certificate badge (PNG/JPG) or enter image URL."
+                previewShape="rounded"
+                aspect="wide"
               />
             </div>
 
