@@ -83,73 +83,7 @@ export default function ContactsManagementPage() {
 
       // If dataset is small demo list, ensure rich preview data matching screenshot
       if (list.length < 5) {
-        const seedData: Contact[] = [
-          {
-            id: 'lead-01',
-            firstName: 'Olivia',
-            lastName: 'Martin',
-            fullName: 'Olivia Martin',
-            company: 'Northstar BV',
-            email: 'olivia@northstar.com',
-            phone: '+31 6 4920 1823',
-            topic: 'Employer of Record',
-            message: 'Looking for EOR solutions for 15 software engineers based in Amsterdam and Rotterdam.',
-            status: 'new',
-            submittedAt: new Date(Date.now() - 1000 * 60 * 45).toISOString(), // Today 10:42
-          },
-          {
-            id: 'lead-02',
-            firstName: 'Daniel',
-            lastName: 'Weber',
-            fullName: 'Daniel Weber',
-            company: 'Weber Logistics',
-            email: 'daniel@weber.eu',
-            phone: '+31 20 894 1120',
-            topic: 'Payroll Services',
-            message: 'Inquiring about outsourced payroll management for 40 drivers in our logistics distribution center.',
-            status: 'in_progress',
-            submittedAt: new Date(Date.now() - 1000 * 60 * 180).toISOString(), // Today 09:18
-          },
-          {
-            id: 'lead-03',
-            firstName: 'Sophie',
-            lastName: 'Laurent',
-            fullName: 'Sophie Laurent',
-            company: 'Atelier Group',
-            email: 'sophie@atelier.fr',
-            phone: '+33 1 42 68 55 00',
-            topic: 'Global Mobility',
-            message: 'Need urgent visa and HSM sponsor support for cross-border engineering specialists in Europe.',
-            status: 'new',
-            submittedAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // Yesterday
-          },
-          {
-            id: 'lead-04',
-            firstName: 'Lucas',
-            lastName: 'de Vries',
-            fullName: 'Lucas de Vries',
-            company: 'VDL Partners',
-            email: 'lucas@vdl.nl',
-            phone: '+31 40 299 4433',
-            topic: 'Staffing Solutions',
-            message: 'Successfully agreed to long-term contingent staffing contract for technical manufacturing.',
-            status: 'converted',
-            submittedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 6).toISOString(), // 12 Nov
-          },
-          {
-            id: 'lead-05',
-            firstName: 'Amelia',
-            lastName: 'Chen',
-            fullName: 'Amelia Chen',
-            company: 'Meridian Tech',
-            email: 'amelia@meridian.com',
-            phone: '+31 6 8201 9945',
-            topic: 'Work Permit Support',
-            message: 'Consultation required regarding IND sponsorship requirements and WAADI certification compliance.',
-            status: 'in_progress',
-            submittedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(), // 11 Nov
-          },
-        ];
+        const seedData: Contact[] = [];
 
         // Merge with existing list without duplicates
         const existingEmails = new Set(list.map((c) => c.email));
