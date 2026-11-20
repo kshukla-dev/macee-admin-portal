@@ -392,27 +392,47 @@ export function syncClientsToWebsite(clientsData: any): boolean {
       const enData = JSON.parse(fs.readFileSync(enPath, 'utf-8'));
       if (clientsData.certifications) {
         if (!enData.certifications) enData.certifications = {};
-        enData.certifications.items = clientsData.certifications;
+        enData.certifications.items = Array.isArray(clientsData.certifications)
+          ? clientsData.certifications
+          : (clientsData.certifications.items || []);
       }
       if (clientsData.industries) {
         if (!enData.industries) enData.industries = {};
-        enData.industries.title = clientsData.industries.title;
-        enData.industries.subheading = clientsData.industries.subheading;
-        enData.industries.paragraphs = Array.isArray(clientsData.industries.description)
-          ? clientsData.industries.description
-          : clientsData.industries.description.split('\n\n').filter(Boolean);
-        enData.industries.tags = clientsData.industries.tags || [];
+        if (clientsData.industries.title) enData.industries.title = clientsData.industries.title;
+        if (clientsData.industries.subheading) enData.industries.subheading = clientsData.industries.subheading;
+        if (clientsData.industries.description) {
+          enData.industries.paragraphs = Array.isArray(clientsData.industries.description)
+            ? clientsData.industries.description
+            : typeof clientsData.industries.description === 'string'
+              ? clientsData.industries.description.split('\n\n').filter(Boolean)
+              : (enData.industries.paragraphs || []);
+        }
+        if (Array.isArray(clientsData.industries)) {
+          enData.industries.tags = clientsData.industries;
+        } else if (clientsData.industries.tags) {
+          enData.industries.tags = clientsData.industries.tags;
+        }
       }
       if (clientsData.expertise) {
         if (!enData.expertise) enData.expertise = {};
-        enData.expertise.title = clientsData.expertise.title;
-        enData.expertise.subheading = clientsData.expertise.subheading;
-        enData.expertise.intro = clientsData.expertise.intro;
-        enData.expertise.prompt = clientsData.expertise.prompt;
-        enData.expertise.items = (clientsData.expertise.items || []).map((i: any) => ({
+          if(clientsData.expertise.title) enData.expertise.title = clientsData.expertise.title;
+        if (clientsData.expertise.subheading) enData.expertise.subheading = clientsData.expertise.subheading;
+        if (clientsData.expertise.intro) enData.expertise.intro = clientsData.expertise.intro;
+        if (clientsData.expertise.prompt) enData.expertise.prompt = clientsData.expertise.prompt;
+        const expItems = Array.isArray(clientsData.expertise)
+          ? clientsData.expertise
+          : clientsData.expertise.items || [];
+        enData.expertise.items = expItems.map((i: any) => ({
           domain: i.domain,
           technologies: i.technologies
         }));
+      }
+      if (clientsData.services) {
+        if (!enData.services) enData.services = {};
+        const servItems = Array.isArray(clientsData.services)
+          ? clientsData.services
+          : (clientsData.services.items || []);
+        enData.services.items = servItems;
       }
       fs.writeFileSync(enPath, JSON.stringify(enData, null, 2), 'utf-8');
     }
@@ -422,13 +442,25 @@ export function syncClientsToWebsite(clientsData: any): boolean {
     if (fs.existsSync(nlPath)) {
       const nlData = JSON.parse(fs.readFileSync(nlPath, 'utf-8'));
       if (clientsData.certifications && nlData.certifications) {
-        nlData.certifications.items = clientsData.certifications;
+        nlData.certifications.items = Array.isArray(clientsData.certifications)
+          ? clientsData.certifications
+          : (clientsData.certifications.items || nlData.certifications.items);
       }
       if (clientsData.industries && nlData.industries) {
-        nlData.industries.tags = clientsData.industries.tags;
+        nlData.industries.tags = Array.isArray(clientsData.industries)
+          ? clientsData.industries
+          : (clientsData.industries.tags || nlData.industries.tags);
       }
       if (clientsData.expertise && nlData.expertise) {
-        nlData.expertise.items = clientsData.expertise.items;
+        const expItems = Array.isArray(clientsData.expertise)
+          ? clientsData.expertise
+          : clientsData.expertise.items || [];
+        nlData.expertise.items = expItems;
+      }
+      if (clientsData.services && nlData.services) {
+        nlData.services.items = Array.isArray(clientsData.services)
+          ? clientsData.services
+          : (clientsData.services.items || nlData.services.items);
       }
       fs.writeFileSync(nlPath, JSON.stringify(nlData, null, 2), 'utf-8');
     }
