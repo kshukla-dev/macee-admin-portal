@@ -19,6 +19,7 @@ import {
   Building,
   ShieldCheck,
   Download,
+  Linkedin,
 } from 'lucide-react';
 
 interface TeamMember {
@@ -342,6 +343,20 @@ export default function TeamManagementPage() {
                       <span>{member.phone}</span>
                     </div>
                   )}
+                  {member.linkedin && (
+                    <div className="flex items-center space-x-2 truncate">
+                      <Linkedin className="w-3.5 h-3.5 text-[#0A66C2] shrink-0" />
+                      <a
+                        href={member.linkedin}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="truncate text-[#0A66C2] hover:underline"
+                        title={member.linkedin}
+                      >
+                        {member.linkedin.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//, '').replace(/\/$/, '') || 'LinkedIn Profile'}
+                      </a>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -434,6 +449,20 @@ export default function TeamManagementPage() {
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="+31 6 12345678"
                   className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613]"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">LinkedIn Profile URL</label>
+              <div className="relative">
+                <Linkedin className="w-3.5 h-3.5 text-[#0A66C2] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <input
+                  type="url"
+                  value={linkedin}
+                  onChange={(e) => setLinkedin(e.target.value)}
+                  placeholder="https://www.linkedin.com/in/username"
+                  className="w-full pl-9 pr-3 py-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613]"
                 />
               </div>
             </div>

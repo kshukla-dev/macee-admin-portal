@@ -828,13 +828,13 @@ export default function FaqManagementPage() {
                   }}
                   className="w-full p-2.5 text-xs rounded-xl border border-slate-200 bg-white focus:outline-none focus:border-[#E30613] font-medium"
                 >
-                  <option value="home">Home Page (HOME_FAQS)</option>
-                  <option value="about">About Page (ABOUT_FAQS)</option>
-                  <option value="clients">Clients & Hiring Managers (CLIENTS_FAQS)</option>
-                  <option value="professionals">Professionals & Expats (PROFESSIONALS_FAQS)</option>
-                  <option value="projects">Projects & Jobs (PROJECTS_FAQS)</option>
-                  <option value="compliance">Compliance & Legal (COMPLIANCE_FAQS)</option>
-                  <option value="contact">Contact & Desk (CONTACT_FAQS)</option>
+                  <option value="home">Home Page</option>
+                  <option value="about">About Page</option>
+                  <option value="clients">Clients & Hiring Managers</option>
+                  <option value="professionals">Professionals & Expats</option>
+                  <option value="projects">Projects & Jobs</option>
+                  <option value="compliance">Compliance & Legal</option>
+                  <option value="contact">Contact & Desk</option>
                 </select>
               </div>
 
