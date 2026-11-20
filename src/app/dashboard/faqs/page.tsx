@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { Topbar } from '@/components/Topbar';
 import { Modal } from '@/components/Modal';
 import {
@@ -13,6 +13,8 @@ import {
   CheckCircle2,
   ChevronDown,
   ChevronUp,
+  ChevronLeft,
+  ChevronRight,
   FolderOpen,
   BookOpen,
   ShieldCheck,
@@ -226,6 +228,18 @@ export default function FaqManagementPage() {
 
   // Accordion Expand State
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  // Tabs scroll container
+  const tabsContainerRef = useRef<HTMLDivElement>(null);
+
+  const handleScrollTabs = (direction: 'left' | 'right') => {
+    if (tabsContainerRef.current) {
+      tabsContainerRef.current.scrollBy({
+        left: direction === 'left' ? -260 : 260,
+        behavior: 'smooth',
+      });
+    }
+  };
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -488,72 +502,24 @@ export default function FaqManagementPage() {
           </div>
         )}
 
-        {/* 4 KPI Summary Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-          <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-              <HelpCircle className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-xs font-medium text-slate-500">Total Questions</p>
-              <div className="flex items-baseline space-x-2 mt-0.5">
-                <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                  {items.length}
-                </span>
-                <span className="text-xs font-semibold text-emerald-600">All Live</span>
-              </div>
-            </div>
-          </div>
+        {/* PAGE FILTER TABS BAR WITH SCROLL CONTROLS */}
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-2xs p-2 relative flex items-center">
+          {/* Scroll Left Button */}
+          <button
+            type="button"
+            onClick={() => handleScrollTabs('left')}
+            className="p-2 rounded-xl text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors shrink-0 mr-1"
+            title="Scroll left"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
 
-          <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-full bg-purple-50 text-purple-700 flex items-center justify-center shrink-0">
-              <Layers className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-xs font-medium text-slate-500">Target Pages</p>
-              <div className="flex items-baseline space-x-2 mt-0.5">
-                <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                  7 Pages
-                </span>
-                <span className="text-[11px] text-slate-400 font-medium">Home to Contact</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-full bg-blue-50 text-blue-700 flex items-center justify-center shrink-0">
-              <Languages className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-xs font-medium text-slate-500">Bilingual Support</p>
-              <div className="flex items-baseline space-x-2 mt-0.5">
-                <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                  EN + NL
-                </span>
-                <span className="text-xs font-semibold text-blue-600">Dutch Ready</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-              <FileCode2 className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-xs font-medium text-slate-500">Direct Code Export</p>
-              <div className="flex items-baseline space-x-2 mt-0.5">
-                <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                  pageFaqs.ts
-                </span>
-                <span className="text-[11px] text-emerald-600 font-medium">Synced</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* PAGE FILTER TABS BAR */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-2xs p-2">
-          <div className="flex items-center space-x-1.5 overflow-x-auto pb-1 scrollbar-none">
+          {/* Scrollable Tabs Container */}
+          <div
+            ref={tabsContainerRef}
+            className="flex items-center space-x-2 overflow-x-auto scroll-smooth py-1 px-1 flex-1 scrollbar-thin"
+            style={{ scrollbarWidth: 'thin' }}
+          >
             {PAGE_TABS.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -563,7 +529,7 @@ export default function FaqManagementPage() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`inline-flex items-center space-x-2 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap shrink-0 ${
+                  className={`inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap shrink-0 ${
                     isActive
                       ? 'bg-[#111827] text-white shadow-2xs font-semibold'
                       : 'text-slate-600 hover:text-[#111827] hover:bg-slate-100/80'
@@ -584,6 +550,16 @@ export default function FaqManagementPage() {
               );
             })}
           </div>
+
+          {/* Scroll Right Button */}
+          <button
+            type="button"
+            onClick={() => handleScrollTabs('right')}
+            className="p-2 rounded-xl text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors shrink-0 ml-1"
+            title="Scroll right"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
         </div>
 
         {/* Selected Page Context Banner */}
@@ -706,46 +682,7 @@ export default function FaqManagementPage() {
                           )}
                         </div>
 
-                        <div className="space-y-1.5 flex-1 min-w-0">
-                          {/* Badges bar */}
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span className="text-[10px] font-mono font-bold text-slate-400">
-                              #{item.order || idx + 1}
-                            </span>
-
-                            {/* Target Page Badge */}
-                            <span
-                              className={`inline-flex items-center space-x-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full border ${pageMeta.bgLight} ${pageMeta.color} ${pageMeta.borderLight}`}
-                            >
-                              <span>{pageMeta.label}</span>
-                            </span>
-
-                            {/* Topic / Tag Badge */}
-                            {item.tag && (
-                              <span className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">
-                                {item.tag}
-                              </span>
-                            )}
-
-                            {/* Active pill */}
-                            {item.active !== false ? (
-                              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                Live
-                              </span>
-                            ) : (
-                              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200">
-                                Draft
-                              </span>
-                            )}
-
-                            {/* Bilingual Indicator */}
-                            {item.question_nl && item.answer_nl && (
-                              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-                                EN + NL
-                              </span>
-                            )}
-                          </div>
-
+                        <div className="space-y-1 flex-1 min-w-0">
                           {/* Question Title */}
                           <h4 className="text-sm sm:text-base font-bold text-[#111827] group-hover:text-[#E30613] transition-colors font-serif">
                             {item.question}
