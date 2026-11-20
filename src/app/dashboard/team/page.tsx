@@ -263,11 +263,10 @@ export default function TeamManagementPage() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`pb-3 transition-colors relative ${
-                  isActive
+                className={`pb-3 transition-colors relative ${isActive
                     ? 'font-bold text-[#111827] border-b-2 border-[#E30613]'
                     : 'text-slate-500 hover:text-slate-800'
-                }`}
+                  }`}
               >
                 {tab}
               </button>
@@ -293,7 +292,7 @@ export default function TeamManagementPage() {
             className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl bg-[#E30613] hover:bg-[#b80510] text-white text-xs font-semibold shadow-xs transition-all shrink-0"
           >
             <Plus className="w-3.5 h-3.5" />
-            <span>+ Add Member</span>
+            <span>Add Member</span>
           </button>
         </div>
 

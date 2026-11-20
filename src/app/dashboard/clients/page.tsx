@@ -60,14 +60,14 @@ export default function ClientsManagementPage() {
   const industryTags: string[] = Array.isArray(clientsData?.industries)
     ? clientsData.industries
     : Array.isArray(clientsData?.industries?.tags)
-    ? clientsData.industries.tags
-    : [];
+      ? clientsData.industries.tags
+      : [];
 
   const expertiseItems: any[] = Array.isArray(clientsData?.expertise)
     ? clientsData.expertise
     : Array.isArray(clientsData?.expertise?.items)
-    ? clientsData.expertise.items
-    : [];
+      ? clientsData.expertise.items
+      : [];
 
   const certificationsList: any[] = Array.isArray(clientsData?.certifications)
     ? clientsData.certifications
@@ -277,11 +277,10 @@ export default function ClientsManagementPage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`pb-3 transition-colors relative ${
-                  isActive
+                className={`pb-3 transition-colors relative ${isActive
                     ? 'font-bold text-[#111827] border-b-2 border-[#E30613]'
                     : 'text-slate-500 hover:text-slate-800'
-                }`}
+                  }`}
               >
                 {tab.label}
               </button>
@@ -307,7 +306,7 @@ export default function ClientsManagementPage() {
                 className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl bg-[#E30613] hover:bg-[#b80510] text-white text-xs font-semibold shadow-xs"
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span>+ Add Certification</span>
+                <span>Add Certification</span>
               </button>
             </div>
 
@@ -317,9 +316,8 @@ export default function ClientsManagementPage() {
                 return (
                   <div
                     key={idx}
-                    className={`bg-white rounded-2xl p-6 border shadow-2xs transition-all relative flex flex-col justify-between ${
-                      cert.accent ? 'border-[#E30613]/50 ring-1 ring-[#E30613]/20' : 'border-slate-100'
-                    }`}
+                    className={`bg-white rounded-2xl p-6 border shadow-2xs transition-all relative flex flex-col justify-between ${cert.accent ? 'border-[#E30613]/50 ring-1 ring-[#E30613]/20' : 'border-slate-100'
+                      }`}
                   >
                     <div>
                       {/* Top Header: Tag, Logo & Actions */}
