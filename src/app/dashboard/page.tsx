@@ -47,16 +47,16 @@ interface ModuleSummary {
 
 export default function DashboardOverviewPage() {
   const [stats, setStats] = useState({
-    totalLeads: 248,
-    newLeads: 24,
-    inProgressLeads: 68,
-    convertedLeads: 156,
-    teamCount: 32,
-    blogsCount: 18,
-    draftBlogsCount: 2,
-    faqsCount: 16,
-    clientsCount: 4,
-    industriesCount: 10,
+    totalLeads: 0,
+    newLeads: 0,
+    inProgressLeads: 0,
+    convertedLeads: 0,
+    teamCount: 0,
+    blogsCount: 0,
+    draftBlogsCount: 0,
+    faqsCount: 0,
+    clientsCount: 0,
+    industriesCount: 0,
   });
 
   const [recentLeads, setRecentLeads] = useState<any[]>([]);
