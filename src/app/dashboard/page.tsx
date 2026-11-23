@@ -441,11 +441,11 @@ export default function DashboardOverviewPage() {
               {/* Chart Legend */}
               <div className="flex items-center space-x-4 text-xs">
                 <div className="flex items-center space-x-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#E30613]" />
+                  <span className="w-3 h-1 rounded-sm bg-[#E30613]" />
                   <span className="text-slate-600 font-medium">Inbound Leads</span>
                 </div>
                 <div className="flex items-center space-x-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#36427D]" />
+                  <span className="w-3 h-1 rounded-sm bg-[#36427D]" />
                   <span className="text-slate-600 font-medium">Articles Released</span>
                 </div>
               </div>
@@ -519,8 +519,7 @@ export default function DashboardOverviewPage() {
                   <Globe className="w-4 h-4 text-[#E30613]" />
                   <span>Website Connection</span>
                 </h3>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 font-mono">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 font-mono">
                   <span>CONNECTED</span>
                 </span>
               </div>
@@ -553,13 +552,13 @@ export default function DashboardOverviewPage() {
             </div>
 
             <a
-              href="http://localhost:3000"
+              href="https://macee.vercel.app/"
               target="_blank"
               rel="noreferrer"
               className="w-full inline-flex items-center justify-center space-x-2 py-2.5 rounded-xl bg-[#0E1726] hover:bg-black text-white text-xs font-semibold transition-all"
             >
               <ExternalLink className="w-3.5 h-3.5" />
-              <span>Preview Live Website (:3000)</span>
+              <span>Preview Live Website</span>
             </a>
           </div>
         </div>
@@ -595,60 +594,59 @@ export default function DashboardOverviewPage() {
                   ))
                 ) : (
                   portalModules.map((mod) => {
-                  const Icon = mod.icon;
-                  return (
-                    <tr key={mod.id} className="hover:bg-slate-50/70 transition-colors">
-                      {/* Module Name & Icon */}
-                      <td className="py-3.5 px-4">
-                        <Link href={mod.href} className="flex items-center space-x-3 group">
-                          <div className={`w-9 h-9 rounded-xl ${mod.iconBg} ${mod.iconColor} flex items-center justify-center shrink-0 shadow-2xs group-hover:bg-[#E30613] group-hover:text-white transition-colors`}>
-                            <Icon className="w-4 h-4" />
-                          </div>
-                          <div>
-                            <p className="font-bold text-[#111827] group-hover:text-[#E30613] transition-colors font-sans">
-                              {mod.name}
-                            </p>
-                            <p className="text-[11px] text-slate-400 font-medium max-w-sm truncate">
-                              {mod.description}
-                            </p>
-                          </div>
-                        </Link>
-                      </td>
+                    const Icon = mod.icon;
+                    return (
+                      <tr key={mod.id} className="hover:bg-slate-50/70 transition-colors">
+                        {/* Module Name & Icon */}
+                        <td className="py-3.5 px-4">
+                          <Link href={mod.href} className="flex items-center space-x-3 group">
+                            <div className={`w-9 h-9 rounded-xl ${mod.iconBg} ${mod.iconColor} flex items-center justify-center shrink-0 shadow-2xs group-hover:bg-[#E30613] group-hover:text-white transition-colors`}>
+                              <Icon className="w-4 h-4" />
+                            </div>
+                            <div>
+                              <p className="font-bold text-[#111827] group-hover:text-[#E30613] transition-colors font-sans">
+                                {mod.name}
+                              </p>
+                              <p className="text-[11px] text-slate-400 font-medium max-w-sm truncate">
+                                {mod.description}
+                              </p>
+                            </div>
+                          </Link>
+                        </td>
 
-                      {/* Total Records */}
-                      <td className="py-3.5 px-4 font-bold text-[#111827]">
-                        <span className="text-sm font-sans">{mod.count}</span>{' '}
-                        <span className="text-[11px] text-slate-500 font-normal">
-                          {mod.countLabel}
-                        </span>
-                      </td>
+                        {/* Total Records */}
+                        <td className="py-3.5 px-4 font-bold text-[#111827]">
+                          <span className="text-sm font-sans">{mod.count}</span>{' '}
+                          <span className="text-[11px] text-slate-500 font-normal">
+                            {mod.countLabel}
+                          </span>
+                        </td>
 
-                      {/* Status & Health */}
-                      <td className="py-3.5 px-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${mod.statusColor}`}>
-                          <span className="w-1.5 h-1.5 rounded-full bg-current" />
-                          <span>{mod.status}</span>
-                        </span>
-                      </td>
+                        {/* Status & Health */}
+                        <td className="py-3.5 px-4 whitespace-nowrap">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${mod.statusColor}`}>
+                            <span>{mod.status}</span>
+                          </span>
+                        </td>
 
-                      {/* Details / Metrics */}
-                      <td className="py-3.5 px-4 text-slate-600 font-medium">
-                        {mod.subtext}
-                      </td>
+                        {/* Details / Metrics */}
+                        <td className="py-3.5 px-4 text-slate-600 font-medium">
+                          {mod.subtext}
+                        </td>
 
-                      {/* Quick Action */}
-                      <td className="py-3.5 px-4 text-right whitespace-nowrap">
-                        <Link
-                          href={mod.href}
-                          className="inline-flex items-center space-x-1 font-semibold text-[#36427D] hover:text-[#E30613] transition-colors"
-                        >
-                          <span>Manage</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
-                        </Link>
-                      </td>
-                    </tr>
-                  );
-                }))}
+                        {/* Quick Action */}
+                        <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                          <Link
+                            href={mod.href}
+                            className="inline-flex items-center space-x-1 font-semibold text-[#36427D] hover:text-[#E30613] transition-colors"
+                          >
+                            <span>Manage</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </Link>
+                        </td>
+                      </tr>
+                    );
+                  }))}
               </tbody>
             </table>
           </div>

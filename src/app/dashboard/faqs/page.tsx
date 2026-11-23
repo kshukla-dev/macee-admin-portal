@@ -735,9 +735,8 @@ export default function FaqManagementPage() {
                           {/* English Answer Box */}
                           <div className="bg-white rounded-xl p-4 border border-slate-200/80 shadow-2xs space-y-2">
                             <div className="flex items-center justify-between">
-                              <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider flex items-center space-x-1.5">
-                                <span className="w-2 h-2 rounded-full bg-blue-600 inline-block"></span>
-                                <span>English Answer (macee.com)</span>
+                              <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">
+                                English Answer (macee.com)
                               </span>
                               <span className="text-[10px] text-slate-400 font-mono">Default</span>
                             </div>
@@ -749,9 +748,8 @@ export default function FaqManagementPage() {
                           {/* Dutch Translation Box */}
                           <div className="bg-white rounded-xl p-4 border border-slate-200/80 shadow-2xs space-y-2">
                             <div className="flex items-center justify-between">
-                              <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider flex items-center space-x-1.5">
-                                <span className="w-2 h-2 rounded-full bg-orange-600 inline-block"></span>
-                                <span>Nederlands (NL Vertaling)</span>
+                              <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">
+                                Nederlands (NL Vertaling)
                               </span>
                               <span className="text-[10px] text-slate-400 font-mono">Dutch</span>
                             </div>
@@ -772,11 +770,11 @@ export default function FaqManagementPage() {
                             <span>
                               Page: <strong className="text-slate-800">{item.pageName}</strong>
                             </span>
-                            <span>•</span>
+                            <span className="text-slate-300">/</span>
                             <span>
                               Route: <strong className="text-slate-800">{pageMeta.route}</strong>
                             </span>
-                            <span>•</span>
+                            <span className="text-slate-300">/</span>
                             <span>
                               Constant: <strong className="text-slate-800 font-mono">{pageMeta.constName}</strong>
                             </span>

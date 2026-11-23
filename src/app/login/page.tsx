@@ -158,10 +158,7 @@ export default function LoginPage() {
 
         {/* Dutch Compliance Footer Accreditations */}
         <div className="pt-4 border-t border-slate-800/80 flex items-center justify-between text-[10px] text-slate-400 font-medium">
-          <span className="flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-            SNA NEN 4400-1
-          </span>
+          <span>SNA NEN 4400-1</span>
           <span className="text-[#8E96CB]">IND Recognised Sponsor</span>
           <span>100% WAADI Compliant</span>
         </div>

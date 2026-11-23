@@ -67,9 +67,8 @@ export function StatusBadge({ status, size = 'sm' }: StatusBadgeProps) {
 
   return (
     <span
-      className={`inline-flex items-center space-x-1.5 rounded-full font-bold border ${current.bg} ${current.text} ${current.border} ${sizeClasses} font-heading tracking-tight`}
+      className={`inline-flex items-center rounded-full font-bold border ${current.bg} ${current.text} ${current.border} ${sizeClasses} font-heading tracking-tight`}
     >
-      <span className={`w-1.5 h-1.5 rounded-full ${current.dot}`} />
       <span>{current.label}</span>
     </span>
   );
