@@ -223,6 +223,8 @@ export default function FaqManagementPage() {
   const [activeTab, setActiveTab] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const pageSize = 10;
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [syncMessage, setSyncMessage] = useState<string | null>(null);
@@ -318,6 +320,19 @@ export default function FaqManagementPage() {
   const currentTabMeta = useMemo(() => {
     return PAGE_TABS.find((t) => t.id === activeTab) || PAGE_TABS[0];
   }, [activeTab]);
+
+  // Reset pagination on filter or tab change
+  useEffect(() => {
+    setCurrentPage(1);
+    setExpandedId(null);
+  }, [activeTab, statusFilter, searchQuery]);
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredItems.length / pageSize) || 1;
+  const paginatedItems = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredItems.slice(start, start + pageSize);
+  }, [filteredItems, currentPage, pageSize]);
 
   const handleOpenAdd = (defaultPage?: string) => {
     setEditingItem(null);
@@ -657,142 +672,196 @@ export default function FaqManagementPage() {
               </button>
             </div>
           ) : (
-            <div className="divide-y divide-slate-100">
-              {filteredItems.map((item, idx) => {
-                const isExpanded = expandedId === item.id;
-                const pageMeta = getPageMeta(item.page);
+            <>
+              <div className="divide-y divide-slate-100">
+                {paginatedItems.map((item, idx) => {
+                  const isExpanded = expandedId === item.id;
+                  const pageMeta = getPageMeta(item.page);
 
-                return (
-                  <div
-                    key={item.id}
-                    className={`transition-colors ${isExpanded ? 'bg-slate-50/70' : 'hover:bg-slate-50/40'}`}
-                  >
-                    <div className="p-5 flex items-start justify-between gap-4">
-                      {/* Left: Expand button & Question Info */}
-                      <button
-                        onClick={() => setExpandedId(isExpanded ? null : item.id)}
-                        className="flex-1 text-left flex items-start space-x-3.5 group cursor-pointer"
-                      >
-                        <div className="mt-1 text-slate-400 group-hover:text-[#E30613] transition-colors shrink-0">
-                          {isExpanded ? (
-                            <ChevronUp className="w-4 h-4 text-[#E30613]" />
-                          ) : (
-                            <ChevronDown className="w-4 h-4" />
-                          )}
-                        </div>
-
-                        <div className="space-y-1 flex-1 min-w-0">
-                          {/* Question Title */}
-                          <h4 className="text-sm sm:text-base font-bold text-[#111827] group-hover:text-[#E30613] transition-colors font-serif">
-                            {item.question}
-                          </h4>
-
-                          {/* Short preview if not expanded */}
-                          {!isExpanded && (
-                            <p className="text-xs text-slate-500 line-clamp-1 pr-6 font-normal">
-                              {item.answer}
-                            </p>
-                          )}
-                        </div>
-                      </button>
-
-                      {/* Right: Actions */}
-                      <div className="flex items-center space-x-1 shrink-0 pt-1">
+                  return (
+                    <div
+                      key={item.id}
+                      className={`transition-colors ${isExpanded ? 'bg-slate-50/70' : 'hover:bg-slate-50/40'}`}
+                    >
+                      <div className="p-5 flex items-start justify-between gap-4">
+                        {/* Left: Expand button & Question Info */}
                         <button
-                          onClick={() => handleToggleActive(item)}
-                          className={`text-xs font-semibold px-2.5 py-1 rounded-lg transition-colors ${
-                            item.active !== false
-                              ? 'text-slate-500 hover:text-amber-600 hover:bg-amber-50'
-                              : 'text-emerald-600 hover:bg-emerald-50'
-                          }`}
-                          title={item.active !== false ? 'Deactivate Question' : 'Activate Question'}
+                          onClick={() => setExpandedId(isExpanded ? null : item.id)}
+                          className="flex-1 text-left flex items-start space-x-3.5 group cursor-pointer"
                         >
-                          {item.active !== false ? 'Deactivate' : 'Publish'}
-                        </button>
-
-                        <button
-                          onClick={() => handleOpenEdit(item)}
-                          className="inline-flex items-center space-x-1 text-xs font-semibold text-slate-700 hover:text-[#111827] px-2.5 py-1 rounded-lg hover:bg-slate-100 transition-colors"
-                        >
-                          <Edit2 className="w-3.5 h-3.5" />
-                          <span>Edit</span>
-                        </button>
-
-                        <button
-                          onClick={() => handleDeleteFaq(item.id, item.question)}
-                          className="inline-flex items-center text-xs font-semibold text-rose-500 hover:text-rose-700 p-1.5 rounded-lg hover:bg-rose-50 transition-colors"
-                          title="Delete FAQ"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* EXPANDED ACCORDION VIEW */}
-                    {isExpanded && (
-                      <div className="px-6 pb-6 pt-2 border-t border-slate-100 space-y-4 animate-fadeIn">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {/* English Answer Box */}
-                          <div className="bg-white rounded-xl p-4 border border-slate-200/80 shadow-2xs space-y-2">
-                            <div className="flex items-center justify-between">
-                              <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">
-                                English Answer (macee.com)
-                              </span>
-                              <span className="text-[10px] text-slate-400 font-mono">Default</span>
-                            </div>
-                            <div className="text-xs text-slate-700 leading-relaxed whitespace-pre-wrap font-sans">
-                              {item.answer}
-                            </div>
+                          <div className="mt-1 text-slate-400 group-hover:text-[#E30613] transition-colors shrink-0">
+                            {isExpanded ? (
+                              <ChevronUp className="w-4 h-4 text-[#E30613]" />
+                            ) : (
+                              <ChevronDown className="w-4 h-4" />
+                            )}
                           </div>
 
-                          {/* Dutch Translation Box */}
-                          <div className="bg-white rounded-xl p-4 border border-slate-200/80 shadow-2xs space-y-2">
-                            <div className="flex items-center justify-between">
-                              <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">
-                                Nederlands (NL Vertaling)
-                              </span>
-                              <span className="text-[10px] text-slate-400 font-mono">Dutch</span>
-                            </div>
-                            {item.question_nl && (
-                              <p className="text-xs font-bold text-[#111827] font-serif border-b border-slate-100 pb-1.5">
-                                {item.question_nl}
+                          <div className="space-y-1 flex-1 min-w-0">
+                            {/* Question Title */}
+                            <h4 className="text-sm sm:text-base font-bold text-[#111827] group-hover:text-[#E30613] transition-colors font-serif">
+                              {item.question}
+                            </h4>
+
+                            {/* Short preview if not expanded */}
+                            {!isExpanded && (
+                              <p className="text-xs text-slate-500 line-clamp-1 pr-6 font-normal">
+                                {item.answer}
                               </p>
                             )}
-                            <div className="text-xs text-slate-700 leading-relaxed whitespace-pre-wrap font-sans">
-                              {item.answer_nl || item.answer}
-                            </div>
                           </div>
-                        </div>
+                        </button>
 
-                        {/* Export & Routing Info Footer */}
-                        <div className="flex flex-wrap items-center justify-between text-[11px] text-slate-500 pt-2 border-t border-slate-100">
-                          <div className="flex items-center space-x-3">
-                            <span>
-                              Page: <strong className="text-slate-800">{item.pageName}</strong>
-                            </span>
-                            <span className="text-slate-300">/</span>
-                            <span>
-                              Route: <strong className="text-slate-800">{pageMeta.route}</strong>
-                            </span>
-                            <span className="text-slate-300">/</span>
-                            <span>
-                              Constant: <strong className="text-slate-800 font-mono">{pageMeta.constName}</strong>
-                            </span>
-                          </div>
+                        {/* Right: Actions */}
+                        <div className="flex items-center space-x-1 shrink-0 pt-1">
+                          <button
+                            onClick={() => handleToggleActive(item)}
+                            className={`text-xs font-semibold px-2.5 py-1 rounded-lg transition-colors ${
+                              item.active !== false
+                                ? 'text-slate-500 hover:text-amber-600 hover:bg-amber-50'
+                                : 'text-emerald-600 hover:bg-emerald-50'
+                            }`}
+                            title={item.active !== false ? 'Deactivate Question' : 'Activate Question'}
+                          >
+                            {item.active !== false ? 'Deactivate' : 'Publish'}
+                          </button>
 
                           <button
                             onClick={() => handleOpenEdit(item)}
-                            className="text-xs font-semibold text-[#E30613] hover:underline"
+                            className="inline-flex items-center space-x-1 text-xs font-semibold text-slate-700 hover:text-[#111827] px-2.5 py-1 rounded-lg hover:bg-slate-100 transition-colors"
                           >
-                            Edit this question & translations →
+                            <Edit2 className="w-3.5 h-3.5" />
+                            <span>Edit</span>
+                          </button>
+
+                          <button
+                            onClick={() => handleDeleteFaq(item.id, item.question)}
+                            className="inline-flex items-center text-xs font-semibold text-rose-500 hover:text-rose-700 p-1.5 rounded-lg hover:bg-rose-50 transition-colors"
+                            title="Delete FAQ"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </div>
                       </div>
-                    )}
+
+                      {/* EXPANDED ACCORDION VIEW */}
+                      {isExpanded && (
+                        <div className="px-6 pb-6 pt-2 border-t border-slate-100 space-y-4 animate-fadeIn">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* English Answer Box */}
+                            <div className="bg-white rounded-xl p-4 border border-slate-200/80 shadow-2xs space-y-2">
+                              <div className="flex items-center justify-between">
+                                <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">
+                                  English Answer (macee.com)
+                                </span>
+                                <span className="text-[10px] text-slate-400 font-mono">Default</span>
+                              </div>
+                              <div className="text-xs text-slate-700 leading-relaxed whitespace-pre-wrap font-sans">
+                                {item.answer}
+                              </div>
+                            </div>
+
+                            {/* Dutch Translation Box */}
+                            <div className="bg-white rounded-xl p-4 border border-slate-200/80 shadow-2xs space-y-2">
+                              <div className="flex items-center justify-between">
+                                <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">
+                                  Nederlands (NL Vertaling)
+                                </span>
+                                <span className="text-[10px] text-slate-400 font-mono">Dutch</span>
+                              </div>
+                              {item.question_nl && (
+                                <p className="text-xs font-bold text-[#111827] font-serif border-b border-slate-100 pb-1.5">
+                                  {item.question_nl}
+                                </p>
+                              )}
+                              <div className="text-xs text-slate-700 leading-relaxed whitespace-pre-wrap font-sans">
+                                {item.answer_nl || item.answer}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Export & Routing Info Footer */}
+                          <div className="flex flex-wrap items-center justify-between text-[11px] text-slate-500 pt-2 border-t border-slate-100">
+                            <div className="flex items-center space-x-3">
+                              <span>
+                                Page: <strong className="text-slate-800">{item.pageName}</strong>
+                              </span>
+                              <span className="text-slate-300">/</span>
+                              <span>
+                                Route: <strong className="text-slate-800">{pageMeta.route}</strong>
+                              </span>
+                              <span className="text-slate-300">/</span>
+                              <span>
+                                Constant: <strong className="text-slate-800 font-mono">{pageMeta.constName}</strong>
+                              </span>
+                            </div>
+
+                            <button
+                              onClick={() => handleOpenEdit(item)}
+                              className="text-xs font-semibold text-[#E30613] hover:underline"
+                            >
+                              Edit this question & translations →
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Pagination Controls Footer */}
+              {filteredItems.length > 0 && (
+                <div className="p-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 bg-white">
+                  <div>
+                    Showing {(currentPage - 1) * pageSize + 1}–
+                    {Math.min(currentPage * pageSize, filteredItems.length)} of {filteredItems.length} questions
                   </div>
-                );
-              })}
-            </div>
+
+                  {totalPages > 1 && (
+                    <div className="flex items-center space-x-1">
+                      <button
+                        disabled={currentPage <= 1}
+                        onClick={() => {
+                          setCurrentPage((p) => Math.max(1, p - 1));
+                        }}
+                        className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-slate-600"
+                        title="Previous page"
+                      >
+                        <ChevronLeft className="w-3.5 h-3.5" />
+                      </button>
+
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                        <button
+                          key={page}
+                          onClick={() => {
+                            setCurrentPage(page);
+                          }}
+                          className={`w-7 h-7 rounded-lg text-xs font-semibold transition-all ${
+                            currentPage === page
+                              ? 'bg-[#0E1726] text-white shadow-2xs'
+                              : 'border border-slate-200 hover:bg-slate-50 text-slate-700'
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      ))}
+
+                      <button
+                        disabled={currentPage >= totalPages}
+                        onClick={() => {
+                          setCurrentPage((p) => Math.min(totalPages, p + 1));
+                        }}
+                        className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-slate-600"
+                        title="Next page"
+                      >
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
