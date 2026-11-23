@@ -2,12 +2,25 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ShieldCheck, Lock, Mail, ArrowRight, AlertCircle, CheckCircle2, Sparkles, Building2 } from 'lucide-react';
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  ArrowRight,
+  AlertCircle,
+  CheckCircle2,
+  ShieldCheck,
+  Building2,
+  Sparkles,
+} from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -45,122 +58,256 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#111827] relative overflow-hidden px-4 sm:px-6 lg:px-8 selection:bg-[#E30613]/20">
-      {/* Top Website Accent Line */}
+    <div className="min-h-screen w-full flex flex-col lg:flex-row bg-white selection:bg-[#E30613]/20">
+      {/* Top Accent Line in Macee Red */}
       <div className="h-[3px] w-full bg-[#E30613] fixed top-0 left-0 z-50 pointer-events-none" />
 
-      {/* Ambient Brand Glows in Macee Red & Periwinkle */}
-      <div className="absolute -top-40 -left-40 w-96 h-96 bg-[#E30613]/15 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-[#8E96CB]/20 rounded-full blur-[140px] pointer-events-none" />
-
-      <div className="max-w-md w-full space-y-7 bg-[#111827] border border-slate-800 p-8 sm:p-9 rounded-[20px] shadow-2xl backdrop-blur-xl relative z-10 border-t-[3px] border-t-[#E30613]">
-        {/* Brand Header with Real Macee Logo */}
-        <div className="text-center space-y-3">
-          <div className="flex justify-center mb-1">
-            <img
-              src="/images/macee-logo-white.png"
-              alt="Macee External Workforce Solutions"
-              className="h-10 w-auto object-contain drop-shadow-md"
-            />
-          </div>
+      {/* =================================================================
+          LEFT COLUMN: SIGN IN FORM (Clean White Editorial Canvas)
+          ================================================================= */}
+      <div className="w-full lg:w-1/2 flex flex-col justify-between p-6 sm:p-10 lg:py-14 lg:pl-12 xl:pl-16 lg:pr-16 xl:pr-20 bg-white min-h-screen">
+        <div className="w-full max-w-[420px] mx-auto lg:ml-auto lg:mr-0 flex-1 flex flex-col justify-between">
+          {/* Top: Macee Brand Logo */}
           <div>
-            <div className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-[6px] bg-[#E30613]/20 border border-[#E30613]/40 text-[#ff5a64] text-[11px] font-bold font-heading mb-1.5 uppercase tracking-wider">
-              <span>Management Portal</span>
-            </div>
-            <h1 className="text-xl font-bold text-white tracking-tight font-heading">
-              Enterprise Admin Portal
-            </h1>
-            <p className="text-xs text-slate-400 mt-1">
-              External Workforce, Secondment & Live Website Sync
-            </p>
-          </div>
-        </div>
-
-        {/* Demo Credentials Quick Fill Chip (Periwinkle & Card accents) */}
-        <div
-          onClick={handleQuickFill}
-          className="cursor-pointer group flex items-center justify-between p-3.5 rounded-[10px] bg-[#F0F3FA]/10 border border-[#8E96CB]/30 hover:border-[#8E96CB] hover:bg-[#F0F3FA]/15 transition-all text-xs shadow-inner"
-        >
-          <div className="flex items-center space-x-2 text-slate-200">
-            <CheckCircle2 className="w-4 h-4 text-[#8E96CB] shrink-0" />
-            <span className="text-[11px]">
-              <strong>Demo Login:</strong> admin@macee.com / admin123
-            </span>
-          </div>
-          <span className="text-[11px] font-bold text-[#ff5a64] group-hover:underline font-heading">
-            Auto-fill
-          </span>
-        </div>
-
-        {/* Error Alert */}
-        {error && (
-          <div className="flex items-center space-x-2.5 p-3.5 bg-rose-950/60 border border-rose-800/80 text-rose-200 rounded-[10px] text-xs">
-            <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
-            <span>{error}</span>
-          </div>
-        )}
-
-        {/* Form */}
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <div>
-            <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5 font-heading">
-              Work Email
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                <Mail className="h-4 w-4" />
-              </div>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@macee.com"
-                className="w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-slate-700 rounded-[10px] text-white text-xs placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#E30613] focus:border-transparent transition-all"
+            <div className="flex items-center space-x-3">
+              <img
+                src="/images/macee-logo.png"
+                alt="Macee External Workforce Solutions"
+                className="h-9 sm:h-10 w-auto object-contain"
+                onError={(e) => {
+                  // Fallback to white logo if dark logo is missing
+                  const target = e.currentTarget as HTMLImageElement;
+                  target.onerror = null;
+                  target.src = '/uploads/Macee-landscape-tricolore.png';
+                }}
               />
             </div>
           </div>
 
-          <div>
-            <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5 font-heading">
-              Secure Password
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                <Lock className="h-4 w-4" />
-              </div>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-slate-700 rounded-[10px] text-white text-xs placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#E30613] focus:border-transparent transition-all"
-              />
+          {/* Middle: Sign In Form Box */}
+          <div className="w-full my-auto py-6 space-y-6">
+            <div className="space-y-1.5">
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#111827] font-heading tracking-tight">
+                Sign in
+              </h1>
+              <p className="text-xs sm:text-sm text-slate-500">
+                Welcome back! Please enter your administrative credentials.
+              </p>
             </div>
-          </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full is-btn mt-2 py-3.5 text-xs uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed font-heading"
-          >
-            {loading ? (
-              <span>Authenticating...</span>
-            ) : (
-              <>
-                <span>Sign In to Macee Portal</span>
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </>
+            {/* Quick Demo Credentials Chip */}
+            <div
+              onClick={handleQuickFill}
+              className="cursor-pointer group flex items-center justify-between p-3 rounded-xl bg-[#F0F3FA] border border-[#8E96CB]/30 hover:border-[#8E96CB] hover:bg-[#EAF0FC] transition-all text-xs"
+              title="Click to auto-fill administrative credentials"
+            >
+              <div className="flex items-center space-x-2 text-slate-700">
+                <CheckCircle2 className="w-4 h-4 text-[#36427D] shrink-0" />
+                <span className="text-[11px] truncate">
+                  <strong>Demo:</strong> admin@macee.com / admin123
+                </span>
+              </div>
+              <span className="text-[11px] font-bold text-[#E30613] group-hover:underline shrink-0 pl-2">
+                Auto-fill
+              </span>
+            </div>
+
+            {/* Error Alert */}
+            {error && (
+              <div className="flex items-center space-x-2.5 p-3.5 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl text-xs animate-fadeIn">
+                <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+                <span>{error}</span>
+              </div>
             )}
-          </button>
-        </form>
 
-        {/* Dutch Compliance Footer Accreditations */}
-        <div className="pt-4 border-t border-slate-800/80 flex items-center justify-between text-[10px] text-slate-400 font-medium">
-          <span>SNA NEN 4400-1</span>
-          <span className="text-[#8E96CB]">IND Recognised Sponsor</span>
-          <span>100% WAADI Compliant</span>
+            {/* Form */}
+            <form className="space-y-4" onSubmit={handleSubmit}>
+              {/* Email Address */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Email address*
+                </label>
+                <div className="relative">
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="admin@macee.com"
+                    className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 text-xs placeholder-slate-400 focus:outline-none focus:border-[#E30613] focus:ring-1 focus:ring-[#E30613] transition-all shadow-2xs"
+                  />
+                </div>
+              </div>
+
+              {/* Password */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Password*
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••••••••••"
+                    className="w-full pl-3.5 pr-10 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 text-xs placeholder-slate-400 focus:outline-none focus:border-[#E30613] focus:ring-1 focus:ring-[#E30613] transition-all shadow-2xs font-mono"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-700 transition-colors"
+                    title={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Remember Me & Quick Forgot / Demo Fill */}
+              <div className="flex items-center justify-between text-xs pt-0.5">
+                <label className="flex items-center space-x-2 text-slate-600 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="w-4 h-4 rounded border-slate-300 text-[#E30613] focus:ring-0 cursor-pointer"
+                  />
+                  <span className="font-medium">Remember me</span>
+                </label>
+
+                <button
+                  type="button"
+                  onClick={handleQuickFill}
+                  className="text-xs font-semibold text-[#E30613] hover:text-[#b80510] hover:underline transition-colors"
+                >
+                  Forgot password?
+                </button>
+              </div>
+
+              {/* Sign In Primary Button in Macee Brand Red */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full mt-2 py-3 px-4 rounded-xl bg-[#E30613] hover:bg-[#b80510] text-white font-semibold text-xs transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 font-heading tracking-wide"
+              >
+                {loading ? (
+                  <span>Authenticating...</span>
+                ) : (
+                  <>
+                    <span>Sign In</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
+
+          {/* Bottom: Dutch Compliance Accreditations */}
+          <div className="pt-6 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-[10px] text-slate-400 font-medium">
+            <span>SNA NEN 4400-1</span>
+            <span className="text-[#36427D]">IND Recognised Sponsor</span>
+            <span>100% WAADI Compliant</span>
+          </div>
+        </div>
+      </div>
+
+      {/* =================================================================
+          RIGHT COLUMN: BRAND HERO (Deep Macee Dark Canvas & Visuals)
+          ================================================================= */}
+      <div className="w-full lg:w-1/2 bg-[#0E1726] relative overflow-hidden flex flex-col justify-between p-8 sm:p-12 lg:py-14 lg:pl-16 xl:pl-20 lg:pr-12 xl:pr-16 text-white min-h-[420px] lg:min-h-screen">
+        {/* Ambient Brand Atmospheric Lighting */}
+        <div className="absolute -top-32 -right-32 w-96 h-96 bg-[#8E96CB]/15 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-[#E30613]/20 rounded-full blur-[140px] pointer-events-none" />
+
+        {/* Subtle Decorative Dot-Matrix Grid (matching reference UI) */}
+        <svg
+          className="absolute top-8 right-8 w-36 h-36 text-slate-700/35 pointer-events-none"
+          fill="currentColor"
+          viewBox="0 0 120 120"
+        >
+          <pattern
+            id="dot-grid"
+            x="0"
+            y="0"
+            width="15"
+            height="15"
+            patternUnits="userSpaceOnUse"
+          >
+            <circle cx="2" cy="2" r="1.5" />
+          </pattern>
+          <rect width="120" height="120" fill="url(#dot-grid)" />
+        </svg>
+
+        {/* Concentric Aesthetic Circles in Background */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full border border-slate-800/30 pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[850px] h-[850px] rounded-full border border-slate-800/15 pointer-events-none" />
+
+        <div className="relative z-10 w-full max-w-[480px] mx-auto lg:mr-auto lg:ml-0 flex-1 flex flex-col justify-between">
+          {/* Top Header Badge */}
+          <div>
+            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 backdrop-blur-md text-xs font-semibold text-slate-200">
+              <span>Macee Management Portal</span>
+            </div>
+          </div>
+
+          {/* Middle: Big Hero Messaging */}
+          <div className="space-y-6 my-auto py-10 lg:py-6">
+            <div className="space-y-3">
+              <h2 className="text-3xl sm:text-4xl xl:text-5xl font-bold tracking-tight text-white font-heading leading-tight">
+                Welcome to <br />
+                <span className="text-white">Macee Workforce</span>
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-md font-sans">
+                Macee empowers international organisations to manage staffing workflows, compliance, and talent deployment effortlessly with precision tools. Connect with verified specialists and streamline your operations today!
+              </p>
+            </div>
+
+            {/* Social Proof Avatars Row (matching reference image) */}
+            <div className="pt-2 flex flex-col sm:flex-row sm:items-center gap-3">
+              <div className="flex -space-x-2.5 overflow-hidden shrink-0">
+                <img
+                  className="inline-block h-10 w-10 rounded-full ring-2 ring-[#0E1726] object-cover"
+                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80"
+                  alt="Specialist"
+                />
+                <img
+                  className="inline-block h-10 w-10 rounded-full ring-2 ring-[#0E1726] object-cover"
+                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80"
+                  alt="Specialist"
+                />
+                <img
+                  className="inline-block h-10 w-10 rounded-full ring-2 ring-[#0E1726] object-cover"
+                  src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80"
+                  alt="Specialist"
+                />
+                <img
+                  className="inline-block h-10 w-10 rounded-full ring-2 ring-[#0E1726] object-cover"
+                  src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80"
+                  alt="Specialist"
+                />
+              </div>
+
+              <p className="text-xs text-slate-300 font-medium">
+                Over <strong className="text-white font-bold">85+ trusted client partners</strong> and verified specialists active on macee.com
+              </p>
+            </div>
+          </div>
+
+          {/* Bottom Feature Badges */}
+          <div className="pt-6 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400">
+            <div className="flex items-center space-x-2">
+              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <span>Encrypted Session & 2FA Ready</span>
+            </div>
+            <div className="text-[11px] font-mono text-slate-500">
+              v2.4 Enterprise
+            </div>
+          </div>
         </div>
       </div>
     </div>
