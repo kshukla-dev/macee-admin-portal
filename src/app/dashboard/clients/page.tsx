@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 
 export default function ClientsManagementPage() {
-  const [activeTab, setActiveTab] = useState<'certifications' | 'industries' | 'expertise' | 'services'>('certifications');
+  const [activeTab, setActiveTab] = useState<'certifications' | 'industries' | 'expertise'>('certifications');
   const [clientsData, setClientsData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -38,6 +38,12 @@ export default function ClientsManagementPage() {
   const [certText, setCertText] = useState('');
   const [certImage, setCertImage] = useState('');
   const [certAccent, setCertAccent] = useState(false);
+
+  // Modal for Technical Domains (Expertise)
+  const [domainModalOpen, setDomainModalOpen] = useState(false);
+  const [editingDomainIndex, setEditingDomainIndex] = useState<number | null>(null);
+  const [domainName, setDomainName] = useState('');
+  const [domainTechnologies, setDomainTechnologies] = useState('');
 
   useEffect(() => {
     fetchClientsData();
@@ -71,10 +77,6 @@ export default function ClientsManagementPage() {
 
   const certificationsList: any[] = Array.isArray(clientsData?.certifications)
     ? clientsData.certifications
-    : [];
-
-  const servicesList: any[] = Array.isArray(clientsData?.services)
-    ? clientsData.services
     : [];
 
   const handleSaveAll = async (updatedData: any) => {
@@ -155,6 +157,85 @@ export default function ClientsManagementPage() {
       const updatedCerts = certificationsList.filter((_: any, i: number) => i !== index);
       const updatedData = { ...clientsData, certifications: updatedCerts };
       handleSaveAll(updatedData);
+    };
+
+    // Technical Domains (Expertise) CRUD
+    const handleOpenAddDomain = () => {
+      setEditingDomainIndex(null);
+      setDomainName('');
+      setDomainTechnologies('');
+      setDomainModalOpen(true);
+    };
+
+    const handleOpenEditDomain = (index: number) => {
+      const item = expertiseItems[index];
+      if (!item) return;
+      setEditingDomainIndex(index);
+      setDomainName(item.domain || '');
+      setDomainTechnologies(
+        Array.isArray(item.technologies) ? item.technologies.join(', ') : item.technologies || ''
+      );
+      setDomainModalOpen(true);
+    };
+
+    const handleSaveDomain = (e: React.FormEvent) => {
+      e.preventDefault();
+      const updatedItems = [...expertiseItems];
+      const existing = editingDomainIndex !== null ? updatedItems[editingDomainIndex] : null;
+
+      const newItem = {
+        id: existing?.id || `exp-${Date.now()}`,
+        domain: domainName.trim(),
+        technologies: domainTechnologies.trim(),
+      };
+
+      if (editingDomainIndex !== null) {
+        updatedItems[editingDomainIndex] = newItem;
+      } else {
+        updatedItems.push(newItem);
+      }
+
+      let updatedExpertise: any;
+      if (Array.isArray(clientsData?.expertise)) {
+        updatedExpertise = updatedItems;
+      } else if (clientsData?.expertise && typeof clientsData.expertise === 'object') {
+        updatedExpertise = {
+          ...clientsData.expertise,
+          items: updatedItems,
+        };
+      } else {
+        updatedExpertise = {
+          title: 'Expertise',
+          subheading: 'Proven track record in technical skills & experience',
+          items: updatedItems,
+        };
+      }
+
+      handleSaveAll({ ...clientsData, expertise: updatedExpertise });
+      setDomainModalOpen(false);
+    };
+
+    const handleDeleteDomain = (index: number) => {
+      if (!confirm('Are you sure you want to delete this technical domain?')) return;
+      const updatedItems = expertiseItems.filter((_: any, i: number) => i !== index);
+
+      let updatedExpertise: any;
+      if (Array.isArray(clientsData?.expertise)) {
+        updatedExpertise = updatedItems;
+      } else if (clientsData?.expertise && typeof clientsData.expertise === 'object') {
+        updatedExpertise = {
+          ...clientsData.expertise,
+          items: updatedItems,
+        };
+      } else {
+        updatedExpertise = {
+          title: 'Expertise',
+          subheading: 'Proven track record in technical skills & experience',
+          items: updatedItems,
+        };
+      }
+
+      handleSaveAll({ ...clientsData, expertise: updatedExpertise });
     };
 
     // Industries Tag handlers
@@ -277,7 +358,6 @@ export default function ClientsManagementPage() {
               { id: 'certifications', label: 'Accreditations & Certifications' },
               { id: 'industries', label: 'Industry Sectors' },
               { id: 'expertise', label: 'Technical Domains' },
-              { id: 'services', label: 'Services' },
             ].map((tab) => {
               const isActive = activeTab === tab.id;
               return (
@@ -435,53 +515,61 @@ export default function ClientsManagementPage() {
 
           {/* Tab 3: Technical Domains */}
           {activeTab === 'expertise' && (
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-2xs p-6 space-y-4">
-              <h3 className="text-base font-bold text-[#111827] font-sans">
-                Domain Competencies & Roles
-              </h3>
-              <p className="text-xs text-slate-500">
-                Specialized candidate allocation frameworks.
-              </p>
+            <div className="space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-base font-bold text-[#111827] font-sans">
+                    Domain Competencies & Roles
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Specialized candidate allocation frameworks and skill profiles displayed on macee.com.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleOpenAddDomain}
+                  className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl bg-[#E30613] hover:bg-[#b80510] text-white text-xs font-semibold shadow-xs transition-all shrink-0 self-start sm:self-auto"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Add Technical Domain</span>
+                </button>
+              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
                 {expertiseItems.map((item: any, idx: number) => (
-                  <div key={idx} className="p-4 rounded-xl border border-slate-100 bg-slate-50/50">
-                    <h4 className="text-xs font-bold text-[#111827] uppercase tracking-wider">
-                      {item.domain}
-                    </h4>
-                    <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                      {Array.isArray(item.technologies) ? item.technologies.join(', ') : item.technologies}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Tab 4: Services */}
-          {activeTab === 'services' && (
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-2xs p-6 space-y-4">
-              <div>
-                <h3 className="text-base font-bold text-[#111827] font-sans">
-                  Workforce Solutions & Services
-                </h3>
-                <p className="text-xs text-slate-500 mt-1">
-                  Core staffing models displayed under the clients solution portfolio.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-                {servicesList.map((service: any, idx: number) => (
-                  <div key={idx} className="p-5 rounded-2xl border border-slate-100 bg-slate-50/60 flex flex-col justify-between">
+                  <div
+                    key={idx}
+                    className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between"
+                  >
                     <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-white text-[#36427D] border border-slate-200">
-                        {service.id || `service-${idx + 1}`}
-                      </span>
-                      <h4 className="text-sm font-bold text-[#111827] mt-3 font-sans">
-                        {service.title}
-                      </h4>
-                      <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                        {service.description}
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-center space-x-2.5">
+                          <div className="w-8 h-8 rounded-lg bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
+                            <Cpu className="w-4 h-4" />
+                          </div>
+                          <h4 className="text-xs font-bold text-[#111827] uppercase tracking-wider font-sans">
+                            {item.domain}
+                          </h4>
+                        </div>
+                        <div className="flex items-center space-x-1 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => handleOpenEditDomain(idx)}
+                            className="text-slate-500 hover:text-[#111827] text-xs font-semibold px-2 py-1 rounded-md hover:bg-slate-100 transition-colors"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteDomain(idx)}
+                            className="text-rose-500 hover:text-rose-700 text-xs font-semibold px-2 py-1 rounded-md hover:bg-rose-50 transition-colors"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                      <p className="text-xs text-slate-600 mt-3 leading-relaxed bg-slate-50/70 p-3 rounded-xl border border-slate-100">
+                        {Array.isArray(item.technologies) ? item.technologies.join(', ') : item.technologies}
                       </p>
                     </div>
                   </div>
@@ -571,6 +659,67 @@ export default function ClientsManagementPage() {
                 </button>
                 <button type="submit" disabled={saving} className="is-btn py-2 px-5 text-xs font-semibold">
                   {saving ? 'Saving...' : 'Save Certification'}
+                </button>
+              </div>
+            </form>
+          </Modal>
+        )}
+
+        {/* Technical Domain Modal */}
+        {domainModalOpen && (
+          <Modal
+            isOpen={true}
+            onClose={() => setDomainModalOpen(false)}
+            title={editingDomainIndex !== null ? 'Edit Technical Domain' : 'Add Technical Domain'}
+            subtitle="Updates will sync with Macee's technical competencies framework."
+            maxWidth="lg"
+          >
+            <form onSubmit={handleSaveDomain} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Domain Title *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={domainName}
+                  onChange={(e) => setDomainName(e.target.value)}
+                  placeholder="e.g. Software Development, Cloud & DevOps, AI & Data"
+                  className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Technologies, Stacks & Tools *
+                </label>
+                <textarea
+                  required
+                  rows={4}
+                  value={domainTechnologies}
+                  onChange={(e) => setDomainTechnologies(e.target.value)}
+                  placeholder="e.g. .NET, C / C++ / C#, JAVA, Python, TypeScript, React etc."
+                  className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613]"
+                />
+                <p className="text-[11px] text-slate-400 mt-1">
+                  Enter comma-separated technologies or specialization roles.
+                </p>
+              </div>
+
+              <div className="pt-2 flex justify-end space-x-2">
+                <button
+                  type="button"
+                  onClick={() => setDomainModalOpen(false)}
+                  className="px-4 py-2 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="is-btn py-2 px-5 text-xs font-semibold"
+                >
+                  {saving ? 'Saving...' : 'Save Domain'}
                 </button>
               </div>
             </form>
