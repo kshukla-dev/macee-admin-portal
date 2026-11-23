@@ -97,28 +97,7 @@ export function Topbar({
 
       {/* Right: Search + Notification Bell + User Profile Dropdown */}
       <div className="flex items-center space-x-3 sm:space-x-4">
-        {/* Search Bar (Screenshot style: rounded pill with search icon) */}
-        <div className="relative hidden sm:block">
-          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-          <input
-            type="text"
-            placeholder={searchPlaceholder}
-            value={searchValue}
-            onChange={handleSearchChange}
-            className="w-48 lg:w-64 h-9 pl-9 pr-3 text-xs bg-slate-50/70 border border-slate-200/80 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#E30613] focus:border-[#E30613] text-slate-800 placeholder-slate-400 transition-all"
-          />
-        </div>
 
-        {/* Notification Bell with Red Badge Dot */}
-        <div className="relative">
-          <button
-            title="Notifications"
-            className="w-8 h-8 rounded-full flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors relative"
-          >
-            <Bell className="w-4 h-4" />
-            <span className="absolute top-1 right-1.5 w-2 h-2 rounded-full bg-[#E30613] ring-2 ring-white" />
-          </button>
-        </div>
 
         {/* User Profile (Avatar circle with 'KS' or 'Admin' + dropdown arrow) */}
         <div className="relative">
@@ -127,7 +106,7 @@ export function Topbar({
             className="flex items-center space-x-2 pl-2 text-xs font-semibold text-slate-700 hover:text-slate-900 focus:outline-none"
           >
             <div className="w-8 h-8 rounded-full bg-[#0E1726] text-white flex items-center justify-center font-bold text-xs">
-              KS
+              AD
             </div>
             <span className="hidden md:inline font-semibold text-slate-800">Admin</span>
             <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
