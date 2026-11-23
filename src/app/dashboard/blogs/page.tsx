@@ -66,7 +66,7 @@ export default function BlogManagementPage() {
   const [slug, setSlug] = useState('');
   const [category, setCategory] = useState(CATEGORIES[0]);
   const [author, setAuthor] = useState('Macee Editorial');
-  const [coverImage, setCoverImage] = useState('/uploads/people-working-dsk.jpg');
+  const [coverImage, setCoverImage] = useState('');
   const [excerpt, setExcerpt] = useState('');
   const [content, setContent] = useState('');
   const [tags, setTags] = useState('');
@@ -120,7 +120,7 @@ export default function BlogManagementPage() {
     setSlug('');
     setCategory(CATEGORIES[0]);
     setAuthor('Macee Editorial');
-    setCoverImage('/uploads/people-working-dsk.jpg');
+    setCoverImage('');
     setExcerpt('');
     setContent('');
     setTags('Netherlands, Compliance, Workforce');
@@ -135,7 +135,7 @@ export default function BlogManagementPage() {
     setSlug(blog.slug);
     setCategory(blog.category || CATEGORIES[0]);
     setAuthor(blog.author || 'Macee Editorial');
-    setCoverImage(blog.coverImage || '/uploads/people-working-dsk.jpg');
+    setCoverImage(blog.coverImage || '');
     setExcerpt(blog.excerpt || '');
     setContent(blog.content || '');
     setTags((blog.tags || []).join(', '));
@@ -493,7 +493,7 @@ export default function BlogManagementPage() {
               value={coverImage}
               onChange={(newUrl) => setCoverImage(newUrl)}
               label="Article Cover Image"
-              helperText="Upload a featured cover image or provide an image URL."
+              helperText="Paste direct image URL. (Direct photo upload requires plan upgrade)."
               previewShape="rounded"
               aspect="wide"
             />

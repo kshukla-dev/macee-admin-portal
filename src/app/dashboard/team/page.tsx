@@ -20,6 +20,7 @@ import {
   ShieldCheck,
   Download,
   Linkedin,
+  User,
 } from 'lucide-react';
 
 interface TeamMember {
@@ -34,15 +35,6 @@ interface TeamMember {
   active?: boolean;
   order?: number;
 }
-
-const DEFAULT_AVATARS = [
-  'https://www.macee.com/media/cache/square_crop_center/rc/sMzvFzco/uploads/Bredere%20foto.png',
-  'https://www.macee.com/media/cache/square_crop_center/rc/IAJ6bXf8/uploads/maarten-koekebakker.jpeg%20%281%29.jpg',
-  'https://www.macee.com/media/cache/square_crop_center/rc/k8LJpK7C/uploads/adam-nichols.jpeg.jpg',
-  'https://www.macee.com/media/cache/square_crop_center/rc/WALuDQhd/uploads/michael-siep.png',
-  'https://www.macee.com/media/cache/square_crop_center/rc/2JLI5vyn/uploads/amin-david.jpeg.jpg',
-  'https://www.macee.com/media/cache/square_crop_center/rc/sjXS1wcB/uploads/Nicky%20.jpg',
-];
 
 export default function TeamManagementPage() {
   const [team, setTeam] = useState<TeamMember[]>([]);
@@ -85,7 +77,7 @@ export default function TeamManagementPage() {
     setEditingMember(null);
     setName('');
     setRole('');
-    setImage(DEFAULT_AVATARS[0]);
+    setImage('');
     setEmail('');
     setPhone('');
     setLinkedin('');
@@ -98,7 +90,7 @@ export default function TeamManagementPage() {
     setEditingMember(member);
     setName(member.name);
     setRole(member.role);
-    setImage(member.image || DEFAULT_AVATARS[0]);
+    setImage(member.image || '');
     setEmail(member.email || '');
     setPhone(member.phone || '');
     setLinkedin(member.linkedin || '');
@@ -312,11 +304,20 @@ export default function TeamManagementPage() {
             >
               <div>
                 <div className="flex items-start space-x-3.5">
-                  <img
-                    src={member.image || DEFAULT_AVATARS[0]}
-                    alt={member.name}
-                    className="w-14 h-14 rounded-full object-cover border-2 border-slate-100 shrink-0"
-                  />
+                  {member.image ? (
+                    <img
+                      src={member.image}
+                      alt={member.name}
+                      className="w-14 h-14 rounded-full object-cover border-2 border-slate-100 shrink-0"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                  ) : (
+                    <div className="w-14 h-14 rounded-full bg-[#EAF0FC] text-[#36427D] border-2 border-slate-100 flex items-center justify-center font-bold text-sm shrink-0">
+                      {member.name ? member.name.charAt(0).toUpperCase() : <User className="w-5 h-5 text-slate-400" />}
+                    </div>
+                  )}
                   <div className="overflow-hidden">
                     <h4 className="text-sm font-bold text-[#111827] truncate font-sans">
                       {member.name}
@@ -471,7 +472,7 @@ export default function TeamManagementPage() {
               value={image}
               onChange={(newUrl) => setImage(newUrl)}
               label="Profile Photo"
-              helperText="Upload a portrait photo or enter an image URL."
+              helperText="Paste direct portrait photo URL. (Direct upload requires plan upgrade)."
               previewShape="circle"
             />
 

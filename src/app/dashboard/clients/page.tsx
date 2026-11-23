@@ -106,7 +106,7 @@ export default function ClientsManagementPage() {
       setCertTag('Certification');
       setCertTitle('');
       setCertText('');
-      setCertImage('/uploads/NEN-4400-1.png');
+      setCertImage('');
       setCertAccent(false);
       setCertModalOpen(true);
     };
@@ -542,7 +542,7 @@ export default function ClientsManagementPage() {
                   value={certImage}
                   onChange={(newUrl) => setCertImage(newUrl)}
                   label="Accreditation Logo / Badge Image"
-                  helperText="Upload official certificate badge (PNG/JPG) or enter image URL."
+                  helperText="Paste direct badge or logo image URL. (Direct upload requires plan upgrade)."
                   previewShape="rounded"
                   aspect="wide"
                 />

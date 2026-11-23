@@ -34,7 +34,7 @@ export async function POST(request: Request) {
       id: `team-${Date.now()}`,
       name: body.name || 'Unnamed Specialist',
       role: body.role || 'Workforce Specialist',
-      image: body.image || '/images/team-room.jpg',
+      image: body.image || '',
       email: body.email || '',
       phone: body.phone || '',
       linkedin: body.linkedin || '',

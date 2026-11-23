@@ -40,7 +40,7 @@ export function syncTeamToWebsite(teamMembers: any[]): boolean {
         const item: any = {
           name: m.name,
           role: m.role,
-          image: m.image || '/images/team-room.jpg',
+          image: m.image || '',
         };
         if (m.email) item.email = m.email;
         if (m.phone) item.phone = m.phone;
