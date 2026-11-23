@@ -306,8 +306,8 @@ export default function BlogManagementPage() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`pb-3 transition-colors relative ${isActive
-                    ? 'font-bold text-[#111827] border-b-2 border-[#E30613]'
-                    : 'text-slate-500 hover:text-slate-800'
+                  ? 'font-bold text-[#111827] border-b-2 border-[#E30613]'
+                  : 'text-slate-500 hover:text-slate-800'
                   }`}
               >
                 {tab.label}
@@ -349,7 +349,7 @@ export default function BlogManagementPage() {
             className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl bg-[#E30613] hover:bg-[#b80510] text-white text-xs font-semibold shadow-xs transition-all shrink-0"
           >
             <Plus className="w-3.5 h-3.5" />
-            <span>+ Create Article</span>
+            <span>Create Article</span>
           </button>
         </div>
 
