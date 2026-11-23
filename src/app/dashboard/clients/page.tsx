@@ -5,6 +5,12 @@ import { Topbar } from '@/components/Topbar';
 import { Modal } from '@/components/Modal';
 import { ImagePicker } from '@/components/ImagePicker';
 import {
+  SkeletonKpiGrid,
+  SkeletonCertCard,
+  SkeletonDomainCard,
+  SkeletonTagChips,
+} from '@/components/Skeleton';
+import {
   Building2,
   Award,
   Cpu,
@@ -293,64 +299,68 @@ export default function ClientsManagementPage() {
           </div>
 
           {/* 4 KPI Metric Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-                <Building2 className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-xs font-medium text-slate-500">Partner Clients</p>
-                <div className="flex items-baseline space-x-2 mt-0.5">
-                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                    85+
-                  </span>
-                  <span className="text-xs font-semibold text-emerald-600">Active</span>
+          {loading ? (
+            <SkeletonKpiGrid count={4} />
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+              <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
+                <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
+                  <Building2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-slate-500">Partner Clients</p>
+                  <div className="flex items-baseline space-x-2 mt-0.5">
+                    <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                      85+
+                    </span>
+                    <span className="text-xs font-semibold text-emerald-600">Active</span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-                <Award className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-xs font-medium text-slate-500">Accreditations</p>
-                <div className="mt-0.5">
-                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                    {certificationsList.length || 0}
-                  </span>
+              <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
+                <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
+                  <Award className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-slate-500">Accreditations</p>
+                  <div className="mt-0.5">
+                    <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                      {certificationsList.length || 0}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-                <Layers className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-xs font-medium text-slate-500">Sectors Supported</p>
-                <div className="mt-0.5">
-                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                    {industryTags.length || 0}
-                  </span>
+              <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
+                <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
+                  <Layers className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-slate-500">Sectors Supported</p>
+                  <div className="mt-0.5">
+                    <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                      {industryTags.length || 0}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-xs font-medium text-slate-500">Compliance Standard</p>
-                <div className="mt-0.5">
-                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                    SNA NEN
-                  </span>
+              <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
+                <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
+                  <ShieldCheck className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-slate-500">Compliance Standard</p>
+                  <div className="mt-0.5">
+                    <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                      SNA NEN
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Status Tabs */}
           <div className="flex items-center space-x-6 border-b border-slate-200 text-xs font-medium pt-2">
@@ -397,8 +407,19 @@ export default function ClientsManagementPage() {
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {certificationsList.map((cert: any, idx: number) => {
+              {loading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <SkeletonCertCard key={i} />
+                  ))}
+                </div>
+              ) : certificationsList.length === 0 ? (
+                <div className="bg-white rounded-2xl border border-slate-100 shadow-2xs p-12 text-center text-slate-400 text-xs">
+                  No accreditations or certifications added yet.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  {certificationsList.map((cert: any, idx: number) => {
                   const imgSrc = typeof cert.image === 'string' ? cert.image : cert.image?.src;
                   return (
                     <div
@@ -466,6 +487,7 @@ export default function ClientsManagementPage() {
                   );
                 })}
               </div>
+            )}
             </div>
           )}
 
@@ -481,22 +503,28 @@ export default function ClientsManagementPage() {
                 </p>
               </div>
 
-              <div className="flex flex-wrap gap-2.5">
-                {industryTags.map((tag: string, i: number) => (
-                  <span
-                    key={i}
-                    className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-[#F0F3FA] text-slate-800 text-xs font-semibold border border-slate-200/60"
-                  >
-                    <span>{tag}</span>
-                    <button
-                      onClick={() => handleDeleteIndustry(tag)}
-                      className="text-slate-400 hover:text-[#E30613] p-0.5"
+              {loading ? (
+                <SkeletonTagChips count={10} />
+              ) : industryTags.length === 0 ? (
+                <p className="text-xs text-slate-400">No industry sectors added yet.</p>
+              ) : (
+                <div className="flex flex-wrap gap-2.5">
+                  {industryTags.map((tag: string, i: number) => (
+                    <span
+                      key={i}
+                      className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-[#F0F3FA] text-slate-800 text-xs font-semibold border border-slate-200/60"
                     >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </span>
-                ))}
-              </div>
+                      <span>{tag}</span>
+                      <button
+                        onClick={() => handleDeleteIndustry(tag)}
+                        className="text-slate-400 hover:text-[#E30613] p-0.5"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
 
               <form onSubmit={handleAddIndustry} className="flex gap-2 max-w-md pt-2">
                 <input
@@ -535,46 +563,58 @@ export default function ClientsManagementPage() {
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
-                {expertiseItems.map((item: any, idx: number) => (
-                  <div
-                    key={idx}
-                    className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between"
-                  >
-                    <div>
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex items-center space-x-2.5">
-                          <div className="w-8 h-8 rounded-lg bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-                            <Cpu className="w-4 h-4" />
+              {loading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <SkeletonDomainCard key={i} />
+                  ))}
+                </div>
+              ) : expertiseItems.length === 0 ? (
+                <div className="bg-white rounded-2xl border border-slate-100 shadow-2xs p-12 text-center text-slate-400 text-xs">
+                  No technical domains added yet.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+                  {expertiseItems.map((item: any, idx: number) => (
+                    <div
+                      key={idx}
+                      className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between"
+                    >
+                      <div>
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex items-center space-x-2.5">
+                            <div className="w-8 h-8 rounded-lg bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
+                              <Cpu className="w-4 h-4" />
+                            </div>
+                            <h4 className="text-xs font-bold text-[#111827] uppercase tracking-wider font-sans">
+                              {item.domain}
+                            </h4>
                           </div>
-                          <h4 className="text-xs font-bold text-[#111827] uppercase tracking-wider font-sans">
-                            {item.domain}
-                          </h4>
+                          <div className="flex items-center space-x-1 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => handleOpenEditDomain(idx)}
+                              className="text-slate-500 hover:text-[#111827] text-xs font-semibold px-2 py-1 rounded-md hover:bg-slate-100 transition-colors"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteDomain(idx)}
+                              className="text-rose-500 hover:text-rose-700 text-xs font-semibold px-2 py-1 rounded-md hover:bg-rose-50 transition-colors"
+                            >
+                              Delete
+                            </button>
+                          </div>
                         </div>
-                        <div className="flex items-center space-x-1 shrink-0">
-                          <button
-                            type="button"
-                            onClick={() => handleOpenEditDomain(idx)}
-                            className="text-slate-500 hover:text-[#111827] text-xs font-semibold px-2 py-1 rounded-md hover:bg-slate-100 transition-colors"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteDomain(idx)}
-                            className="text-rose-500 hover:text-rose-700 text-xs font-semibold px-2 py-1 rounded-md hover:bg-rose-50 transition-colors"
-                          >
-                            Delete
-                          </button>
-                        </div>
+                        <p className="text-xs text-slate-600 mt-3 leading-relaxed bg-slate-50/70 p-3 rounded-xl border border-slate-100">
+                          {Array.isArray(item.technologies) ? item.technologies.join(', ') : item.technologies}
+                        </p>
                       </div>
-                      <p className="text-xs text-slate-600 mt-3 leading-relaxed bg-slate-50/70 p-3 rounded-xl border border-slate-100">
-                        {Array.isArray(item.technologies) ? item.technologies.join(', ') : item.technologies}
-                      </p>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>

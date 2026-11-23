@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { Topbar } from '@/components/Topbar';
 import { Modal } from '@/components/Modal';
+import { SkeletonAccordion } from '@/components/Skeleton';
 import {
   HelpCircle,
   Plus,
@@ -640,9 +641,7 @@ export default function FaqManagementPage() {
         {/* FAQs LIST / TABLE (Editorial Style) */}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-2xs overflow-hidden">
           {loading ? (
-            <div className="p-16 text-center text-slate-400 text-xs">
-              Loading page questions...
-            </div>
+            <SkeletonAccordion count={6} />
           ) : filteredItems.length === 0 ? (
             <div className="p-16 text-center space-y-3">
               <HelpCircle className="w-8 h-8 text-slate-300 mx-auto" />

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Topbar } from '@/components/Topbar';
 import { Modal } from '@/components/Modal';
+import { SkeletonKpiGrid, SkeletonTableRow } from '@/components/Skeleton';
 import {
   Users2,
   Mail,
@@ -44,6 +45,7 @@ interface Contact {
 export default function ContactsManagementPage() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [filteredContacts, setFilteredContacts] = useState<Contact[]>([]);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'all' | 'new' | 'in_progress' | 'converted'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedService, setSelectedService] = useState('All Services');
@@ -77,6 +79,7 @@ export default function ContactsManagementPage() {
 
   const fetchContacts = async () => {
     try {
+      setLoading(true);
       const res = await fetch('/api/contacts');
       const data = await res.json();
       const list: Contact[] = data.contacts || [];
@@ -99,6 +102,8 @@ export default function ContactsManagementPage() {
       }
     } catch (e) {
       console.error(e);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -325,67 +330,71 @@ export default function ContactsManagementPage() {
         {/* =================================================================
             ROW OF 4 KPI METRIC CARDS (Exact Match to Screenshot)
             ================================================================= */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-          {/* Card 1: Total Leads */}
-          <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-              <Users2 className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-xs font-medium text-slate-500">Total Leads</p>
-              <div className="flex items-baseline space-x-2 mt-0.5">
-                <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                  {totalCount}
-                </span>
+        {loading ? (
+          <SkeletonKpiGrid count={4} />
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+            {/* Card 1: Total Leads */}
+            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
+              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
+                <Users2 className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-xs font-medium text-slate-500">Total Leads</p>
+                <div className="flex items-baseline space-x-2 mt-0.5">
+                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                    {totalCount}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Card 2: New */}
-          <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-              <Mail className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-xs font-medium text-slate-500">New</p>
-              <div className="mt-0.5">
-                <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                  {newCount}
-                </span>
+            {/* Card 2: New */}
+            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
+              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
+                <Mail className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-xs font-medium text-slate-500">New</p>
+                <div className="mt-0.5">
+                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                    {newCount}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Card 3: In Progress */}
-          <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-              <Clock className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-xs font-medium text-slate-500">In Progress</p>
-              <div className="mt-0.5">
-                <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                  {inProgressCount}
-                </span>
+            {/* Card 3: In Progress */}
+            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
+              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
+                <Clock className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-xs font-medium text-slate-500">In Progress</p>
+                <div className="mt-0.5">
+                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                    {inProgressCount}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Card 4: Converted */}
-          <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-              <Check className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-xs font-medium text-slate-500">Converted</p>
-              <div className="mt-0.5">
-                <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                  {convertedCount}
-                </span>
+            {/* Card 4: Converted */}
+            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
+              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
+                <Check className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-xs font-medium text-slate-500">Converted</p>
+                <div className="mt-0.5">
+                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                    {convertedCount}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* =================================================================
             STATUS TABS (All Leads | New | In Progress | Converted)
@@ -538,7 +547,11 @@ export default function ContactsManagementPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {paginatedList.length === 0 ? (
+                {loading ? (
+                  Array.from({ length: 6 }).map((_, i) => (
+                    <SkeletonTableRow key={i} cols={8} />
+                  ))
+                ) : paginatedList.length === 0 ? (
                   <tr>
                     <td colSpan={8} className="py-12 text-center text-slate-400">
                       No contact leads found matching your criteria.

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Topbar } from '@/components/Topbar';
 import { Modal } from '@/components/Modal';
 import { ImagePicker } from '@/components/ImagePicker';
+import { SkeletonKpiGrid, SkeletonMemberCard } from '@/components/Skeleton';
 import {
   Users2,
   Plus,
@@ -189,64 +190,68 @@ export default function TeamManagementPage() {
         </div>
 
         {/* 4 KPI Metric Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-          <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-              <Users2 className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-xs font-medium text-slate-500">Total Specialists</p>
-              <div className="flex items-baseline space-x-2 mt-0.5">
-                <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                  {team.length > 0 ? team.length : 0}
-                </span>
-                <span className="text-xs font-semibold text-emerald-600">Active</span>
+        {loading ? (
+          <SkeletonKpiGrid count={4} />
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
+              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
+                <Users2 className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-xs font-medium text-slate-500">Total Specialists</p>
+                <div className="flex items-baseline space-x-2 mt-0.5">
+                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                    {team.length > 0 ? team.length : 0}
+                  </span>
+                  <span className="text-xs font-semibold text-emerald-600">Active</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-              <UserCheck className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-xs font-medium text-slate-500">Public on Website</p>
-              <div className="mt-0.5">
-                <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                  {team.length > 0 ? team.length : 0}
-                </span>
+            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
+              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
+                <UserCheck className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-xs font-medium text-slate-500">Public on Website</p>
+                <div className="mt-0.5">
+                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                    {team.length > 0 ? team.length : 0}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-              <Building className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-xs font-medium text-slate-500">Departments</p>
-              <div className="mt-0.5">
-                <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                  6 Desks
-                </span>
+            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
+              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
+                <Building className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-xs font-medium text-slate-500">Departments</p>
+                <div className="mt-0.5">
+                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                    6 Desks
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-              <ShieldCheck className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-xs font-medium text-slate-500">Compliance</p>
-              <div className="mt-0.5">
-                <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                  100%
-                </span>
+            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
+              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-xs font-medium text-slate-500">Compliance</p>
+                <div className="mt-0.5">
+                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                    100%
+                  </span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Status Tabs */}
         <div className="flex items-center space-x-6 border-b border-slate-200 text-xs font-medium pt-2">
@@ -296,12 +301,23 @@ export default function TeamManagementPage() {
         )}
 
         {/* Team Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filteredTeam.map((member) => (
-            <div
-              key={member.id}
-              className="bg-white rounded-2xl border border-slate-100 shadow-2xs p-5 hover:shadow-md transition-all flex flex-col justify-between"
-            >
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <SkeletonMemberCard key={i} />
+            ))}
+          </div>
+        ) : filteredTeam.length === 0 ? (
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-2xs p-12 text-center text-slate-400 text-xs">
+            No team members found matching your criteria.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {filteredTeam.map((member) => (
+              <div
+                key={member.id}
+                className="bg-white rounded-2xl border border-slate-100 shadow-2xs p-5 hover:shadow-md transition-all flex flex-col justify-between"
+              >
               <div>
                 <div className="flex items-start space-x-3.5">
                   {member.image ? (
@@ -380,7 +396,8 @@ export default function TeamManagementPage() {
             </div>
           ))}
         </div>
-      </div>
+      )}
+    </div>
 
       {/* Edit/Add Modal */}
       {isModalOpen && (

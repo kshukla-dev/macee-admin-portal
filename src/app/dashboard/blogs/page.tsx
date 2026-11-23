@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Topbar } from '@/components/Topbar';
 import { Modal } from '@/components/Modal';
 import { ImagePicker } from '@/components/ImagePicker';
+import { SkeletonKpiGrid, SkeletonTableRow } from '@/components/Skeleton';
 import {
   FileText,
   Plus,
@@ -234,64 +235,68 @@ export default function BlogManagementPage() {
         </div>
 
         {/* 4 KPI Metric Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-          <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-              <FileText className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-xs font-medium text-slate-500">Total Articles</p>
-              <div className="flex items-baseline space-x-2 mt-0.5">
-                <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                  {blogs.length > 0 ? blogs.length : 0}
-                </span>
-                <span className="text-xs font-semibold text-emerald-600">Active</span>
+        {loading ? (
+          <SkeletonKpiGrid count={4} />
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
+              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
+                <FileText className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-xs font-medium text-slate-500">Total Articles</p>
+                <div className="flex items-baseline space-x-2 mt-0.5">
+                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                    {blogs.length > 0 ? blogs.length : 0}
+                  </span>
+                  <span className="text-xs font-semibold text-emerald-600">Active</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-              <BookOpen className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-xs font-medium text-slate-500">Published on Web</p>
-              <div className="mt-0.5">
-                <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                  {publishedCount}
-                </span>
+            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
+              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
+                <BookOpen className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-xs font-medium text-slate-500">Published on Web</p>
+                <div className="mt-0.5">
+                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                    {publishedCount}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-              <Clock className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-xs font-medium text-slate-500">Drafts</p>
-              <div className="mt-0.5">
-                <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                  {draftCount}
-                </span>
+            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
+              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
+                <Clock className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-xs font-medium text-slate-500">Drafts</p>
+                <div className="mt-0.5">
+                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                    {draftCount}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-              <TrendingUp className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-xs font-medium text-slate-500">Estimated Reach</p>
-              <div className="mt-0.5">
-                <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                  14.2k
-                </span>
+            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
+              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
+                <TrendingUp className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-xs font-medium text-slate-500">Estimated Reach</p>
+                <div className="mt-0.5">
+                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                    14.2k
+                  </span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Status Tabs */}
         <div className="flex items-center space-x-6 border-b border-slate-200 text-xs font-medium pt-2">
@@ -374,7 +379,11 @@ export default function BlogManagementPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {filteredBlogs.length === 0 ? (
+                {loading ? (
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <SkeletonTableRow key={i} cols={6} />
+                  ))
+                ) : filteredBlogs.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="py-12 text-center text-slate-400">
                       No articles found.

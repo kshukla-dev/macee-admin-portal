@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Topbar } from '@/components/Topbar';
 import { StatusBadge } from '@/components/StatusBadge';
+import { SkeletonKpiGrid, SkeletonTableRow } from '@/components/Skeleton';
 import {
   Mail,
   Users2,
@@ -318,103 +319,107 @@ export default function DashboardOverviewPage() {
         {/* =================================================================
             ROW OF 4 REAL PORTAL METRIC CARDS (Exact Mockup Style)
             ================================================================= */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-          {/* Card 1: Contact Leads */}
-          <Link
-            href="/dashboard/contacts"
-            className="group bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs hover:shadow-md hover:border-[#E30613]/40 transition-all flex items-center justify-between"
-          >
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] group-hover:bg-[#E30613] group-hover:text-white transition-colors flex items-center justify-center shrink-0">
-                <Mail className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-xs font-medium text-slate-500">Contact Leads</p>
-                <div className="flex items-baseline space-x-2 mt-0.5">
-                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                    {stats.totalLeads}
-                  </span>
-                  <span className="text-xs font-semibold text-emerald-600">
-                    +{stats.newLeads} new
-                  </span>
+        {loading ? (
+          <SkeletonKpiGrid count={4} />
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+            {/* Card 1: Contact Leads */}
+            <Link
+              href="/dashboard/contacts"
+              className="group bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs hover:shadow-md hover:border-[#E30613]/40 transition-all flex items-center justify-between"
+            >
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] group-hover:bg-[#E30613] group-hover:text-white transition-colors flex items-center justify-center shrink-0">
+                  <Mail className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-slate-500">Contact Leads</p>
+                  <div className="flex items-baseline space-x-2 mt-0.5">
+                    <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                      {stats.totalLeads}
+                    </span>
+                    <span className="text-xs font-semibold text-emerald-600">
+                      +{stats.newLeads} new
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-            <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#E30613] group-hover:translate-x-0.5 transition-all" />
-          </Link>
+              <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#E30613] group-hover:translate-x-0.5 transition-all" />
+            </Link>
 
-          {/* Card 2: Team Profiles */}
-          <Link
-            href="/dashboard/team"
-            className="group bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs hover:shadow-md hover:border-[#36427D]/40 transition-all flex items-center justify-between"
-          >
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] group-hover:bg-[#36427D] group-hover:text-white transition-colors flex items-center justify-center shrink-0">
-                <Users2 className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-xs font-medium text-slate-500">Team Profiles</p>
-                <div className="flex items-baseline space-x-2 mt-0.5">
-                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                    {stats.teamCount}
-                  </span>
-                  <span className="text-xs font-semibold text-[#36427D]">
-                    Active
-                  </span>
+            {/* Card 2: Team Profiles */}
+            <Link
+              href="/dashboard/team"
+              className="group bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs hover:shadow-md hover:border-[#36427D]/40 transition-all flex items-center justify-between"
+            >
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] group-hover:bg-[#36427D] group-hover:text-white transition-colors flex items-center justify-center shrink-0">
+                  <Users2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-slate-500">Team Profiles</p>
+                  <div className="flex items-baseline space-x-2 mt-0.5">
+                    <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                      {stats.teamCount}
+                    </span>
+                    <span className="text-xs font-semibold text-[#36427D]">
+                      Active
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-            <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#36427D] group-hover:translate-x-0.5 transition-all" />
-          </Link>
+              <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#36427D] group-hover:translate-x-0.5 transition-all" />
+            </Link>
 
-          {/* Card 3: Articles & Blogs */}
-          <Link
-            href="/dashboard/blogs"
-            className="group bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs hover:shadow-md hover:border-[#8E96CB]/60 transition-all flex items-center justify-between"
-          >
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] group-hover:bg-[#8E96CB] group-hover:text-white transition-colors flex items-center justify-center shrink-0">
-                <FileText className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-xs font-medium text-slate-500">Articles & Blogs</p>
-                <div className="flex items-baseline space-x-2 mt-0.5">
-                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                    {stats.blogsCount}
-                  </span>
-                  <span className="text-xs font-semibold text-slate-500">
-                    Published
-                  </span>
+            {/* Card 3: Articles & Blogs */}
+            <Link
+              href="/dashboard/blogs"
+              className="group bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs hover:shadow-md hover:border-[#8E96CB]/60 transition-all flex items-center justify-between"
+            >
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] group-hover:bg-[#8E96CB] group-hover:text-white transition-colors flex items-center justify-center shrink-0">
+                  <FileText className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-slate-500">Articles & Blogs</p>
+                  <div className="flex items-baseline space-x-2 mt-0.5">
+                    <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                      {stats.blogsCount}
+                    </span>
+                    <span className="text-xs font-semibold text-slate-500">
+                      Published
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-            <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#8E96CB] group-hover:translate-x-0.5 transition-all" />
-          </Link>
+              <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#8E96CB] group-hover:translate-x-0.5 transition-all" />
+            </Link>
 
-          {/* Card 4: FAQs & Accreditations */}
-          <Link
-            href="/dashboard/faqs"
-            className="group bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs hover:shadow-md hover:border-emerald-500/40 transition-all flex items-center justify-between"
-          >
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] group-hover:bg-emerald-600 group-hover:text-white transition-colors flex items-center justify-center shrink-0">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-xs font-medium text-slate-500">FAQs</p>
-                <div className="flex items-baseline space-x-2 mt-0.5">
-                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                    {stats.faqsCount} FAQs
-                  </span>
-                  <span className="text-xs font-semibold text-emerald-600">
-                    SNA NEN
-                  </span>
+            {/* Card 4: FAQs & Accreditations */}
+            <Link
+              href="/dashboard/faqs"
+              className="group bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs hover:shadow-md hover:border-emerald-500/40 transition-all flex items-center justify-between"
+            >
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] group-hover:bg-emerald-600 group-hover:text-white transition-colors flex items-center justify-center shrink-0">
+                  <ShieldCheck className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-slate-500">FAQs</p>
+                  <div className="flex items-baseline space-x-2 mt-0.5">
+                    <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                      {stats.faqsCount} FAQs
+                    </span>
+                    <span className="text-xs font-semibold text-emerald-600">
+                      SNA NEN
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-            <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all" />
-          </Link>
-        </div>
+              <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all" />
+            </Link>
+          </div>
+        )}
 
         {/* =================================================================
             ANALYTICS & CONTENT DISTRIBUTION CHART SECTION
@@ -584,7 +589,12 @@ export default function DashboardOverviewPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {portalModules.map((mod) => {
+                {loading ? (
+                  Array.from({ length: 6 }).map((_, i) => (
+                    <SkeletonTableRow key={i} cols={5} />
+                  ))
+                ) : (
+                  portalModules.map((mod) => {
                   const Icon = mod.icon;
                   return (
                     <tr key={mod.id} className="hover:bg-slate-50/70 transition-colors">
@@ -638,7 +648,7 @@ export default function DashboardOverviewPage() {
                       </td>
                     </tr>
                   );
-                })}
+                }))}
               </tbody>
             </table>
           </div>
@@ -679,7 +689,11 @@ export default function DashboardOverviewPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {recentLeads.length === 0 ? (
+                {loading ? (
+                  Array.from({ length: 4 }).map((_, i) => (
+                    <SkeletonTableRow key={i} cols={5} />
+                  ))
+                ) : recentLeads.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="py-8 text-center text-slate-400">
                       No recent enquiries recorded.
