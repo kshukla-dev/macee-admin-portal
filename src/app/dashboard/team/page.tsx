@@ -261,7 +261,7 @@ export default function TeamManagementPage() {
                 <p className="text-xs font-medium text-slate-500">Departments</p>
                 <div className="mt-0.5">
                   <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                    6 Desks
+                    {new Set(team.map((m) => m.desk).filter(Boolean)).size} Desks
                   </span>
                 </div>
               </div>

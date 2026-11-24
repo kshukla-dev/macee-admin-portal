@@ -53,11 +53,13 @@ export default function DashboardOverviewPage() {
     inProgressLeads: 0,
     convertedLeads: 0,
     teamCount: 0,
+    desksCount: 0,
     blogsCount: 0,
     draftBlogsCount: 0,
     faqsCount: 0,
     clientsCount: 0,
     industriesCount: 0,
+    domainsCount: 0,
   });
 
   const [recentLeads, setRecentLeads] = useState<any[]>([]);
@@ -93,27 +95,35 @@ export default function DashboardOverviewPage() {
       const inProgCount = contacts.filter((c: any) => c.status === 'in_progress').length;
       const convCount = contacts.filter((c: any) => c.status === 'converted').length;
 
+      const teamMembers = teamData.team || [];
+      const distinctDesks = new Set(teamMembers.map((m: any) => m.desk).filter(Boolean)).size;
+
       const blogs = blogsData.blogs || [];
       const publishedBlogs = blogs.filter((b: any) => b.status === 'published').length;
       const draftBlogs = blogs.filter((b: any) => b.status === 'draft').length;
 
       const clientObj = clientsData.clients || {};
-      const certsCount = (clientObj.certifications || []).length || 4;
+      const certsCount = (clientObj.certifications || []).length;
       const indCount = Array.isArray(clientObj.industries)
         ? clientObj.industries.length
-        : (clientObj.industries?.tags || []).length || 10;
+        : (clientObj.industries?.tags || []).length;
+      const domainsCount = Array.isArray(clientObj.expertise)
+        ? clientObj.expertise.length
+        : (clientObj.expertise?.items || []).length;
 
       setStats({
-        totalLeads: contacts.length > 0 ? contacts.length : 248,
-        newLeads: newCount > 0 ? newCount : 24,
-        inProgressLeads: inProgCount > 0 ? inProgCount : 68,
-        convertedLeads: convCount > 0 ? convCount : 156,
-        teamCount: (teamData.team || []).length || 32,
-        blogsCount: publishedBlogs || 18,
-        draftBlogsCount: draftBlogs || 2,
-        faqsCount: (faqsData.items || []).length || 16,
+        totalLeads: contacts.length,
+        newLeads: newCount,
+        inProgressLeads: inProgCount,
+        convertedLeads: convCount,
+        teamCount: teamMembers.length,
+        desksCount: distinctDesks,
+        blogsCount: publishedBlogs,
+        draftBlogsCount: draftBlogs,
+        faqsCount: (faqsData.items || []).length,
         clientsCount: certsCount,
         industriesCount: indCount,
+        domainsCount: domainsCount,
       });
 
       setRecentLeads(contacts.slice(0, 5));
@@ -187,7 +197,7 @@ export default function DashboardOverviewPage() {
       iconColor: 'text-[#36427D]',
       count: stats.teamCount,
       countLabel: 'Specialists',
-      subtext: '6 Department Desks',
+      subtext: `${stats.desksCount || stats.teamCount} Department Desks`,
       status: 'Published Live',
       statusColor: 'bg-emerald-50 text-emerald-700 border-emerald-200',
     },
@@ -229,7 +239,7 @@ export default function DashboardOverviewPage() {
       iconColor: 'text-[#36427D]',
       count: `${stats.industriesCount} Sectors`,
       countLabel: 'Capabilities',
-      subtext: `${stats.clientsCount} Accreditations`,
+      subtext: `${stats.clientsCount} Accreditations, ${stats.domainsCount} Domains`,
       status: 'SNA NEN 4400-1',
       statusColor: 'bg-[#F0F3FA] text-[#36427D] border-slate-200',
     },
@@ -408,10 +418,10 @@ export default function DashboardOverviewPage() {
                   <p className="text-xs font-medium text-slate-500">FAQs</p>
                   <div className="flex items-baseline space-x-2 mt-0.5">
                     <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                      {stats.faqsCount} FAQs
+                      {stats.faqsCount}
                     </span>
                     <span className="text-xs font-semibold text-emerald-600">
-                      SNA NEN
+                      Active
                     </span>
                   </div>
                 </div>

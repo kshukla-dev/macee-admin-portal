@@ -347,29 +347,15 @@ export default function ClientsManagementPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
             <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
               <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-                <Building2 className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-xs font-medium text-slate-500">Partner Clients</p>
-                <div className="flex items-baseline space-x-2 mt-0.5">
-                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                    85+
-                  </span>
-                  <span className="text-xs font-semibold text-emerald-600">Active</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
                 <Award className="w-5 h-5" />
               </div>
               <div>
                 <p className="text-xs font-medium text-slate-500">Accreditations</p>
-                <div className="mt-0.5">
+                <div className="flex items-baseline space-x-2 mt-0.5">
                   <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                    {certificationsList.length || 0}
+                    {certificationsList.length}
                   </span>
+                  <span className="text-xs font-semibold text-emerald-600">Active</span>
                 </div>
               </div>
             </div>
@@ -379,11 +365,27 @@ export default function ClientsManagementPage() {
                 <Layers className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-xs font-medium text-slate-500">Sectors Supported</p>
-                <div className="mt-0.5">
+                <p className="text-xs font-medium text-slate-500">Industry Sectors</p>
+                <div className="flex items-baseline space-x-2 mt-0.5">
                   <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                    {industryTags.length || 0}
+                    {industryTags.length}
                   </span>
+                  <span className="text-xs font-semibold text-sky-600">Supported</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
+              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
+                <Cpu className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-xs font-medium text-slate-500">Technical Domains</p>
+                <div className="flex items-baseline space-x-2 mt-0.5">
+                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                    {expertiseItems.length}
+                  </span>
+                  <span className="text-xs font-semibold text-indigo-600">Frameworks</span>
                 </div>
               </div>
             </div>
@@ -394,10 +396,11 @@ export default function ClientsManagementPage() {
               </div>
               <div>
                 <p className="text-xs font-medium text-slate-500">Compliance Standard</p>
-                <div className="mt-0.5">
-                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                <div className="flex items-baseline space-x-2 mt-0.5">
+                  <span className="text-xl sm:text-2xl font-bold text-[#111827] font-sans">
                     SNA NEN
                   </span>
+                  <span className="text-xs font-semibold text-emerald-600">4400-1</span>
                 </div>
               </div>
             </div>

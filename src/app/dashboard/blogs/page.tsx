@@ -314,13 +314,13 @@ export default function BlogManagementPage() {
 
             <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
               <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-                <TrendingUp className="w-5 h-5" />
+                <Tag className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-xs font-medium text-slate-500">Estimated Reach</p>
+                <p className="text-xs font-medium text-slate-500">Topic Categories</p>
                 <div className="mt-0.5">
                   <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                    14.2k
+                    {new Set(blogs.map((b) => b.category).filter(Boolean)).size}
                   </span>
                 </div>
               </div>
