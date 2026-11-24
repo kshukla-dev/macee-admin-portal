@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { Topbar } from '@/components/Topbar';
 import { Modal } from '@/components/Modal';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { SkeletonAccordion } from '@/components/Skeleton';
 import {
   HelpCircle,
@@ -403,19 +404,48 @@ export default function FaqManagementPage() {
     }
   };
 
-  const handleDeleteFaq = async (id: string, questionTitle: string) => {
-    if (!confirm(`Are you sure you want to delete this FAQ?\n\n"${questionTitle}"`)) return;
-    try {
-      const res = await fetch(`/api/faqs?id=${id}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (data.success) {
-        setItems((prev) => prev.filter((item) => item.id !== id));
-        setSyncMessage('✓ FAQ deleted and updated on Macee website.');
-        setTimeout(() => setSyncMessage(null), 4000);
-      }
-    } catch (e) {
-      alert('Failed to delete FAQ');
-    }
+  // Delete Confirmation Dialog state
+  const [deleteDialog, setDeleteDialog] = useState<{
+    isOpen: boolean;
+    title: string;
+    description: string;
+    itemName?: string;
+    isLoading?: boolean;
+    onConfirm: () => void | Promise<void>;
+  }>({
+    isOpen: false,
+    title: '',
+    description: '',
+    onConfirm: () => { },
+  });
+
+  const handleDeleteFaq = (id: string, questionTitle: string) => {
+    setDeleteDialog({
+      isOpen: true,
+      title: 'Delete FAQ',
+      description: 'Are you sure you want to delete this FAQ? This action cannot be undone and will update the live Macee website.',
+      itemName: questionTitle,
+      isLoading: false,
+      onConfirm: async () => {
+        setDeleteDialog((prev) => ({ ...prev, isLoading: true }));
+        try {
+          const res = await fetch(`/api/faqs?id=${id}`, { method: 'DELETE' });
+          const data = await res.json();
+          if (data.success) {
+            setItems((prev) => prev.filter((item) => item.id !== id));
+            setSyncMessage('✓ FAQ deleted and updated on Macee website.');
+            setTimeout(() => setSyncMessage(null), 4000);
+            setDeleteDialog((prev) => ({ ...prev, isOpen: false, isLoading: false }));
+          } else {
+            alert('Failed to delete FAQ');
+            setDeleteDialog((prev) => ({ ...prev, isLoading: false }));
+          }
+        } catch (e) {
+          alert('Failed to delete FAQ');
+          setDeleteDialog((prev) => ({ ...prev, isLoading: false }));
+        }
+      },
+    });
   };
 
   const handleToggleActive = async (item: FaqItem) => {
@@ -545,20 +575,18 @@ export default function FaqManagementPage() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap shrink-0 ${
-                    isActive
+                  className={`inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap shrink-0 ${isActive
                       ? 'bg-[#111827] text-white shadow-2xs font-semibold'
                       : 'text-slate-600 hover:text-[#111827] hover:bg-slate-100/80'
-                  }`}
+                    }`}
                 >
                   <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : 'text-slate-400'}`} />
                   <span>{tab.label}</span>
                   <span
-                    className={`ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
-                      isActive
+                    className={`ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${isActive
                         ? 'bg-white/20 text-white'
                         : 'bg-slate-200/70 text-slate-600'
-                    }`}
+                      }`}
                   >
                     {count}
                   </span>
@@ -627,25 +655,22 @@ export default function FaqManagementPage() {
             <div className="flex items-center space-x-1 bg-white border border-slate-200/90 rounded-xl p-1 shadow-2xs text-xs">
               <button
                 onClick={() => setStatusFilter('all')}
-                className={`px-2.5 py-1 rounded-lg font-medium transition-colors ${
-                  statusFilter === 'all' ? 'bg-[#111827] text-white' : 'text-slate-600 hover:text-slate-900'
-                }`}
+                className={`px-2.5 py-1 rounded-lg font-medium transition-colors ${statusFilter === 'all' ? 'bg-[#111827] text-white' : 'text-slate-600 hover:text-slate-900'
+                  }`}
               >
                 All Status
               </button>
               <button
                 onClick={() => setStatusFilter('active')}
-                className={`px-2.5 py-1 rounded-lg font-medium transition-colors ${
-                  statusFilter === 'active' ? 'bg-emerald-600 text-white' : 'text-slate-600 hover:text-slate-900'
-                }`}
+                className={`px-2.5 py-1 rounded-lg font-medium transition-colors ${statusFilter === 'active' ? 'bg-emerald-600 text-white' : 'text-slate-600 hover:text-slate-900'
+                  }`}
               >
                 Active Only
               </button>
               <button
                 onClick={() => setStatusFilter('inactive')}
-                className={`px-2.5 py-1 rounded-lg font-medium transition-colors ${
-                  statusFilter === 'inactive' ? 'bg-slate-700 text-white' : 'text-slate-600 hover:text-slate-900'
-                }`}
+                className={`px-2.5 py-1 rounded-lg font-medium transition-colors ${statusFilter === 'inactive' ? 'bg-slate-700 text-white' : 'text-slate-600 hover:text-slate-900'
+                  }`}
               >
                 Draft / Inactive
               </button>
@@ -716,11 +741,10 @@ export default function FaqManagementPage() {
                         <div className="flex items-center space-x-1 shrink-0 pt-1">
                           <button
                             onClick={() => handleToggleActive(item)}
-                            className={`text-xs font-semibold px-2.5 py-1 rounded-lg transition-colors ${
-                              item.active !== false
+                            className={`text-xs font-semibold px-2.5 py-1 rounded-lg transition-colors ${item.active !== false
                                 ? 'text-slate-500 hover:text-amber-600 hover:bg-amber-50'
                                 : 'text-emerald-600 hover:bg-emerald-50'
-                            }`}
+                              }`}
                             title={item.active !== false ? 'Deactivate Question' : 'Activate Question'}
                           >
                             {item.active !== false ? 'Deactivate' : 'Publish'}
@@ -728,10 +752,10 @@ export default function FaqManagementPage() {
 
                           <button
                             onClick={() => handleOpenEdit(item)}
-                            className="inline-flex items-center space-x-1 text-xs font-semibold text-slate-700 hover:text-[#111827] px-2.5 py-1 rounded-lg hover:bg-slate-100 transition-colors"
+                            className="inline-flex items-center text-slate-500 hover:text-[#111827] p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+                            title="Edit FAQ"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
-                            <span>Edit</span>
                           </button>
 
                           <button
@@ -837,11 +861,10 @@ export default function FaqManagementPage() {
                           onClick={() => {
                             setCurrentPage(page);
                           }}
-                          className={`w-7 h-7 rounded-lg text-xs font-semibold transition-all ${
-                            currentPage === page
+                          className={`w-7 h-7 rounded-lg text-xs font-semibold transition-all ${currentPage === page
                               ? 'bg-[#0E1726] text-white shadow-2xs'
                               : 'border border-slate-200 hover:bg-slate-50 text-slate-700'
-                          }`}
+                            }`}
                         >
                           {page}
                         </button>
@@ -942,11 +965,10 @@ export default function FaqManagementPage() {
                       key={suggested}
                       type="button"
                       onClick={() => setFormTag(suggested)}
-                      className={`text-[10px] px-2 py-0.5 rounded-md border transition-colors ${
-                        formTag === suggested
+                      className={`text-[10px] px-2 py-0.5 rounded-md border transition-colors ${formTag === suggested
                           ? 'bg-[#111827] text-white border-[#111827]'
                           : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
-                      }`}
+                        }`}
                     >
                       {suggested}
                     </button>
@@ -961,22 +983,20 @@ export default function FaqManagementPage() {
                 <button
                   type="button"
                   onClick={() => setModalTab('en')}
-                  className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition-colors ${
-                    modalTab === 'en'
+                  className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition-colors ${modalTab === 'en'
                       ? 'border-[#E30613] text-[#111827]'
                       : 'border-transparent text-slate-400 hover:text-slate-700'
-                  }`}
+                    }`}
                 >
                   🇬🇧 English Content (Default)
                 </button>
                 <button
                   type="button"
                   onClick={() => setModalTab('nl')}
-                  className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition-colors ${
-                    modalTab === 'nl'
+                  className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition-colors ${modalTab === 'nl'
                       ? 'border-[#E30613] text-[#111827]'
                       : 'border-transparent text-slate-400 hover:text-slate-700'
-                  }`}
+                    }`}
                 >
                   🇳🇱 Dutch Translation (Nederlands)
                 </button>
@@ -1095,6 +1115,17 @@ export default function FaqManagementPage() {
           </form>
         </Modal>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={deleteDialog.isOpen}
+        onClose={() => setDeleteDialog((prev) => ({ ...prev, isOpen: false }))}
+        onConfirm={deleteDialog.onConfirm}
+        title={deleteDialog.title}
+        description={deleteDialog.description}
+        itemName={deleteDialog.itemName}
+        isLoading={deleteDialog.isLoading}
+      />
     </div>
   );
 }

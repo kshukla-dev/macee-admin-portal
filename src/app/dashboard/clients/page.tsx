@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Topbar } from '@/components/Topbar';
 import { Modal } from '@/components/Modal';
 import { ImagePicker } from '@/components/ImagePicker';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 import {
   SkeletonKpiGrid,
   SkeletonCertCard,
@@ -43,6 +44,20 @@ export default function ClientsManagementPage() {
   const [certTitle, setCertTitle] = useState('');
   const [certText, setCertText] = useState('');
   const [certImage, setCertImage] = useState('');
+
+  // Delete Confirmation Dialog state
+  const [deleteDialog, setDeleteDialog] = useState<{
+    isOpen: boolean;
+    title: string;
+    description: string;
+    itemName?: string;
+    onConfirm: () => void | Promise<void>;
+  }>({
+    isOpen: false,
+    title: '',
+    description: '',
+    onConfirm: () => { },
+  });
   const [certAccent, setCertAccent] = useState(false);
 
   // Modal for Technical Domains (Expertise)
@@ -94,332 +109,359 @@ export default function ClientsManagementPage() {
         body: JSON.stringify(updatedData),
       });
       const data = await res.json();
-        if (res.ok && data.success) {
-          setClientsData(data.clients || updatedData);
-          setSyncAlert(true);
-          setTimeout(() => setSyncAlert(false), 3000);
+      if (res.ok && data.success) {
+        setClientsData(data.clients || updatedData);
+        setSyncAlert(true);
+        setTimeout(() => setSyncAlert(false), 3000);
+      } else {
+        alert(data.error || 'Failed to save clients data');
+      }
+    } catch (e) {
+      alert('Failed to save clients data');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Certifications CRUD
+  const handleOpenAddCert = () => {
+    setEditingCertIndex(null);
+    setCertTag('Certification');
+    setCertTitle('');
+    setCertText('');
+    setCertImage('');
+    setCertAccent(false);
+    setCertModalOpen(true);
+  };
+
+  const handleOpenEditCert = (index: number) => {
+    const cert = certificationsList[index];
+    if (!cert) return;
+    setEditingCertIndex(index);
+    setCertTag(cert.tag || 'Certification');
+    setCertTitle(cert.title || '');
+    setCertText(cert.text || '');
+    const imgVal = typeof cert.image === 'string' ? cert.image : cert.image?.src || '';
+    setCertImage(imgVal || '');
+    setCertAccent(!!cert.accent);
+    setCertModalOpen(true);
+  };
+
+  const handleSaveCert = (e: React.FormEvent) => {
+    e.preventDefault();
+    const updatedCerts = [...certificationsList];
+    const existingCert = editingCertIndex !== null ? updatedCerts[editingCertIndex] : null;
+
+    const newCert = {
+      id: existingCert?.id || `cert-${Date.now()}`,
+      tag: certTag,
+      title: certTitle,
+      text: certText,
+      image: certImage,
+      accent: certAccent,
+      order: existingCert?.order || (updatedCerts.length + 1),
+    };
+
+    if (editingCertIndex !== null) {
+      updatedCerts[editingCertIndex] = newCert;
+    } else {
+      updatedCerts.push(newCert);
+    }
+
+    const updatedData = { ...clientsData, certifications: updatedCerts };
+    handleSaveAll(updatedData);
+    setCertModalOpen(false);
+  };
+
+  const handleDeleteCert = (index: number) => {
+    const cert = certificationsList[index];
+    setDeleteDialog({
+      isOpen: true,
+      title: 'Delete Certification',
+      description: 'Are you sure you want to delete this accreditation and certification card? This action cannot be undone.',
+      itemName: cert?.title || 'Certification Card',
+      onConfirm: () => {
+        const updatedCerts = certificationsList.filter((_: any, i: number) => i !== index);
+        const updatedData = { ...clientsData, certifications: updatedCerts };
+        handleSaveAll(updatedData);
+        setDeleteDialog((prev) => ({ ...prev, isOpen: false }));
+      },
+    });
+  };
+
+  // Technical Domains (Expertise) CRUD
+  const handleOpenAddDomain = () => {
+    setEditingDomainIndex(null);
+    setDomainName('');
+    setDomainTechnologies('');
+    setDomainModalOpen(true);
+  };
+
+  const handleOpenEditDomain = (index: number) => {
+    const item = expertiseItems[index];
+    if (!item) return;
+    setEditingDomainIndex(index);
+    setDomainName(item.domain || '');
+    setDomainTechnologies(
+      Array.isArray(item.technologies) ? item.technologies.join(', ') : item.technologies || ''
+    );
+    setDomainModalOpen(true);
+  };
+
+  const handleSaveDomain = (e: React.FormEvent) => {
+    e.preventDefault();
+    const updatedItems = [...expertiseItems];
+    const existing = editingDomainIndex !== null ? updatedItems[editingDomainIndex] : null;
+
+    const newItem = {
+      id: existing?.id || `exp-${Date.now()}`,
+      domain: domainName.trim(),
+      technologies: domainTechnologies.trim(),
+    };
+
+    if (editingDomainIndex !== null) {
+      updatedItems[editingDomainIndex] = newItem;
+    } else {
+      updatedItems.push(newItem);
+    }
+
+    let updatedExpertise: any;
+    if (Array.isArray(clientsData?.expertise)) {
+      updatedExpertise = updatedItems;
+    } else if (clientsData?.expertise && typeof clientsData.expertise === 'object') {
+      updatedExpertise = {
+        ...clientsData.expertise,
+        items: updatedItems,
+      };
+    } else {
+      updatedExpertise = {
+        title: 'Expertise',
+        subheading: 'Proven track record in technical skills & experience',
+        items: updatedItems,
+      };
+    }
+
+    handleSaveAll({ ...clientsData, expertise: updatedExpertise });
+    setDomainModalOpen(false);
+  };
+
+  const handleDeleteDomain = (index: number) => {
+    const item = expertiseItems[index];
+    setDeleteDialog({
+      isOpen: true,
+      title: 'Delete Technical Domain',
+      description: 'Are you sure you want to delete this technical domain? This action cannot be undone.',
+      itemName: item?.domain || 'Technical Domain',
+      onConfirm: () => {
+        const updatedItems = expertiseItems.filter((_: any, i: number) => i !== index);
+
+        let updatedExpertise: any;
+        if (Array.isArray(clientsData?.expertise)) {
+          updatedExpertise = updatedItems;
+        } else if (clientsData?.expertise && typeof clientsData.expertise === 'object') {
+          updatedExpertise = {
+            ...clientsData.expertise,
+            items: updatedItems,
+          };
         } else {
-          alert(data.error || 'Failed to save clients data');
+          updatedExpertise = {
+            title: 'Expertise',
+            subheading: 'Proven track record in technical skills & experience',
+            items: updatedItems,
+          };
         }
-      } catch (e) {
-        alert('Failed to save clients data');
-      } finally {
-        setSaving(false);
-      }
-    };
 
-    // Certifications CRUD
-    const handleOpenAddCert = () => {
-      setEditingCertIndex(null);
-      setCertTag('Certification');
-      setCertTitle('');
-      setCertText('');
-      setCertImage('');
-      setCertAccent(false);
-      setCertModalOpen(true);
-    };
+        handleSaveAll({ ...clientsData, expertise: updatedExpertise });
+        setDeleteDialog((prev) => ({ ...prev, isOpen: false }));
+      },
+    });
+  };
 
-    const handleOpenEditCert = (index: number) => {
-      const cert = certificationsList[index];
-      if (!cert) return;
-      setEditingCertIndex(index);
-      setCertTag(cert.tag || 'Certification');
-      setCertTitle(cert.title || '');
-      setCertText(cert.text || '');
-      const imgVal = typeof cert.image === 'string' ? cert.image : cert.image?.src || '';
-      setCertImage(imgVal || '');
-      setCertAccent(!!cert.accent);
-      setCertModalOpen(true);
-    };
+  // Industries Tag handlers
+  const handleAddIndustry = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newIndustryTag.trim()) return;
+    const currentTags = industryTags;
+    if (currentTags.includes(newIndustryTag.trim())) return;
+    const updatedTags = [...currentTags, newIndustryTag.trim()];
 
-    const handleSaveCert = (e: React.FormEvent) => {
-      e.preventDefault();
-      const updatedCerts = [...certificationsList];
-      const existingCert = editingCertIndex !== null ? updatedCerts[editingCertIndex] : null;
+    let updatedIndustries: any;
+    if (Array.isArray(clientsData?.industries)) {
+      updatedIndustries = updatedTags;
+    } else {
+      updatedIndustries = { ...clientsData?.industries, tags: updatedTags };
+    }
 
-      const newCert = {
-        id: existingCert?.id || `cert-${Date.now()}`,
-        tag: certTag,
-        title: certTitle,
-        text: certText,
-        image: certImage,
-        accent: certAccent,
-        order: existingCert?.order || (updatedCerts.length + 1),
-      };
+    handleSaveAll({ ...clientsData, industries: updatedIndustries });
+    setNewIndustryTag('');
+  };
 
-      if (editingCertIndex !== null) {
-        updatedCerts[editingCertIndex] = newCert;
-      } else {
-        updatedCerts.push(newCert);
-      }
+  const handleDeleteIndustry = (tagToDelete: string) => {
+    setDeleteDialog({
+      isOpen: true,
+      title: 'Remove Industry Sector',
+      description: 'Are you sure you want to remove this industry sector tag?',
+      itemName: tagToDelete,
+      onConfirm: () => {
+        const currentTags = industryTags;
+        const updatedTags = currentTags.filter((t: string) => t !== tagToDelete);
 
-      const updatedData = { ...clientsData, certifications: updatedCerts };
-      handleSaveAll(updatedData);
-      setCertModalOpen(false);
-    };
+        let updatedIndustries: any;
+        if (Array.isArray(clientsData?.industries)) {
+          updatedIndustries = updatedTags;
+        } else {
+          updatedIndustries = { ...clientsData?.industries, tags: updatedTags };
+        }
 
-    const handleDeleteCert = (index: number) => {
-      if (!confirm('Delete this certification card?')) return;
-      const updatedCerts = certificationsList.filter((_: any, i: number) => i !== index);
-      const updatedData = { ...clientsData, certifications: updatedCerts };
-      handleSaveAll(updatedData);
-    };
+        handleSaveAll({ ...clientsData, industries: updatedIndustries });
+        setDeleteDialog((prev) => ({ ...prev, isOpen: false }));
+      },
+    });
+  };
 
-    // Technical Domains (Expertise) CRUD
-    const handleOpenAddDomain = () => {
-      setEditingDomainIndex(null);
-      setDomainName('');
-      setDomainTechnologies('');
-      setDomainModalOpen(true);
-    };
+  return (
+    <div className="min-h-screen bg-[#F8FAFC]">
+      <Topbar
+        breadcrumbs={[
+          { label: 'Dashboard', href: '/dashboard' },
+          { label: 'Client Partners' },
+        ]}
+        searchPlaceholder="Search clients & accreditations..."
+      />
 
-    const handleOpenEditDomain = (index: number) => {
-      const item = expertiseItems[index];
-      if (!item) return;
-      setEditingDomainIndex(index);
-      setDomainName(item.domain || '');
-      setDomainTechnologies(
-        Array.isArray(item.technologies) ? item.technologies.join(', ') : item.technologies || ''
-      );
-      setDomainModalOpen(true);
-    };
+      <div className="p-6 sm:p-8 lg:p-10 max-w-[1440px] mx-auto space-y-6">
+        {/* Page Header (Editorial Serif) */}
+        <div className="space-y-1">
+          <h1 className="text-3xl sm:text-4xl font-serif text-[#111827] tracking-tight">
+            Client Partners & Accreditations
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500">
+            Manage industry accreditations, sector capabilities, and client trust logos on macee.com.
+          </p>
+        </div>
 
-    const handleSaveDomain = (e: React.FormEvent) => {
-      e.preventDefault();
-      const updatedItems = [...expertiseItems];
-      const existing = editingDomainIndex !== null ? updatedItems[editingDomainIndex] : null;
-
-      const newItem = {
-        id: existing?.id || `exp-${Date.now()}`,
-        domain: domainName.trim(),
-        technologies: domainTechnologies.trim(),
-      };
-
-      if (editingDomainIndex !== null) {
-        updatedItems[editingDomainIndex] = newItem;
-      } else {
-        updatedItems.push(newItem);
-      }
-
-      let updatedExpertise: any;
-      if (Array.isArray(clientsData?.expertise)) {
-        updatedExpertise = updatedItems;
-      } else if (clientsData?.expertise && typeof clientsData.expertise === 'object') {
-        updatedExpertise = {
-          ...clientsData.expertise,
-          items: updatedItems,
-        };
-      } else {
-        updatedExpertise = {
-          title: 'Expertise',
-          subheading: 'Proven track record in technical skills & experience',
-          items: updatedItems,
-        };
-      }
-
-      handleSaveAll({ ...clientsData, expertise: updatedExpertise });
-      setDomainModalOpen(false);
-    };
-
-    const handleDeleteDomain = (index: number) => {
-      if (!confirm('Are you sure you want to delete this technical domain?')) return;
-      const updatedItems = expertiseItems.filter((_: any, i: number) => i !== index);
-
-      let updatedExpertise: any;
-      if (Array.isArray(clientsData?.expertise)) {
-        updatedExpertise = updatedItems;
-      } else if (clientsData?.expertise && typeof clientsData.expertise === 'object') {
-        updatedExpertise = {
-          ...clientsData.expertise,
-          items: updatedItems,
-        };
-      } else {
-        updatedExpertise = {
-          title: 'Expertise',
-          subheading: 'Proven track record in technical skills & experience',
-          items: updatedItems,
-        };
-      }
-
-      handleSaveAll({ ...clientsData, expertise: updatedExpertise });
-    };
-
-    // Industries Tag handlers
-    const handleAddIndustry = (e: React.FormEvent) => {
-      e.preventDefault();
-      if (!newIndustryTag.trim()) return;
-      const currentTags = industryTags;
-      if (currentTags.includes(newIndustryTag.trim())) return;
-      const updatedTags = [...currentTags, newIndustryTag.trim()];
-
-      let updatedIndustries: any;
-      if (Array.isArray(clientsData?.industries)) {
-        updatedIndustries = updatedTags;
-      } else {
-        updatedIndustries = { ...clientsData?.industries, tags: updatedTags };
-      }
-
-      handleSaveAll({ ...clientsData, industries: updatedIndustries });
-      setNewIndustryTag('');
-    };
-
-    const handleDeleteIndustry = (tagToDelete: string) => {
-      const currentTags = industryTags;
-      const updatedTags = currentTags.filter((t: string) => t !== tagToDelete);
-
-      let updatedIndustries: any;
-      if (Array.isArray(clientsData?.industries)) {
-        updatedIndustries = updatedTags;
-      } else {
-        updatedIndustries = { ...clientsData?.industries, tags: updatedTags };
-      }
-
-      handleSaveAll({ ...clientsData, industries: updatedIndustries });
-    };
-
-    return (
-      <div className="min-h-screen bg-[#F8FAFC]">
-        <Topbar
-          breadcrumbs={[
-            { label: 'Dashboard', href: '/dashboard' },
-            { label: 'Client Partners' },
-          ]}
-          searchPlaceholder="Search clients & accreditations..."
-        />
-
-        <div className="p-6 sm:p-8 lg:p-10 max-w-[1440px] mx-auto space-y-6">
-          {/* Page Header (Editorial Serif) */}
-          <div className="space-y-1">
-            <h1 className="text-3xl sm:text-4xl font-serif text-[#111827] tracking-tight">
-              Client Partners & Accreditations
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-500">
-              Manage industry accreditations, sector capabilities, and client trust logos on macee.com.
-            </p>
-          </div>
-
-          {/* 4 KPI Metric Cards */}
-          {loading ? (
-            <SkeletonKpiGrid count={4} />
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-              <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-                <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-                  <Building2 className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="text-xs font-medium text-slate-500">Partner Clients</p>
-                  <div className="flex items-baseline space-x-2 mt-0.5">
-                    <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                      85+
-                    </span>
-                    <span className="text-xs font-semibold text-emerald-600">Active</span>
-                  </div>
-                </div>
+        {/* 4 KPI Metric Cards */}
+        {loading ? (
+          <SkeletonKpiGrid count={4} />
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
+              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
+                <Building2 className="w-5 h-5" />
               </div>
-
-              <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-                <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-                  <Award className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="text-xs font-medium text-slate-500">Accreditations</p>
-                  <div className="mt-0.5">
-                    <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                      {certificationsList.length || 0}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-                <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-                  <Layers className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="text-xs font-medium text-slate-500">Sectors Supported</p>
-                  <div className="mt-0.5">
-                    <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                      {industryTags.length || 0}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-                <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-                  <ShieldCheck className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="text-xs font-medium text-slate-500">Compliance Standard</p>
-                  <div className="mt-0.5">
-                    <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                      SNA NEN
-                    </span>
-                  </div>
+              <div>
+                <p className="text-xs font-medium text-slate-500">Partner Clients</p>
+                <div className="flex items-baseline space-x-2 mt-0.5">
+                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                    85+
+                  </span>
+                  <span className="text-xs font-semibold text-emerald-600">Active</span>
                 </div>
               </div>
             </div>
-          )}
 
-          {/* Status Tabs */}
-          <div className="flex items-center space-x-6 border-b border-slate-200 text-xs font-medium pt-2">
-            {[
-              { id: 'certifications', label: 'Accreditations & Certifications' },
-              { id: 'industries', label: 'Industry Sectors' },
-              { id: 'expertise', label: 'Technical Domains' },
-            ].map((tab) => {
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
-                  className={`pb-3 transition-colors relative ${isActive
-                    ? 'font-bold text-[#111827] border-b-2 border-[#E30613]'
-                    : 'text-slate-500 hover:text-slate-800'
-                    }`}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
-
-          {syncAlert && (
-            <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center justify-between animate-fadeIn">
-              <span>✓ Changes saved and synchronized with website files!</span>
-            </div>
-          )}
-
-          {/* Tab 1: Certifications */}
-          {activeTab === 'certifications' && (
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <p className="text-xs text-slate-500">
-                  Official accreditations displayed on the Macee homepage and compliance sections.
-                </p>
-                <button
-                  onClick={handleOpenAddCert}
-                  className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl bg-[#E30613] hover:bg-[#b80510] text-white text-xs font-semibold shadow-xs"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>Add Certification</span>
-                </button>
+            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
+              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
+                <Award className="w-5 h-5" />
               </div>
+              <div>
+                <p className="text-xs font-medium text-slate-500">Accreditations</p>
+                <div className="mt-0.5">
+                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                    {certificationsList.length || 0}
+                  </span>
+                </div>
+              </div>
+            </div>
 
-              {loading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  {Array.from({ length: 4 }).map((_, i) => (
-                    <SkeletonCertCard key={i} />
-                  ))}
+            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
+              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
+                <Layers className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-xs font-medium text-slate-500">Sectors Supported</p>
+                <div className="mt-0.5">
+                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                    {industryTags.length || 0}
+                  </span>
                 </div>
-              ) : certificationsList.length === 0 ? (
-                <div className="bg-white rounded-2xl border border-slate-100 shadow-2xs p-12 text-center text-slate-400 text-xs">
-                  No accreditations or certifications added yet.
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
+              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-xs font-medium text-slate-500">Compliance Standard</p>
+                <div className="mt-0.5">
+                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                    SNA NEN
+                  </span>
                 </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  {certificationsList.map((cert: any, idx: number) => {
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Status Tabs */}
+        <div className="flex items-center space-x-6 border-b border-slate-200 text-xs font-medium pt-2">
+          {[
+            { id: 'certifications', label: 'Accreditations & Certifications' },
+            { id: 'industries', label: 'Industry Sectors' },
+            { id: 'expertise', label: 'Technical Domains' },
+          ].map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`pb-3 transition-colors relative ${isActive
+                  ? 'font-bold text-[#111827] border-b-2 border-[#E30613]'
+                  : 'text-slate-500 hover:text-slate-800'
+                  }`}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {syncAlert && (
+          <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center justify-between animate-fadeIn">
+            <span>✓ Changes saved and synchronized with website files!</span>
+          </div>
+        )}
+
+        {/* Tab 1: Certifications */}
+        {activeTab === 'certifications' && (
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <p className="text-xs text-slate-500">
+                Official accreditations displayed on the Macee homepage and compliance sections.
+              </p>
+              <button
+                onClick={handleOpenAddCert}
+                className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl bg-[#E30613] hover:bg-[#b80510] text-white text-xs font-semibold shadow-xs"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Add Certification</span>
+              </button>
+            </div>
+
+            {loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <SkeletonCertCard key={i} />
+                ))}
+              </div>
+            ) : certificationsList.length === 0 ? (
+              <div className="bg-white rounded-2xl border border-slate-100 shadow-2xs p-12 text-center text-slate-400 text-xs">
+                No accreditations or certifications added yet.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {certificationsList.map((cert: any, idx: number) => {
                   const imgSrc = typeof cert.image === 'string' ? cert.image : cert.image?.src;
                   return (
                     <div
@@ -453,171 +495,176 @@ export default function ClientsManagementPage() {
                             </span>
                           </div>
 
-                          <div className="flex items-center space-x-2 shrink-0">
-                            <button
-                              onClick={() => handleOpenEditCert(idx)}
-                              className="text-slate-500 hover:text-[#111827] text-xs font-semibold px-2 py-1 rounded-md hover:bg-slate-100 transition-colors"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => handleDeleteCert(idx)}
-                              className="text-rose-500 hover:text-rose-700 text-xs font-semibold px-2 py-1 rounded-md hover:bg-rose-50 transition-colors"
-                            >
-                              Delete
-                            </button>
+                            <div className="flex items-center space-x-1 shrink-0">
+                              <button
+                                onClick={() => handleOpenEditCert(idx)}
+                                className="p-1.5 rounded-lg text-slate-500 hover:text-[#111827] hover:bg-slate-100 transition-colors"
+                                title="Edit Certification"
+                              >
+                                <Edit2 className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteCert(idx)}
+                                className="p-1.5 rounded-lg text-rose-500 hover:text-rose-700 hover:bg-rose-50 transition-colors"
+                                title="Delete Certification"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
                           </div>
+
+                          <h4 className="text-base font-bold text-[#111827] mt-3.5 font-sans">
+                            {cert.title}
+                          </h4>
+                          <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+                            {cert.text}
+                          </p>
                         </div>
 
-                        <h4 className="text-base font-bold text-[#111827] mt-3.5 font-sans">
-                          {cert.title}
-                        </h4>
-                        <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                          {cert.text}
-                        </p>
+                        {imgSrc && (
+                          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+                            <span className="truncate max-w-[260px] font-mono text-[10px] text-slate-500">{imgSrc}</span>
+                            <span className="text-emerald-600 font-semibold text-[10px]">✓ Logo Attached</span>
+                          </div>
+                        )}
                       </div>
-
-                      {imgSrc && (
-                        <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
-                          <span className="truncate max-w-[260px] font-mono text-[10px] text-slate-500">{imgSrc}</span>
-                          <span className="text-emerald-600 font-semibold text-[10px]">✓ Logo Attached</span>
-                        </div>
-                      )}
-                    </div>
-                  );
+                      );
                 })}
-              </div>
+                    </div>
+                  )
+                }
+            </div>
             )}
-            </div>
-          )}
 
-          {/* Tab 2: Industry Sectors */}
-          {activeTab === 'industries' && (
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-2xs p-6 space-y-5">
-              <div>
-                <h3 className="text-base font-bold text-[#111827] font-sans">
-                  Industry Sectors & Capable Fields
-                </h3>
-                <p className="text-xs text-slate-500 mt-1">
-                  These tags dictate the filter options on the Contact and Solution pages.
-                </p>
-              </div>
-
-              {loading ? (
-                <SkeletonTagChips count={10} />
-              ) : industryTags.length === 0 ? (
-                <p className="text-xs text-slate-400">No industry sectors added yet.</p>
-              ) : (
-                <div className="flex flex-wrap gap-2.5">
-                  {industryTags.map((tag: string, i: number) => (
-                    <span
-                      key={i}
-                      className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-[#F0F3FA] text-slate-800 text-xs font-semibold border border-slate-200/60"
-                    >
-                      <span>{tag}</span>
-                      <button
-                        onClick={() => handleDeleteIndustry(tag)}
-                        className="text-slate-400 hover:text-[#E30613] p-0.5"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              <form onSubmit={handleAddIndustry} className="flex gap-2 max-w-md pt-2">
-                <input
-                  type="text"
-                  placeholder="New industry sector (e.g. Maritime & Offshore)..."
-                  value={newIndustryTag}
-                  onChange={(e) => setNewIndustryTag(e.target.value)}
-                  className="flex-1 p-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613]"
-                />
-                <button type="submit" className="is-btn py-2 px-4 text-xs font-semibold">
-                  Add Tag
-                </button>
-              </form>
-            </div>
-          )}
-
-          {/* Tab 3: Technical Domains */}
-          {activeTab === 'expertise' && (
-            <div className="space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            {/* Tab 2: Industry Sectors */}
+            {activeTab === 'industries' && (
+              <div className="bg-white rounded-2xl border border-slate-100 shadow-2xs p-6 space-y-5">
                 <div>
                   <h3 className="text-base font-bold text-[#111827] font-sans">
-                    Domain Competencies & Roles
+                    Industry Sectors & Capable Fields
                   </h3>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Specialized candidate allocation frameworks and skill profiles displayed on macee.com.
+                  <p className="text-xs text-slate-500 mt-1">
+                    These tags dictate the filter options on the Contact and Solution pages.
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={handleOpenAddDomain}
-                  className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl bg-[#E30613] hover:bg-[#b80510] text-white text-xs font-semibold shadow-xs transition-all shrink-0 self-start sm:self-auto"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>Add Technical Domain</span>
-                </button>
-              </div>
 
-              {loading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
-                  {Array.from({ length: 6 }).map((_, i) => (
-                    <SkeletonDomainCard key={i} />
-                  ))}
+                {loading ? (
+                  <SkeletonTagChips count={10} />
+                ) : industryTags.length === 0 ? (
+                  <p className="text-xs text-slate-400">No industry sectors added yet.</p>
+                ) : (
+                  <div className="flex flex-wrap gap-2.5">
+                    {industryTags.map((tag: string, i: number) => (
+                      <span
+                        key={i}
+                        className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-[#F0F3FA] text-slate-800 text-xs font-semibold border border-slate-200/60"
+                      >
+                        <span>{tag}</span>
+                        <button
+                          onClick={() => handleDeleteIndustry(tag)}
+                          className="text-slate-400 hover:text-[#E30613] p-0.5"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                <form onSubmit={handleAddIndustry} className="flex gap-2 max-w-md pt-2">
+                  <input
+                    type="text"
+                    placeholder="New industry sector (e.g. Maritime & Offshore)..."
+                    value={newIndustryTag}
+                    onChange={(e) => setNewIndustryTag(e.target.value)}
+                    className="flex-1 p-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613]"
+                  />
+                  <button type="submit" className="is-btn py-2 px-4 text-xs font-semibold">
+                    Add Tag
+                  </button>
+                </form>
+              </div>
+            )}
+
+            {/* Tab 3: Technical Domains */}
+            {activeTab === 'expertise' && (
+              <div className="space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <h3 className="text-base font-bold text-[#111827] font-sans">
+                      Domain Competencies & Roles
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Specialized candidate allocation frameworks and skill profiles displayed on macee.com.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleOpenAddDomain}
+                    className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl bg-[#E30613] hover:bg-[#b80510] text-white text-xs font-semibold shadow-xs transition-all shrink-0 self-start sm:self-auto"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Add Technical Domain</span>
+                  </button>
                 </div>
-              ) : expertiseItems.length === 0 ? (
-                <div className="bg-white rounded-2xl border border-slate-100 shadow-2xs p-12 text-center text-slate-400 text-xs">
-                  No technical domains added yet.
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
-                  {expertiseItems.map((item: any, idx: number) => (
-                    <div
-                      key={idx}
-                      className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between"
-                    >
-                      <div>
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="flex items-center space-x-2.5">
-                            <div className="w-8 h-8 rounded-lg bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-                              <Cpu className="w-4 h-4" />
+
+                {loading ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                      <SkeletonDomainCard key={i} />
+                    ))}
+                  </div>
+                ) : expertiseItems.length === 0 ? (
+                  <div className="bg-white rounded-2xl border border-slate-100 shadow-2xs p-12 text-center text-slate-400 text-xs">
+                    No technical domains added yet.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+                    {expertiseItems.map((item: any, idx: number) => (
+                      <div
+                        key={idx}
+                        className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between"
+                      >
+                        <div>
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex items-center space-x-2.5">
+                              <div className="w-8 h-8 rounded-lg bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
+                                <Cpu className="w-4 h-4" />
+                              </div>
+                              <h4 className="text-xs font-bold text-[#111827] uppercase tracking-wider font-sans">
+                                {item.domain}
+                              </h4>
                             </div>
-                            <h4 className="text-xs font-bold text-[#111827] uppercase tracking-wider font-sans">
-                              {item.domain}
-                            </h4>
+                            <div className="flex items-center space-x-1 shrink-0">
+                              <button
+                                type="button"
+                                onClick={() => handleOpenEditDomain(idx)}
+                                className="p-1.5 rounded-lg text-slate-500 hover:text-[#111827] hover:bg-slate-100 transition-colors"
+                                title="Edit Domain"
+                              >
+                                <Edit2 className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteDomain(idx)}
+                                className="p-1.5 rounded-lg text-rose-500 hover:text-rose-700 hover:bg-rose-50 transition-colors"
+                                title="Delete Domain"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
                           </div>
-                          <div className="flex items-center space-x-1 shrink-0">
-                            <button
-                              type="button"
-                              onClick={() => handleOpenEditDomain(idx)}
-                              className="text-slate-500 hover:text-[#111827] text-xs font-semibold px-2 py-1 rounded-md hover:bg-slate-100 transition-colors"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteDomain(idx)}
-                              className="text-rose-500 hover:text-rose-700 text-xs font-semibold px-2 py-1 rounded-md hover:bg-rose-50 transition-colors"
-                            >
-                              Delete
-                            </button>
-                          </div>
+                          <p className="text-xs text-slate-600 mt-3 leading-relaxed bg-slate-50/70 p-3 rounded-xl border border-slate-100">
+                            {Array.isArray(item.technologies) ? item.technologies.join(', ') : item.technologies}
+                          </p>
                         </div>
-                        <p className="text-xs text-slate-600 mt-3 leading-relaxed bg-slate-50/70 p-3 rounded-xl border border-slate-100">
-                          {Array.isArray(item.technologies) ? item.technologies.join(', ') : item.technologies}
-                        </p>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
 
         {/* Certification Modal */}
         {certModalOpen && (
@@ -765,6 +812,16 @@ export default function ClientsManagementPage() {
             </form>
           </Modal>
         )}
+
+        {/* Delete Confirmation Dialog */}
+        <ConfirmDialog
+          isOpen={deleteDialog.isOpen}
+          onClose={() => setDeleteDialog((prev) => ({ ...prev, isOpen: false }))}
+          onConfirm={deleteDialog.onConfirm}
+          title={deleteDialog.title}
+          description={deleteDialog.description}
+          itemName={deleteDialog.itemName}
+        />
       </div>
-    );
+      );
   }

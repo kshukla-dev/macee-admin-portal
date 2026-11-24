@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Topbar } from '@/components/Topbar';
 import { Modal } from '@/components/Modal';
 import { ImagePicker } from '@/components/ImagePicker';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { SkeletonKpiGrid, SkeletonMemberCard } from '@/components/Skeleton';
 import {
   Users2,
@@ -138,17 +139,46 @@ export default function TeamManagementPage() {
     }
   };
 
-  const handleDeleteMember = async (id: string) => {
-    if (!confirm('Are you sure you want to remove this team member?')) return;
-    try {
-      const res = await fetch(`/api/team?id=${id}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (data.success) {
-        setTeam(team.filter((m) => m.id !== id));
-      }
-    } catch (e) {
-      alert('Failed to delete member');
-    }
+  // Delete Confirmation Dialog state
+  const [deleteDialog, setDeleteDialog] = useState<{
+    isOpen: boolean;
+    title: string;
+    description: string;
+    itemName?: string;
+    isLoading?: boolean;
+    onConfirm: () => void | Promise<void>;
+  }>({
+    isOpen: false,
+    title: '',
+    description: '',
+    onConfirm: () => { },
+  });
+
+  const handleDeleteMember = (member: TeamMember) => {
+    setDeleteDialog({
+      isOpen: true,
+      title: 'Delete Team Member',
+      description: 'Are you sure you want to remove this team member from the directory? This action cannot be undone.',
+      itemName: `${member.name} (${member.role})`,
+      isLoading: false,
+      onConfirm: async () => {
+        setDeleteDialog((prev) => ({ ...prev, isLoading: true }));
+        try {
+          const res = await fetch(`/api/team?id=${member.id}`, { method: 'DELETE' });
+          const data = await res.json();
+          if (data.success) {
+            setTeam((prev) => prev.filter((m) => m.id !== member.id));
+            setDeleteDialog((prev) => ({ ...prev, isOpen: false, isLoading: false }));
+          } else {
+            alert('Failed to delete member');
+            setDeleteDialog((prev) => ({ ...prev, isLoading: false }));
+          }
+        } catch (e) {
+          alert('Failed to delete member');
+          setDeleteDialog((prev) => ({ ...prev, isLoading: false }));
+        }
+      },
+    });
   };
 
   // Filtered members
@@ -318,86 +348,86 @@ export default function TeamManagementPage() {
                 key={member.id}
                 className="bg-white rounded-2xl border border-slate-100 shadow-2xs p-5 hover:shadow-md transition-all flex flex-col justify-between"
               >
-              <div>
-                <div className="flex items-start space-x-3.5">
-                  {member.image ? (
-                    <img
-                      src={member.image}
-                      alt={member.name}
-                      className="w-14 h-14 rounded-full object-cover border-2 border-slate-100 shrink-0"
-                      onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).style.display = 'none';
-                      }}
-                    />
-                  ) : (
-                    <div className="w-14 h-14 rounded-full bg-[#EAF0FC] text-[#36427D] border-2 border-slate-100 flex items-center justify-center font-bold text-sm shrink-0">
-                      {member.name ? member.name.charAt(0).toUpperCase() : <User className="w-5 h-5 text-slate-400" />}
+                <div>
+                  <div className="flex items-start space-x-3.5">
+                    {member.image ? (
+                      <img
+                        src={member.image}
+                        alt={member.name}
+                        className="w-14 h-14 rounded-full object-cover border-2 border-slate-100 shrink-0"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                    ) : (
+                      <div className="w-14 h-14 rounded-full bg-[#EAF0FC] text-[#36427D] border-2 border-slate-100 flex items-center justify-center font-bold text-sm shrink-0">
+                        {member.name ? member.name.charAt(0).toUpperCase() : <User className="w-5 h-5 text-slate-400" />}
+                      </div>
+                    )}
+                    <div className="overflow-hidden">
+                      <h4 className="text-sm font-bold text-[#111827] truncate font-sans">
+                        {member.name}
+                      </h4>
+                      <p className="text-xs text-[#E30613] font-medium truncate mt-0.5">
+                        {member.role}
+                      </p>
+                      <span className="inline-block mt-1 text-[10px] font-semibold px-2 py-0.5 rounded-md bg-[#F0F3FA] text-[#36427D]">
+                        {member.desk || 'Specialist'}
+                      </span>
                     </div>
-                  )}
-                  <div className="overflow-hidden">
-                    <h4 className="text-sm font-bold text-[#111827] truncate font-sans">
-                      {member.name}
-                    </h4>
-                    <p className="text-xs text-[#E30613] font-medium truncate mt-0.5">
-                      {member.role}
-                    </p>
-                    <span className="inline-block mt-1 text-[10px] font-semibold px-2 py-0.5 rounded-md bg-[#F0F3FA] text-[#36427D]">
-                      {member.desk || 'Specialist'}
-                    </span>
+                  </div>
+
+                  <div className="mt-4 pt-3 border-t border-slate-100 space-y-1.5 text-xs text-slate-500">
+                    {member.email && (
+                      <div className="flex items-center space-x-2 truncate">
+                        <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <span className="truncate">{member.email}</span>
+                      </div>
+                    )}
+                    {member.phone && (
+                      <div className="flex items-center space-x-2">
+                        <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <span>{member.phone}</span>
+                      </div>
+                    )}
+                    {member.linkedin && (
+                      <div className="flex items-center space-x-2 truncate">
+                        <Linkedin className="w-3.5 h-3.5 text-[#0A66C2] shrink-0" />
+                        <a
+                          href={member.linkedin}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="truncate text-[#0A66C2] hover:underline"
+                          title={member.linkedin}
+                        >
+                          {member.linkedin.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//, '').replace(/\/$/, '') || 'LinkedIn Profile'}
+                        </a>
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-slate-100 space-y-1.5 text-xs text-slate-500">
-                  {member.email && (
-                    <div className="flex items-center space-x-2 truncate">
-                      <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                      <span className="truncate">{member.email}</span>
-                    </div>
-                  )}
-                  {member.phone && (
-                    <div className="flex items-center space-x-2">
-                      <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                      <span>{member.phone}</span>
-                    </div>
-                  )}
-                  {member.linkedin && (
-                    <div className="flex items-center space-x-2 truncate">
-                      <Linkedin className="w-3.5 h-3.5 text-[#0A66C2] shrink-0" />
-                      <a
-                        href={member.linkedin}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="truncate text-[#0A66C2] hover:underline"
-                        title={member.linkedin}
-                      >
-                        {member.linkedin.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//, '').replace(/\/$/, '') || 'LinkedIn Profile'}
-                      </a>
-                    </div>
-                  )}
+                <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+                  <button
+                    onClick={() => handleOpenEdit(member)}
+                    className="text-xs font-semibold text-slate-600 hover:text-[#111827] flex items-center space-x-1"
+                  >
+                    <Edit2 className="w-3.5 h-3.5" />
+                    <span>Edit Profile</span>
+                  </button>
+                  <button
+                    onClick={() => handleDeleteMember(member)}
+                    className="text-xs font-semibold text-rose-500 hover:text-rose-700 flex items-center space-x-1"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Remove</span>
+                  </button>
                 </div>
               </div>
-
-              <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-                <button
-                  onClick={() => handleOpenEdit(member)}
-                  className="text-xs font-semibold text-slate-600 hover:text-[#111827] flex items-center space-x-1"
-                >
-                  <Edit2 className="w-3.5 h-3.5" />
-                  <span>Edit Profile</span>
-                </button>
-                <button
-                  onClick={() => handleDeleteMember(member.id)}
-                  className="text-xs font-semibold text-rose-500 hover:text-rose-700 flex items-center space-x-1"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  <span>Remove</span>
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Edit/Add Modal */}
       {isModalOpen && (
@@ -508,6 +538,17 @@ export default function TeamManagementPage() {
           </form>
         </Modal>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={deleteDialog.isOpen}
+        onClose={() => setDeleteDialog((prev) => ({ ...prev, isOpen: false }))}
+        onConfirm={deleteDialog.onConfirm}
+        title={deleteDialog.title}
+        description={deleteDialog.description}
+        itemName={deleteDialog.itemName}
+        isLoading={deleteDialog.isLoading}
+      />
     </div>
   );
 }

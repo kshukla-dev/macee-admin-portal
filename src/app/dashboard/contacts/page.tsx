@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Topbar } from '@/components/Topbar';
 import { Modal } from '@/components/Modal';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { SkeletonKpiGrid, SkeletonTableRow } from '@/components/Skeleton';
 import {
   Users2,
@@ -192,16 +193,43 @@ export default function ContactsManagementPage() {
     }
   };
 
-  const handleDeleteContact = async (contactId: string) => {
-    if (!confirm('Are you sure you want to remove this enquiry?')) return;
-    try {
-      await fetch(`/api/contacts?id=${contactId}`, { method: 'DELETE' });
-      setContacts((prev) => prev.filter((c) => c.id !== contactId));
-      if (selectedContact?.id === contactId) setSelectedContact(null);
-      setActiveActionMenuId(null);
-    } catch (e) {
-      console.error(e);
-    }
+  // Delete Confirmation Dialog state
+  const [deleteDialog, setDeleteDialog] = useState<{
+    isOpen: boolean;
+    title: string;
+    description: string;
+    itemName?: string;
+    isLoading?: boolean;
+    onConfirm: () => void | Promise<void>;
+  }>({
+    isOpen: false,
+    title: '',
+    description: '',
+    onConfirm: () => {},
+  });
+
+  const handleDeleteContact = (contact: Contact) => {
+    setActiveActionMenuId(null);
+    const contactDisplayName = contact.fullName || `${contact.firstName || ''} ${contact.lastName || ''}`.trim() || contact.email;
+    setDeleteDialog({
+      isOpen: true,
+      title: 'Delete Enquiry',
+      description: 'Are you sure you want to remove this client enquiry/lead? This action cannot be undone.',
+      itemName: `${contactDisplayName} (${contact.email})`,
+      isLoading: false,
+      onConfirm: async () => {
+        setDeleteDialog((prev) => ({ ...prev, isLoading: true }));
+        try {
+          await fetch(`/api/contacts?id=${contact.id}`, { method: 'DELETE' });
+          setContacts((prev) => prev.filter((c) => c.id !== contact.id));
+          if (selectedContact?.id === contact.id) setSelectedContact(null);
+          setDeleteDialog((prev) => ({ ...prev, isOpen: false, isLoading: false }));
+        } catch (e) {
+          console.error(e);
+          setDeleteDialog((prev) => ({ ...prev, isLoading: false }));
+        }
+      },
+    });
   };
 
   const handleSaveNotes = async () => {
@@ -688,7 +716,7 @@ export default function ContactsManagementPage() {
                               </button>
                               <div className="border-t border-slate-100 my-1" />
                               <button
-                                onClick={() => handleDeleteContact(contact.id)}
+                                onClick={() => handleDeleteContact(contact)}
                                 className="w-full px-3 py-1.5 text-xs text-rose-600 hover:bg-rose-50 flex items-center space-x-2"
                               >
                                 <Trash2 className="w-3.5 h-3.5 text-rose-500" />
@@ -967,6 +995,17 @@ export default function ContactsManagementPage() {
           </form>
         </Modal>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={deleteDialog.isOpen}
+        onClose={() => setDeleteDialog((prev) => ({ ...prev, isOpen: false }))}
+        onConfirm={deleteDialog.onConfirm}
+        title={deleteDialog.title}
+        description={deleteDialog.description}
+        itemName={deleteDialog.itemName}
+        isLoading={deleteDialog.isLoading}
+      />
     </div>
   );
 }

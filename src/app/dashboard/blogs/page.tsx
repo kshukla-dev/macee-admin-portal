@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Topbar } from '@/components/Topbar';
 import { Modal } from '@/components/Modal';
 import { ImagePicker } from '@/components/ImagePicker';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { SkeletonKpiGrid, SkeletonTableRow } from '@/components/Skeleton';
 import {
   FileText,
@@ -196,17 +197,46 @@ export default function BlogManagementPage() {
     }
   };
 
-  const handleDeleteBlog = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this article?')) return;
-    try {
-      const res = await fetch(`/api/blogs?id=${id}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (data.success) {
-        setBlogs(blogs.filter((b) => b.id !== id));
-      }
-    } catch (e) {
-      alert('Failed to delete blog');
-    }
+  // Delete Confirmation Dialog state
+  const [deleteDialog, setDeleteDialog] = useState<{
+    isOpen: boolean;
+    title: string;
+    description: string;
+    itemName?: string;
+    isLoading?: boolean;
+    onConfirm: () => void | Promise<void>;
+  }>({
+    isOpen: false,
+    title: '',
+    description: '',
+    onConfirm: () => { },
+  });
+
+  const handleDeleteBlog = (blog: BlogPost) => {
+    setDeleteDialog({
+      isOpen: true,
+      title: 'Delete Article',
+      description: 'Are you sure you want to delete this article? This action cannot be undone.',
+      itemName: blog.title,
+      isLoading: false,
+      onConfirm: async () => {
+        setDeleteDialog((prev) => ({ ...prev, isLoading: true }));
+        try {
+          const res = await fetch(`/api/blogs?id=${blog.id}`, { method: 'DELETE' });
+          const data = await res.json();
+          if (data.success) {
+            setBlogs((prev) => prev.filter((b) => b.id !== blog.id));
+            setDeleteDialog((prev) => ({ ...prev, isOpen: false, isLoading: false }));
+          } else {
+            alert('Failed to delete blog');
+            setDeleteDialog((prev) => ({ ...prev, isLoading: false }));
+          }
+        } catch (e) {
+          alert('Failed to delete blog');
+          setDeleteDialog((prev) => ({ ...prev, isLoading: false }));
+        }
+      },
+    });
   };
 
   const publishedCount = blogs.filter((b) => b.status === 'published').length || 0;
@@ -422,20 +452,24 @@ export default function BlogManagementPage() {
                           </span>
                         )}
                       </td>
-                      <td className="py-3.5 px-4 text-right space-x-2 whitespace-nowrap">
-                        <button
-                          onClick={() => handleOpenEdit(blog)}
-                          className="text-slate-600 hover:text-[#111827] font-semibold"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDeleteBlog(blog.id)}
-                          className="text-rose-500 hover:text-rose-700 font-semibold"
-                        >
-                          Delete
-                        </button>
-                      </td>
+                        <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                          <div className="flex items-center justify-end space-x-1.5">
+                            <button
+                              onClick={() => handleOpenEdit(blog)}
+                              className="p-1.5 rounded-lg text-slate-500 hover:text-[#111827] hover:bg-slate-100 transition-colors"
+                              title="Edit article"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteBlog(blog)}
+                              className="p-1.5 rounded-lg text-rose-500 hover:text-rose-700 hover:bg-rose-50 transition-colors"
+                              title="Delete article"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
                     </tr>
                   ))
                 )}
@@ -543,6 +577,17 @@ export default function BlogManagementPage() {
           </form>
         </Modal>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={deleteDialog.isOpen}
+        onClose={() => setDeleteDialog((prev) => ({ ...prev, isOpen: false }))}
+        onConfirm={deleteDialog.onConfirm}
+        title={deleteDialog.title}
+        description={deleteDialog.description}
+        itemName={deleteDialog.itemName}
+        isLoading={deleteDialog.isLoading}
+      />
     </div>
   );
 }
