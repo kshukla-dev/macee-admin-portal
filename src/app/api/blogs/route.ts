@@ -2,18 +2,34 @@ import { NextResponse } from 'next/server';
 import { getStoredData, saveStoredData } from '@/lib/storage';
 import { syncBlogsToWebsite } from '@/lib/syncEngine';
 
+export interface BlogContributor {
+  personId?: string;
+  name: string;
+  role: 'Author' | 'Reviewer' | 'Editor' | 'Contributor';
+  avatar?: string;
+}
+
 export interface BlogPost {
   id: string;
   slug: string;
   title: string;
   excerpt: string;
   content: string;
-  category: string;
-  author: string;
   coverImage?: string;
+  coverImageAlt?: string;
+  coverImageUrl?: string;
+  author: string;
+  authorId?: string;
+  authorRole?: string;
+  authorAvatar?: string;
+  contributors?: BlogContributor[];
+  category: string;
+  categories: string[];
+  relatedPosts?: string[];
+  estimatedReadingTime?: number;
+  readTime: string;
   tags: string[];
   status: 'published' | 'draft';
-  readTime: string;
   publishedAt: string;
 }
 
@@ -39,7 +55,11 @@ export async function GET(request: Request) {
     }
 
     if (category && category !== 'all') {
-      blogs = blogs.filter((b) => b.category.toLowerCase() === category.toLowerCase());
+      blogs = blogs.filter(
+        (b) =>
+          (b.category && b.category.toLowerCase() === category.toLowerCase()) ||
+          (b.categories && b.categories.some((c) => c.toLowerCase() === category.toLowerCase()))
+      );
     }
 
     if (search) {
@@ -48,6 +68,7 @@ export async function GET(request: Request) {
           b.title.toLowerCase().includes(search) ||
           b.excerpt.toLowerCase().includes(search) ||
           b.author.toLowerCase().includes(search) ||
+          (b.contributors && b.contributors.some((c) => c.name.toLowerCase().includes(search))) ||
           b.tags.some((t) => t.toLowerCase().includes(search))
       );
     }
@@ -67,8 +88,23 @@ export async function POST(request: Request) {
     const body = await request.json();
     const blogs = await getStoredData<BlogPost[]>('blogs', []);
 
-    const title = body.title || 'Untitled Post';
-    const slug = body.slug ? generateSlug(body.slug) : generateSlug(title);
+    const title = (body.title || 'Untitled Post').trim();
+    const rawSlug = body.slug ? generateSlug(body.slug) : generateSlug(title);
+    const slug = rawSlug.slice(0, 120);
+
+    const categories: string[] = Array.isArray(body.categories) && body.categories.length > 0
+      ? body.categories
+      : body.category
+        ? [body.category]
+        : ['General'];
+
+    const primaryCategory = categories[0] || 'General';
+
+    const estimatedReadingTime = typeof body.estimatedReadingTime === 'number'
+      ? Math.max(1, Math.round(body.estimatedReadingTime))
+      : body.readTime
+        ? parseInt(body.readTime, 10) || 4
+        : 4;
 
     const newBlog: BlogPost = {
       id: `blog-${Date.now()}`,
@@ -76,9 +112,19 @@ export async function POST(request: Request) {
       title,
       excerpt: body.excerpt || '',
       content: body.content || '',
-      category: body.category || 'General',
-      author: body.author || 'Macee Editorial',
       coverImage: body.coverImage || '',
+      coverImageAlt: body.coverImageAlt || '',
+      coverImageUrl: body.coverImageUrl || '',
+      author: body.author || 'Macee Editorial',
+      authorId: body.authorId || '',
+      authorRole: body.authorRole || '',
+      authorAvatar: body.authorAvatar || '',
+      contributors: Array.isArray(body.contributors) ? body.contributors : [],
+      category: primaryCategory,
+      categories,
+      relatedPosts: Array.isArray(body.relatedPosts) ? body.relatedPosts.slice(0, 4) : [],
+      estimatedReadingTime,
+      readTime: `${estimatedReadingTime} min read`,
       tags: Array.isArray(body.tags)
         ? body.tags
         : (body.tags || '')
@@ -86,7 +132,6 @@ export async function POST(request: Request) {
           .map((t: string) => t.trim())
           .filter(Boolean),
       status: body.status === 'published' ? 'published' : 'draft',
-      readTime: body.readTime || '4 min read',
       publishedAt: body.publishedAt || new Date().toISOString(),
     };
 
@@ -117,17 +162,44 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
     }
 
+    const categories: string[] = Array.isArray(body.categories) && body.categories.length > 0
+      ? body.categories
+      : body.category
+        ? [body.category]
+        : blogs[index].categories || (blogs[index].category ? [blogs[index].category] : ['General']);
+
+    const primaryCategory = categories[0] || blogs[index].category || 'General';
+
+    const estimatedReadingTime = typeof body.estimatedReadingTime === 'number'
+      ? Math.max(1, Math.round(body.estimatedReadingTime))
+      : body.readTime
+        ? parseInt(body.readTime, 10) || blogs[index].estimatedReadingTime || 4
+        : blogs[index].estimatedReadingTime || 4;
+
     const updatedTags = Array.isArray(body.tags)
       ? body.tags
       : typeof body.tags === 'string'
         ? body.tags.split(',').map((t: string) => t.trim()).filter(Boolean)
         : blogs[index].tags;
 
+    const rawSlug = body.slug ? generateSlug(body.slug) : blogs[index].slug;
+    const slug = rawSlug.slice(0, 120);
+
     blogs[index] = {
       ...blogs[index],
       ...body,
+      slug,
       tags: updatedTags,
-      slug: body.slug ? generateSlug(body.slug) : blogs[index].slug,
+      categories,
+      category: primaryCategory,
+      estimatedReadingTime,
+      readTime: `${estimatedReadingTime} min read`,
+      relatedPosts: Array.isArray(body.relatedPosts)
+        ? body.relatedPosts.slice(0, 4)
+        : blogs[index].relatedPosts || [],
+      contributors: Array.isArray(body.contributors)
+        ? body.contributors
+        : blogs[index].contributors || [],
     };
 
     await saveStoredData('blogs', blogs);

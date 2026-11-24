@@ -1,58 +1,111 @@
 [
   {
-    "id": "blog-1",
-    "slug": "navigating-dutch-dba-regulations-2026",
-    "title": "Navigating Dutch DBA Regulations in 2026: What Hirers and ZZP'ers Must Know",
-    "excerpt": "With the full enforcement of the Wet DBA by the Dutch Belastingdienst, understanding the legal boundaries of self-employment versus bogus self-employment is crucial.",
-    "content": "## Understanding the Wet DBA in 2026\n\nThe Dutch Tax Authority (Belastingdienst) has resumed strict enforcement of the Deregulation Assessment of Labor Relations Act (Wet DBA). For companies hiring self-employed professionals (ZZP'ers), avoiding 'schijnzelfstandigheid' (bogus self-employment) is no longer optional.\n\n### Key Audit Criteria:\n1. **Authority and Direction:** Does the client have managerial authority over how the specialist works?\n2. **Substitution:** Can the ZZP specialist freely send a qualified replacement without client pre-approval?\n3. **Remuneration and Independence:** Are market rates paid, and does the contractor maintain multiple business engagements?\n\n### How Macee Protects Clients:\nMacee provides DBA-proof model contracts, conducts quarterly risk assessments, and acts as the protective compliance link.",
-    "category": "Compliance & Legal",
-    "author": "Adam Nichols",
-    "coverImage": "/uploads/people-working-dsk.jpg",
-    "tags": ["DBA Law", "ZZP", "Compliance", "Belastingdienst", "Labor Regulations"],
-    "status": "published",
-    "readTime": "4 min read",
-    "publishedAt": "2026-11-10T09:00:00.000Z"
-  },
-  {
-    "id": "blog-2",
-    "slug": "fast-track-ind-visa-sponsorship-guide",
-    "title": "Fast-Track IND Visa Sponsorship: Sourcing Non-EU Tech Talent for Dutch Enterprises",
-    "excerpt": "How Macee leverages its official IND Recognised Sponsor status to deploy senior international engineers to Dutch projects within weeks.",
-    "content": "## Overcoming the Dutch IT Talent Shortage\n\nThe shortage of senior software engineers, cloud architects, and data engineers in the Netherlands has made international talent acquisition an essential growth strategy.\n\n### The IND Recognised Sponsor Advantage\nAs an officially recognised sponsor (Erkend Referent) by the Dutch Immigration and Naturalisation Service (IND), Macee handles:\n- Fast-track Highly Skilled Migrant (Kennismigrant) residence and work permits\n- 30% Tax Facility (Ruling) application and compliance checks\n- Expat onboarding, BSN registration, and housing transition guidance\n\nContact our Talent & Visa Desk to learn more.",
+    "id": "blog-1795512683465",
+    "slug": "new-test",
+    "title": "New Test",
+    "excerpt": "Test bl;ogs",
+    "content": "",
+    "coverImage": "data:image/jpeg;base64,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",
+    "coverImageAlt": "",
+    "coverImageUrl": "",
+    "author": "New00",
+    "authorId": "team-1795512577953",
+    "authorRole": "New",
+    "authorAvatar": "",
+    "contributors": [],
     "category": "Immigration & Visas",
+    "categories": [
+      "Immigration & Visas"
+    ],
+    "relatedPosts": [],
+    "estimatedReadingTime": 4,
+    "readTime": "4 min read",
+    "tags": [
+      "Netherlands",
+      "Compliance",
+      "Workforce"
+    ],
+    "status": "published",
+    "publishedAt": "2026-11-24T09:31:23.465Z"
+  },
+  {
+    "author": "Adam Nichols",
+    "category": "Compliance & Legal",
+    "content": "## Understanding the Wet DBA in 2026\n\nThe Dutch Tax Authority (Belastingdienst) has resumed strict enforcement of the Deregulation Assessment of Labor Relations Act (Wet DBA). For companies hiring self-employed professionals (ZZP'ers), avoiding 'schijnzelfstandigheid' (bogus self-employment) is no longer optional.\n\n### Key Audit Criteria:\n1. **Authority and Direction:** Does the client have managerial authority over how the specialist works?\n2. **Substitution:** Can the ZZP specialist freely send a qualified replacement without client pre-approval?\n3. **Remuneration and Independence:** Are market rates paid, and does the contractor maintain multiple business engagements?\n\n### How Macee Protects Clients:\nMacee provides DBA-proof model contracts, conducts quarterly risk assessments, and acts as the protective compliance link.",
+    "coverImage": "/uploads/people-working-dsk.jpg",
+    "excerpt": "With the full enforcement of the Wet DBA by the Dutch Belastingdienst, understanding the legal boundaries of self-employment versus bogus self-employment is crucial.",
+    "id": "blog-1",
+    "publishedAt": "2026-11-10T09:00:00.000Z",
+    "readTime": "4 min read",
+    "slug": "navigating-dutch-dba-regulations-2026",
+    "status": "published",
+    "tags": [
+      "DBA Law",
+      "ZZP",
+      "Compliance",
+      "Belastingdienst",
+      "Labor Regulations"
+    ],
+    "title": "Navigating Dutch DBA Regulations in 2026: What Hirers and ZZP'ers Must Know"
+  },
+  {
     "author": "Nicky Weijgertze",
+    "category": "Immigration & Visas",
+    "content": "## Overcoming the Dutch IT Talent Shortage\n\nThe shortage of senior software engineers, cloud architects, and data engineers in the Netherlands has made international talent acquisition an essential growth strategy.\n\n### The IND Recognised Sponsor Advantage\nAs an officially recognised sponsor (Erkend Referent) by the Dutch Immigration and Naturalisation Service (IND), Macee handles:\n- Fast-track Highly Skilled Migrant (Kennismigrant) residence and work permits\n- 30% Tax Facility (Ruling) application and compliance checks\n- Expat onboarding, BSN registration, and housing transition guidance\n\nContact our Talent & Visa Desk to learn more.",
     "coverImage": "/uploads/Dutch-government-3.jpg",
-    "tags": ["IND", "Kennismigrant", "Expats", "30% Tax Ruling", "Relocation"],
-    "status": "published",
+    "excerpt": "How Macee leverages its official IND Recognised Sponsor status to deploy senior international engineers to Dutch projects within weeks.",
+    "id": "blog-2",
+    "publishedAt": "2026-11-05T14:30:00.000Z",
     "readTime": "5 min read",
-    "publishedAt": "2026-11-05T14:30:00.000Z"
-  },
-  {
-    "id": "blog-3",
-    "slug": "external-workforce-desk-trends-netherlands",
-    "title": "The Rise of the External Hiring Desk: Smarter Contingent Workforce Strategies",
-    "excerpt": "Why modern enterprises are transitioning away from ad-hoc recruiting toward consolidated external hiring desks for contractor management.",
-    "content": "## Centralizing Contingent Labor\n\nManaging dozens of external recruitment suppliers often leads to rate discrepancies, legal exposures, and admin overhead. Macee's External Workforce Desk acts as an extension of your internal HR/Procurement departments.\n\n### Strategic Benefits:\n- Single point of invoice & contract management\n- Comprehensive SNA NEN 4400-1 audited payroll security\n- Live market benchmarking for hourly contractor rates across Arnhem, Amsterdam, and Utrecht.",
-    "category": "Workforce Strategy",
-    "author": "Maarten Koekebakker",
-    "coverImage": "/uploads/macee1.png",
-    "tags": ["MSP", "Contracting", "Workforce Solutions", "Arnhem", "HR Strategy"],
+    "slug": "fast-track-ind-visa-sponsorship-guide",
     "status": "published",
-    "readTime": "3 min read",
-    "publishedAt": "2026-10-28T11:00:00.000Z"
+    "tags": [
+      "IND",
+      "Kennismigrant",
+      "Expats",
+      "30% Tax Ruling",
+      "Relocation"
+    ],
+    "title": "Fast-Track IND Visa Sponsorship: Sourcing Non-EU Tech Talent for Dutch Enterprises"
   },
   {
-    "id": "blog-4",
-    "slug": "ai-and-data-engineering-salary-trends-2027",
-    "title": "AI, Cloud and Data Engineering: Demand and Rate Trends Ahead of 2027",
-    "excerpt": "A deep dive into contractor rates, tech stacks in high demand (Spark, Azure, Databricks, LLMs), and hiring forecasts in the Benelux region.",
-    "content": "## The Tech Landscape in 2026-2027\n\nData and Cloud continue to dominate enterprise tech investments. Specializations in data mesh architectures, Kafka event streaming, and secure private LLM deployment command premium day rates.\n\nExplore our latest benchmark report or contact Michael Siep for tailored tech recruitment advice.",
-    "category": "Market Insights",
+    "author": "Maarten Koekebakker",
+    "category": "Workforce Strategy",
+    "content": "## Centralizing Contingent Labor\n\nManaging dozens of external recruitment suppliers often leads to rate discrepancies, legal exposures, and admin overhead. Macee's External Workforce Desk acts as an extension of your internal HR/Procurement departments.\n\n### Strategic Benefits:\n- Single point of invoice & contract management\n- Comprehensive SNA NEN 4400-1 audited payroll security\n- Live market benchmarking for hourly contractor rates across Arnhem, Amsterdam, and Utrecht.",
+    "coverImage": "/uploads/macee1.png",
+    "excerpt": "Why modern enterprises are transitioning away from ad-hoc recruiting toward consolidated external hiring desks for contractor management.",
+    "id": "blog-3",
+    "publishedAt": "2026-10-28T11:00:00.000Z",
+    "readTime": "3 min read",
+    "slug": "external-workforce-desk-trends-netherlands",
+    "status": "published",
+    "tags": [
+      "MSP",
+      "Contracting",
+      "Workforce Solutions",
+      "Arnhem",
+      "HR Strategy"
+    ],
+    "title": "The Rise of the External Hiring Desk: Smarter Contingent Workforce Strategies"
+  },
+  {
     "author": "Michael Siep",
+    "category": "Market Insights",
+    "content": "## The Tech Landscape in 2026-2027\n\nData and Cloud continue to dominate enterprise tech investments. Specializations in data mesh architectures, Kafka event streaming, and secure private LLM deployment command premium day rates.\n\nExplore our latest benchmark report or contact Michael Siep for tailored tech recruitment advice.",
     "coverImage": "/uploads/Software-Development-2.jpg",
-    "tags": ["Data Engineering", "AI", "Cloud", "Contractor Rates", "Tech Recruitment"],
-    "status": "draft",
+    "excerpt": "A deep dive into contractor rates, tech stacks in high demand (Spark, Azure, Databricks, LLMs), and hiring forecasts in the Benelux region.",
+    "id": "blog-4",
+    "publishedAt": "2026-11-15T08:00:00.000Z",
     "readTime": "6 min read",
-    "publishedAt": "2026-11-15T08:00:00.000Z"
+    "slug": "ai-and-data-engineering-salary-trends-2027",
+    "status": "draft",
+    "tags": [
+      "Data Engineering",
+      "AI",
+      "Cloud",
+      "Contractor Rates",
+      "Tech Recruitment"
+    ],
+    "title": "AI, Cloud and Data Engineering: Demand and Rate Trends Ahead of 2027"
   }
 ]
