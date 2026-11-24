@@ -247,7 +247,7 @@ export default function BlogManagementPage() {
       <Topbar
         breadcrumbs={[
           { label: 'Dashboard', href: '/dashboard' },
-          { label: 'Articles & Blogs' },
+          { label: 'Articles & Blogs (For Future Purpose)' },
         ]}
         searchPlaceholder="Search articles..."
         onSearch={(q) => setSearchQuery(q)}
@@ -256,11 +256,16 @@ export default function BlogManagementPage() {
       <div className="p-6 sm:p-8 lg:p-10 max-w-[1440px] mx-auto space-y-6">
         {/* Page Header (Editorial Serif) */}
         <div className="space-y-1">
-          <h1 className="text-3xl sm:text-4xl font-serif text-[#111827] tracking-tight">
-            Articles & Blogs
-          </h1>
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-3xl sm:text-4xl font-serif text-[#111827] tracking-tight">
+              Articles & Blogs
+            </h1>
+            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200 shadow-2xs">
+              For Future Purpose
+            </span>
+          </div>
           <p className="text-xs sm:text-sm text-slate-500">
-            Draft, edit, and publish thought leadership articles for macee.com.
+            For future purpose — Draft, edit, and prepare thought leadership articles for future release on macee.com.
           </p>
         </div>
 

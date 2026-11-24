@@ -204,16 +204,16 @@ export default function DashboardOverviewPage() {
     {
       id: 'mod-blogs',
       name: 'Articles & Blogs',
-      description: 'Thought leadership articles, compliance news, and labor market guides.',
+      description: 'For future purpose — Thought leadership articles, compliance news, and labor market guides.',
       href: '/dashboard/blogs',
       icon: FileText,
       iconBg: 'bg-[#EAF0FC]',
       iconColor: 'text-[#36427D]',
       count: stats.blogsCount,
       countLabel: 'Articles',
-      subtext: `${stats.draftBlogsCount} drafts pending`,
-      status: 'Live on Web',
-      statusColor: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+      subtext: 'For Future Purpose',
+      status: 'For Future Purpose',
+      statusColor: 'bg-amber-50 text-amber-700 border-amber-200',
     },
     {
       id: 'mod-faqs',
@@ -391,13 +391,18 @@ export default function DashboardOverviewPage() {
                   <FileText className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-xs font-medium text-slate-500">Articles & Blogs</p>
+                  <div className="flex items-center space-x-1.5">
+                    <p className="text-xs font-medium text-slate-500">Articles & Blogs</p>
+                    <span className="text-[10px] font-semibold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
+                      Future
+                    </span>
+                  </div>
                   <div className="flex items-baseline space-x-2 mt-0.5">
                     <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
                       {stats.blogsCount}
                     </span>
-                    <span className="text-xs font-semibold text-slate-500">
-                      Published
+                    <span className="text-xs font-semibold text-amber-600">
+                      For Future Purpose
                     </span>
                   </div>
                 </div>
