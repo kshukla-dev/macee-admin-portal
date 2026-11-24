@@ -2,7 +2,7 @@
   "pages": [
     {
       "id": "home",
-      "name": "Home Page",
+      "name": "Home",
       "categoryId": 1,
       "categoryName": "Workforce Desk & General",
       "route": "/",
@@ -10,7 +10,7 @@
     },
     {
       "id": "about",
-      "name": "About Page",
+      "name": "About Us",
       "categoryId": 2,
       "categoryName": "About Macee & Certifications",
       "route": "/about",
@@ -18,7 +18,7 @@
     },
     {
       "id": "clients",
-      "name": "Clients Page",
+      "name": "Clients",
       "categoryId": 3,
       "categoryName": "Clients & Hiring Managers",
       "route": "/clients",
@@ -26,7 +26,7 @@
     },
     {
       "id": "professionals",
-      "name": "Professionals Page",
+      "name": "Professionals",
       "categoryId": 4,
       "categoryName": "Professionals & Contractors",
       "route": "/professionals",
@@ -34,23 +34,15 @@
     },
     {
       "id": "projects",
-      "name": "Projects Page",
+      "name": "Projects",
       "categoryId": 5,
       "categoryName": "Projects & Vacancies",
       "route": "/projects",
       "description": "CV Formats, Live OTYS Desk & Applications"
     },
     {
-      "id": "compliance",
-      "name": "Compliance & Legal",
-      "categoryId": 6,
-      "categoryName": "Compliance, Wet DBA & WAADI",
-      "route": "/faqs#compliance",
-      "description": "Wet DBA, WAADI, G-Account & Ketenaansprakelijkheid"
-    },
-    {
       "id": "contact",
-      "name": "Contact Page",
+      "name": "Contact",
       "categoryId": 7,
       "categoryName": "Contact & Urgencies",
       "route": "/contact",
@@ -95,13 +87,6 @@
     },
     {
       "id": 6,
-      "key": "compliance",
-      "title": "Compliance, Wet DBA & WAADI",
-      "page": "Compliance & Legal",
-      "desc": "Wet DBA, WAADI, G-Account & Ketenaansprakelijkheid"
-    },
-    {
-      "id": 7,
       "key": "contact",
       "title": "Contact & Urgencies",
       "page": "Contact Page",
@@ -112,7 +97,7 @@
     {
       "id": "faq-home-1",
       "page": "home",
-      "pageName": "Home Page",
+      "pageName": "Home",
       "categoryId": 1,
       "categoryName": "Workforce Desk & General",
       "question": "What is an External Workforce Desk and how does Macee manage it? 0000125",
@@ -126,7 +111,7 @@
     {
       "id": "faq-home-2",
       "page": "home",
-      "pageName": "Home Page",
+      "pageName": "Home",
       "categoryId": 1,
       "categoryName": "Workforce Desk & General",
       "question": "How does Macee guarantee 100% compliance with Dutch labor regulations?",
@@ -140,7 +125,7 @@
     {
       "id": "faq-home-3",
       "page": "home",
-      "pageName": "Home Page",
+      "pageName": "Home",
       "categoryId": 1,
       "categoryName": "Workforce Desk & General",
       "question": "What contract models does Macee offer?",
@@ -154,7 +139,7 @@
     {
       "id": "faq-home-4",
       "page": "home",
-      "pageName": "Home Page",
+      "pageName": "Home",
       "categoryId": 1,
       "categoryName": "Workforce Desk & General",
       "question": "In which sectors does Macee have proven recruitment expertise?",
@@ -168,7 +153,7 @@
     {
       "id": "faq-home-5",
       "page": "home",
-      "pageName": "Home Page",
+      "pageName": "Home",
       "categoryId": 1,
       "categoryName": "Workforce Desk & General",
       "question": "How quickly can Macee deploy qualified professionals to a project?",
@@ -182,7 +167,7 @@
     {
       "id": "faq-about-1",
       "page": "about",
-      "pageName": "About Page",
+      "pageName": "About Us",
       "categoryId": 2,
       "categoryName": "About Macee & Certifications",
       "question": "What sets Macee apart from traditional recruitment agencies?",
@@ -196,7 +181,7 @@
     {
       "id": "faq-about-2",
       "page": "about",
-      "pageName": "About Page",
+      "pageName": "About Us",
       "categoryId": 2,
       "categoryName": "About Macee & Certifications",
       "question": "Why is the SNA NEN 4400-1 certification critical for our clients?",
@@ -210,7 +195,7 @@
     {
       "id": "faq-about-3",
       "page": "about",
-      "pageName": "About Page",
+      "pageName": "About Us",
       "categoryId": 2,
       "categoryName": "About Macee & Certifications",
       "question": "Where is Macee located and what areas do you serve?",
@@ -224,7 +209,7 @@
     {
       "id": "faq-about-4",
       "page": "about",
-      "pageName": "About Page",
+      "pageName": "About Us",
       "categoryId": 2,
       "categoryName": "About Macee & Certifications",
       "question": "How does the Macee internal team operate?",
@@ -238,7 +223,7 @@
     {
       "id": "faq-clients-1",
       "page": "clients",
-      "pageName": "Clients Page",
+      "pageName": "Clients",
       "categoryId": 3,
       "categoryName": "Clients & Hiring Managers",
       "question": "How fast can Macee deliver verified candidate profiles?",
@@ -252,7 +237,7 @@
     {
       "id": "faq-clients-2",
       "page": "clients",
-      "pageName": "Clients Page",
+      "pageName": "Clients",
       "categoryId": 3,
       "categoryName": "Clients & Hiring Managers",
       "question": "What guarantee does Macee provide if an interim professional is not the right fit?",
@@ -266,7 +251,7 @@
     {
       "id": "faq-clients-3",
       "page": "clients",
-      "pageName": "Clients Page",
+      "pageName": "Clients",
       "categoryId": 3,
       "categoryName": "Clients & Hiring Managers",
       "question": "How does Macee protect hiring clients from Wet DBA / False Self-Employment risks?",
@@ -280,7 +265,7 @@
     {
       "id": "faq-clients-4",
       "page": "clients",
-      "pageName": "Clients Page",
+      "pageName": "Clients",
       "categoryId": 3,
       "categoryName": "Clients & Hiring Managers",
       "question": "Can Macee act as a Master Vendor or Managed Service Provider (MSP)?",
@@ -294,7 +279,7 @@
     {
       "id": "faq-clients-5",
       "page": "clients",
-      "pageName": "Clients Page",
+      "pageName": "Clients",
       "categoryId": 3,
       "categoryName": "Clients & Hiring Managers",
       "question": "What is your fee structure for interim vs permanent placements?",
@@ -308,7 +293,7 @@
     {
       "id": "faq-professionals-1",
       "page": "professionals",
-      "pageName": "Professionals Page",
+      "pageName": "Professionals",
       "categoryId": 4,
       "categoryName": "Professionals & Contractors",
       "question": "What onboarding and relocation support does Macee offer to professionals?",
@@ -322,7 +307,7 @@
     {
       "id": "faq-professionals-2",
       "page": "professionals",
-      "pageName": "Professionals Page",
+      "pageName": "Professionals",
       "categoryId": 4,
       "categoryName": "Professionals & Contractors",
       "question": "Does Macee support applications for the 30% Tax Ruling (30%-regeling)?",
@@ -336,7 +321,7 @@
     {
       "id": "faq-professionals-3",
       "page": "professionals",
-      "pageName": "Professionals Page",
+      "pageName": "Professionals",
       "categoryId": 4,
       "categoryName": "Professionals & Contractors",
       "question": "Can my spouse and dependent children move to the Netherlands with me?",
@@ -350,7 +335,7 @@
     {
       "id": "faq-professionals-4",
       "page": "professionals",
-      "pageName": "Professionals Page",
+      "pageName": "Professionals",
       "categoryId": 4,
       "categoryName": "Professionals & Contractors",
       "question": "What contract options are available for professionals working through Macee?",
@@ -364,7 +349,7 @@
     {
       "id": "faq-professionals-5",
       "page": "professionals",
-      "pageName": "Professionals Page",
+      "pageName": "Professionals",
       "categoryId": 4,
       "categoryName": "Professionals & Contractors",
       "question": "How promptly are contractor invoices paid?",
@@ -378,7 +363,7 @@
     {
       "id": "faq-projects-1",
       "page": "projects",
-      "pageName": "Projects Page",
+      "pageName": "Projects",
       "categoryId": 5,
       "categoryName": "Projects & Vacancies",
       "question": "What format should my CV and portfolio be in when applying?",
@@ -392,7 +377,7 @@
     {
       "id": "faq-projects-2",
       "page": "projects",
-      "pageName": "Projects Page",
+      "pageName": "Projects",
       "categoryId": 5,
       "categoryName": "Projects & Vacancies",
       "question": "What happens after I apply for an open project on Macee?",
@@ -406,7 +391,7 @@
     {
       "id": "faq-projects-3",
       "page": "projects",
-      "pageName": "Projects Page",
+      "pageName": "Projects",
       "categoryId": 5,
       "categoryName": "Projects & Vacancies",
       "question": "Are remote or hybrid work arrangements available for open assignments?",
@@ -420,7 +405,7 @@
     {
       "id": "faq-projects-4",
       "page": "projects",
-      "pageName": "Projects Page",
+      "pageName": "Projects",
       "categoryId": 5,
       "categoryName": "Projects & Vacancies",
       "question": "What should I do if there is no open project currently matching my skill set?",
@@ -434,7 +419,7 @@
     {
       "id": "faq-projects-5",
       "page": "projects",
-      "pageName": "Projects Page",
+      "pageName": "Projects",
       "categoryId": 5,
       "categoryName": "Projects & Vacancies",
       "question": "Are all projects published on this website real and currently active?",
@@ -446,51 +431,9 @@
       "active": true
     },
     {
-      "id": "faq-compliance-1",
-      "page": "compliance",
-      "pageName": "Compliance & Legal",
-      "categoryId": 6,
-      "categoryName": "Compliance, Wet DBA & WAADI",
-      "question": "What is the Wet DBA and how does Macee protect clients from enforcement penalties?",
-      "answer": "The Wet DBA (Deregulering Beoordeling Arbeidsrelaties) enforces strict boundaries between true self-employment (ZZP) and disguised employment (schijnzelfstandigheid). Macee uses officially verified model agreements, monitors relationship parameters, and provides secondment alternatives to shield clients from retroactive wage taxes and fines.",
-      "question_nl": "Wat houdt de Wet DBA in en hoe beschermt Macee opdrachtgevers?",
-      "answer_nl": "De Wet DBA bewaakt de grens tussen echt ondernemerschap en schijnzelfstandigheid. Macee gebruikt getoetste modelcontracten en biedt detachering om naheffingen en boetes uit te sluiten.",
-      "tag": "Zero DBA Exposure",
-      "order": 25,
-      "active": true
-    },
-    {
-      "id": "faq-compliance-2",
-      "page": "compliance",
-      "pageName": "Compliance & Legal",
-      "categoryId": 6,
-      "categoryName": "Compliance, Wet DBA & WAADI",
-      "question": "What is a G-account (G-rekening) and how does it protect hiring companies?",
-      "answer": "A G-account is a restricted bank account used solely to pay payroll taxes and VAT to the Dutch Tax Administration. When clients pay the tax portion into Macee’s verified G-account, they are legally indemnified against chain liability under Dutch law.",
-      "question_nl": "Wat is een G-rekening en welke zekerheid biedt dit?",
-      "answer_nl": "Een G-rekening is een geblokkeerde bankrekening waarmee uitsluitend loonheffingen aan de Belastingdienst worden betaald. Hierdoor zijn opdrachtgevers gevrijwaard van ketenaansprakelijkheid.",
-      "tag": "G-Account Tax Guarantee",
-      "order": 26,
-      "active": true
-    },
-    {
-      "id": "faq-compliance-3",
-      "page": "compliance",
-      "pageName": "Compliance & Legal",
-      "categoryId": 6,
-      "categoryName": "Compliance, Wet DBA & WAADI",
-      "question": "What is the WAADI legislation and is Macee registered?",
-      "answer": "The WAADI (Wet allocatie arbeidskrachten door intermediairs) requires all intermediaries providing personnel in the Netherlands to be formally registered with the Dutch Chamber of Commerce (KvK). Macee is 100% WAADI compliant and registered.",
-      "question_nl": "Wat is de WAADI en is Macee geregistreerd?",
-      "answer_nl": "De WAADI verplicht uitleners van arbeidskrachten geregistreerd te zijn in het Handelsregister. Macee voldoet aan alle WAADI-voorwaarden en beschikt over de vereiste registratie.",
-      "tag": "WAADI Registered Intermediary",
-      "order": 27,
-      "active": true
-    },
-    {
       "id": "faq-contact-1",
       "page": "contact",
-      "pageName": "Contact Page",
+      "pageName": "Contact",
       "categoryId": 7,
       "categoryName": "Contact & Urgencies",
       "question": "How quickly does Macee respond to website inquiries?",
@@ -498,13 +441,13 @@
       "question_nl": "Hoe snel reageert Macee op contactaanvragen?",
       "answer_nl": "Ons team reageert binnen 24 werkuren op elk formulier of bericht. Voor spoed kunt u ons kantoor in Arnhem direct bellen op +31 (0) 26 785 1010.",
       "tag": "Response Within 24 Business Hours",
-      "order": 28,
+      "order": 25,
       "active": true
     },
     {
       "id": "faq-contact-2",
       "page": "contact",
-      "pageName": "Contact Page",
+      "pageName": "Contact",
       "categoryId": 7,
       "categoryName": "Contact & Urgencies",
       "question": "Can I visit Macee’s Arnhem office for an in-person consultation?",
@@ -512,13 +455,13 @@
       "question_nl": "Kan ik langskomen op kantoor in Arnhem voor een kennismaking?",
       "answer_nl": "Jazeker, wij ontvangen u graag op afspraak op Willemsplein 44 te Arnhem om uw inhuur- of carrièredoelen persoonlijk door te nemen.",
       "tag": "Willemsplein 44, Arnhem",
-      "order": 29,
+      "order": 26,
       "active": true
     },
     {
       "id": "faq-contact-3",
       "page": "contact",
-      "pageName": "Contact Page",
+      "pageName": "Contact",
       "categoryId": 7,
       "categoryName": "Contact & Urgencies",
       "question": "How can an employer request an emergency / urgent interim replacement?",
@@ -526,13 +469,13 @@
       "question_nl": "Hoe vraagt een werkgever een spoedinterim kandidaat aan?",
       "answer_nl": "Vermeld \"Spoed\" in uw aanvraag of bel onze directe lijn. Wij kunnen binnen 24 tot 48 uur beschikbare specialisten uit ons netwerk voordragen.",
       "tag": "Emergency Staffing Desk",
-      "order": 30,
+      "order": 27,
       "active": true
     },
     {
       "id": "faq-contact-4",
       "page": "contact",
-      "pageName": "Contact Page",
+      "pageName": "Contact",
       "categoryId": 7,
       "categoryName": "Contact & Urgencies",
       "question": "Are phone consultations free of charge and confidential?",
@@ -540,7 +483,7 @@
       "question_nl": "Zijn telefonische adviesgesprekken kosteloos en vertrouwelijk?",
       "answer_nl": "Ja, al onze oriënterende gesprekken en inhuurscans zijn 100% kosteloos en strikt vertrouwelijk conform AVG en privacyrichtlijnen.",
       "tag": "Free & Confidential Assessment",
-      "order": 31,
+      "order": 28,
       "active": true
     }
   ]

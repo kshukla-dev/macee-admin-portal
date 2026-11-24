@@ -237,13 +237,6 @@ export const FAQ_CATEGORIES_EN: FaqCategoryDef[] = [
     image: '/uploads/PM-2.jpg',
   },
   {
-    key: 'compliance',
-    title: 'Compliance, Wet DBA & WAADI',
-    description: 'Eliminating false self-employment risks, G-account tax protection, and Dutch labor regulations.',
-    page: 'compliance',
-    image: '/uploads/Dutch-government-3.jpg',
-  },
-  {
     key: 'contact',
     title: 'Contact & Urgencies',
     description: 'Response times, Arnhem office visits, emergency staffing requests, and confidential consultations.',
@@ -293,13 +286,6 @@ export const FAQ_CATEGORIES_NL: FaqCategoryDef[] = [
     description: 'Sollicitatieprocedure, gewenste CV-formaten, reactietijden en hybride werkvormen.',
     page: 'projects',
     image: '/uploads/PM-2.jpg',
-  },
-  {
-    key: 'compliance',
-    title: 'Compliance, Wet DBA & WAADI',
-    description: 'Voorkomen van schijnzelfstandigheid, G-rekening fiscale zekerheid en ketenaansprakelijkheid.',
-    page: 'compliance',
-    image: '/uploads/Dutch-government-3.jpg',
   },
   {
     key: 'contact',

@@ -87,8 +87,8 @@ const PAGE_TABS: PageMeta[] = [
   },
   {
     id: 'home',
-    name: 'Home Page',
-    label: 'Home Page',
+    name: 'Home',
+    label: 'Home',
     icon: Building2,
     route: '/',
     constName: 'HOME_FAQS',
@@ -99,7 +99,7 @@ const PAGE_TABS: PageMeta[] = [
   },
   {
     id: 'about',
-    name: 'About Page',
+    name: 'About Us',
     label: 'About Us',
     icon: BookOpen,
     route: '/about',
@@ -111,8 +111,8 @@ const PAGE_TABS: PageMeta[] = [
   },
   {
     id: 'clients',
-    name: 'Clients Page',
-    label: 'Clients & Hiring',
+    name: 'Clients',
+    label: 'Clients',
     icon: Briefcase,
     route: '/clients',
     constName: 'CLIENTS_FAQS',
@@ -123,8 +123,8 @@ const PAGE_TABS: PageMeta[] = [
   },
   {
     id: 'professionals',
-    name: 'Professionals Page',
-    label: 'Professionals & Expats',
+    name: 'Professionals',
+    label: 'Professionals',
     icon: Users,
     route: '/professionals',
     constName: 'PROFESSIONALS_FAQS',
@@ -135,8 +135,8 @@ const PAGE_TABS: PageMeta[] = [
   },
   {
     id: 'projects',
-    name: 'Projects Page',
-    label: 'Projects & Jobs',
+    name: 'Projects',
+    label: 'Projects',
     icon: FolderGit2,
     route: '/projects',
     constName: 'PROJECTS_FAQS',
@@ -146,21 +146,9 @@ const PAGE_TABS: PageMeta[] = [
     description: 'CV format guidelines, OTYS applicant review workflows, hybrid & remote policies.',
   },
   {
-    id: 'compliance',
-    name: 'Compliance & Legal',
-    label: 'Compliance & Wet DBA',
-    icon: ShieldCheck,
-    route: '/faqs#compliance',
-    constName: 'COMPLIANCE_FAQS',
-    color: 'text-rose-700',
-    bgLight: 'bg-rose-50',
-    borderLight: 'border-rose-200',
-    description: 'Wet DBA false-employment elimination, verified G-Account tax indemnity and WAADI.',
-  },
-  {
     id: 'contact',
-    name: 'Contact Page',
-    label: 'Contact & Desk',
+    name: 'Contact',
+    label: 'Contact',
     icon: PhoneCall,
     route: '/contact',
     constName: 'CONTACT_FAQS',
@@ -205,11 +193,6 @@ const SUGGESTED_TAGS_BY_PAGE: Record<string, string[]> = {
     'Flexible Hybrid Options',
     'Job Alerts & Open Registration',
     'Live OTYS Desk Synchronization',
-  ],
-  compliance: [
-    'Wet DBA & Fiscal Safety',
-    'G-Account Tax Indemnity',
-    'WAADI Registered',
   ],
   contact: [
     'Response Within 24 Business Hours',
@@ -510,7 +493,7 @@ export default function FaqManagementPage() {
               FAQs
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Manage page-specific FAQs for Home, About, Clients, Professionals, Projects, Compliance, and Contact with instant website sync.
+              Manage page-specific FAQs for Home, About Us, Clients, Professionals, Projects, and Contact with instant website sync.
             </p>
           </div>
 
@@ -917,13 +900,12 @@ export default function FaqManagementPage() {
                   }}
                   className="w-full p-2.5 text-xs rounded-xl border border-slate-200 bg-white focus:outline-none focus:border-[#E30613] font-medium"
                 >
-                  <option value="home">Home Page</option>
-                  <option value="about">About Page</option>
-                  <option value="clients">Clients & Hiring Managers</option>
-                  <option value="professionals">Professionals & Expats</option>
-                  <option value="projects">Projects & Jobs</option>
-                  <option value="compliance">Compliance & Legal</option>
-                  <option value="contact">Contact & Desk</option>
+                  <option value="home">Home</option>
+                  <option value="about">About Us</option>
+                  <option value="clients">Clients</option>
+                  <option value="professionals">Professionals</option>
+                  <option value="projects">Projects</option>
+                  <option value="contact">Contact</option>
                 </select>
               </div>
 

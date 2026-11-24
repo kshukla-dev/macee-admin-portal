@@ -4,7 +4,7 @@ import { syncFaqsToWebsite } from '@/lib/syncEngine';
 
 export interface FaqItem {
   id: string;
-  page: 'home' | 'about' | 'clients' | 'professionals' | 'projects' | 'compliance' | 'contact' | string;
+  page: 'home' | 'about' | 'clients' | 'professionals' | 'projects' | 'contact' | string;
   pageName: string;
   categoryId: number;
   categoryName: string;
