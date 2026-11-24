@@ -99,24 +99,42 @@ export function Topbar({
       <div className="flex items-center space-x-3 sm:space-x-4">
 
 
-        {/* User Profile (Avatar circle with 'KS' or 'Admin' + dropdown arrow) */}
+        {/* User Profile (Avatar circle with Macee logo + dropdown arrow) */}
         <div className="relative">
           <button
             onClick={() => setUserMenuOpen(!userMenuOpen)}
-            className="flex items-center space-x-2 pl-2 text-xs font-semibold text-slate-700 hover:text-slate-900 focus:outline-none"
+            className="flex items-center space-x-2 pl-2 text-xs font-semibold text-slate-700 hover:text-slate-900 focus:outline-none cursor-pointer"
           >
-            <div className="w-8 h-8 rounded-full bg-[#0E1726] text-white flex items-center justify-center font-bold text-xs">
-              AD
+            <div className="w-8 h-8 rounded-full bg-white border border-slate-200/90 shadow-2xs flex items-center justify-center p-1 shrink-0 overflow-hidden">
+              <img
+                src="/favicon.png"
+                alt="Macee"
+                className="w-full h-full object-contain"
+                onError={(e) => {
+                  const target = e.currentTarget as HTMLImageElement;
+                  target.onerror = null;
+                  target.src = '/uploads/favicon-96x96.png';
+                }}
+              />
             </div>
             <span className="hidden md:inline font-semibold text-slate-800">Admin</span>
             <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
           </button>
 
           {userMenuOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-slate-100 py-1.5 z-50 animate-fadeIn">
-              <div className="px-3.5 py-2 border-b border-slate-100">
-                <p className="text-xs font-bold text-[#111827]">Macee Administrator</p>
-                <p className="text-[10px] text-slate-400 font-mono">admin@macee.com</p>
+            <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-lg border border-slate-100 py-1.5 z-50 animate-fadeIn">
+              <div className="px-3.5 py-2.5 border-b border-slate-100 flex items-center space-x-2.5">
+                <div className="w-7 h-7 rounded-full bg-white border border-slate-200 p-0.5 shrink-0 overflow-hidden">
+                  <img
+                    src="/favicon.png"
+                    alt="Macee"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-bold text-[#111827] truncate">Macee Administrator</p>
+                  <p className="text-[10px] text-slate-400 font-mono truncate">admin@macee.com</p>
+                </div>
               </div>
               <Link
                 href="/dashboard/settings"
@@ -128,7 +146,7 @@ export function Topbar({
               </Link>
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center space-x-2 px-3.5 py-2 text-xs text-rose-600 hover:bg-rose-50 text-left"
+                className="w-full flex items-center space-x-2 px-3.5 py-2 text-xs text-rose-600 hover:bg-rose-50 text-left cursor-pointer"
               >
                 <LogOut className="w-3.5 h-3.5 text-rose-500" />
                 <span>Sign Out</span>
