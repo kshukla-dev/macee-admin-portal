@@ -156,7 +156,7 @@ export function SkeletonDomainCard() {
   );
 }
 
-// Tag Chips Skeleton (for Industry Sectors)
+// Tag Chips Skeleton
 export function SkeletonTagChips({ count = 10 }: { count?: number }) {
   return (
     <div className="flex flex-wrap gap-2.5 animate-pulse">

@@ -197,7 +197,7 @@ export default function ContactsManagementPage() {
     isOpen: false,
     title: '',
     description: '',
-    onConfirm: () => {},
+    onConfirm: () => { },
   });
 
   const handleDeleteContact = (contact: Contact) => {
@@ -554,7 +554,7 @@ export default function ContactsManagementPage() {
 
                         {/* Company */}
                         <td className="py-3.5 px-4 text-slate-600 font-medium">
-                          {contact.company || '—'}
+                          {contact.company || '-'}
                         </td>
 
                         {/* Email */}

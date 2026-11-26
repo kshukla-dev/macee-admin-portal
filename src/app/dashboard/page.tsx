@@ -29,6 +29,7 @@ import {
   FolderGit2,
   Clock,
   Sparkles,
+  MessageSquareQuote,
 } from 'lucide-react';
 
 interface ModuleSummary {
@@ -231,15 +232,15 @@ export default function DashboardOverviewPage() {
     },
     {
       id: 'mod-clients',
-      name: 'Client Partners',
-      description: 'Industrial sectors, legal accreditations (SNA, IND, SBB), and capabilities.',
+      name: 'Testimonials',
+      description: 'Client reviews, partner testimonials, and verified accreditations.',
       href: '/dashboard/clients',
-      icon: Building2,
+      icon: MessageSquareQuote,
       iconBg: 'bg-[#EAF0FC]',
       iconColor: 'text-[#36427D]',
-      count: `${stats.industriesCount} Sectors`,
-      countLabel: 'Capabilities',
-      subtext: `${stats.clientsCount} Accreditations, ${stats.domainsCount} Domains`,
+      count: stats.clientsCount,
+      countLabel: 'Testimonials',
+      subtext: 'Verified Client Stories',
       status: 'SNA NEN 4400-1',
       statusColor: 'bg-[#F0F3FA] text-[#36427D] border-slate-200',
     },
@@ -556,7 +557,7 @@ export default function DashboardOverviewPage() {
                 <strong className="text-emerald-600">✓ Synced ({stats.faqsCount})</strong>
               </div>
               <div className="flex items-center justify-between text-slate-600">
-                <span>Client Partners:</span>
+                <span>Testimonials:</span>
                 <strong className="text-emerald-600">✓ Synced ({stats.clientsCount})</strong>
               </div>
             </div>

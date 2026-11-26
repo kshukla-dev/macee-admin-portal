@@ -65,10 +65,10 @@ npm start
 ## 🌐 Public REST API Endpoints (Port 3001)
 
 All endpoints include CORS headers for frontend integration:
-- `POST /api/public/contact` — Submits new contact form inquiry
-- `GET  /api/public/team` — Fetches active team members
-- `GET  /api/public/blogs` — Fetches published blog articles
-- `GET  /api/public/faqs` — Fetches active FAQs
-- `GET  /api/public/clients` — Fetches certifications, industries, and expertise
-- `POST /api/sync` — Triggers a full synchronization with the website files
+- `POST /api/public/contact` - Submits new contact form inquiry
+- `GET  /api/public/team` - Fetches active team members
+- `GET  /api/public/blogs` - Fetches published blog articles
+- `GET  /api/public/faqs` - Fetches active FAQs
+- `GET  /api/public/clients` - Fetches certifications, industries, and expertise
+- `POST /api/sync` - Triggers a full synchronization with the website files
 "# macee-admin-portal" 

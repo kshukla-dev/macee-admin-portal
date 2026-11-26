@@ -15,6 +15,7 @@ import {
   LogOut,
   ExternalLink,
   Menu,
+  MessageSquareQuote,
 } from 'lucide-react';
 import { useSidebar } from '@/context/SidebarContext';
 
@@ -60,9 +61,9 @@ export function Sidebar({ className = '' }: SidebarProps) {
       icon: HelpCircle,
     },
     {
-      name: 'Client Partners',
+      name: 'Testimonials',
       href: '/dashboard/clients',
-      icon: Building2,
+      icon: MessageSquareQuote,
     },
     {
       name: 'Website Sync & Setup',

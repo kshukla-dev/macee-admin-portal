@@ -1,49 +1,48 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Topbar } from '@/components/Topbar';
 import { Modal } from '@/components/Modal';
 import { ImagePicker } from '@/components/ImagePicker';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
+import { SkeletonCertCard } from '@/components/Skeleton';
 import {
-  SkeletonKpiGrid,
-  SkeletonCertCard,
-  SkeletonDomainCard,
-  SkeletonTagChips,
-} from '@/components/Skeleton';
-import {
-  Building2,
-  Award,
-  Cpu,
-  Layers,
+  MessageSquareQuote,
   Plus,
   Trash2,
   Edit2,
   CheckCircle2,
-  ExternalLink,
-  Save,
-  X,
-  ShieldCheck,
   Search,
+  Sparkles,
+  Quote,
+  Star,
 } from 'lucide-react';
 
-export default function ClientsManagementPage() {
-  const [activeTab, setActiveTab] = useState<'certifications' | 'industries' | 'expertise'>('certifications');
+export interface TestimonialItem {
+  id: string;
+  tag: string;
+  title: string;
+  text: string;
+  image?: string;
+  accent?: boolean;
+  order?: number;
+}
+
+export default function TestimonialsManagementPage() {
   const [clientsData, setClientsData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [syncAlert, setSyncAlert] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  // New industry tag input
-  const [newIndustryTag, setNewIndustryTag] = useState('');
-
-  // Modal for Certifications
-  const [certModalOpen, setCertModalOpen] = useState(false);
-  const [editingCertIndex, setEditingCertIndex] = useState<number | null>(null);
-  const [certTag, setCertTag] = useState('');
-  const [certTitle, setCertTitle] = useState('');
-  const [certText, setCertText] = useState('');
-  const [certImage, setCertImage] = useState('');
+  // Modal State
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [itemTag, setItemTag] = useState('');
+  const [itemTitle, setItemTitle] = useState('');
+  const [itemText, setItemText] = useState('');
+  const [itemImage, setItemImage] = useState('');
+  const [itemAccent, setItemAccent] = useState(false);
 
   // Delete Confirmation Dialog state
   const [deleteDialog, setDeleteDialog] = useState<{
@@ -58,19 +57,12 @@ export default function ClientsManagementPage() {
     description: '',
     onConfirm: () => { },
   });
-  const [certAccent, setCertAccent] = useState(false);
-
-  // Modal for Technical Domains (Expertise)
-  const [domainModalOpen, setDomainModalOpen] = useState(false);
-  const [editingDomainIndex, setEditingDomainIndex] = useState<number | null>(null);
-  const [domainName, setDomainName] = useState('');
-  const [domainTechnologies, setDomainTechnologies] = useState('');
 
   useEffect(() => {
-    fetchClientsData();
+    fetchData();
   }, []);
 
-  const fetchClientsData = async () => {
+  const fetchData = async () => {
     try {
       setLoading(true);
       const res = await fetch('/api/clients');
@@ -83,22 +75,28 @@ export default function ClientsManagementPage() {
     }
   };
 
-  // Safe Array Extractors
-  const industryTags: string[] = Array.isArray(clientsData?.industries)
-    ? clientsData.industries
-    : Array.isArray(clientsData?.industries?.tags)
-      ? clientsData.industries.tags
-      : [];
+  const testimonialsList: TestimonialItem[] = useMemo(() => {
+    if (!clientsData?.certifications || !Array.isArray(clientsData.certifications)) {
+      return [];
+    }
+    return clientsData.certifications;
+  }, [clientsData]);
 
-  const expertiseItems: any[] = Array.isArray(clientsData?.expertise)
-    ? clientsData.expertise
-    : Array.isArray(clientsData?.expertise?.items)
-      ? clientsData.expertise.items
-      : [];
+  // Filtered Testimonials
+  const filteredItems = useMemo(() => {
+    if (!searchQuery.trim()) return testimonialsList;
+    const q = searchQuery.toLowerCase();
+    return testimonialsList.filter((item) => {
+      const matchTitle = item.title?.toLowerCase().includes(q);
+      const matchText = item.text?.toLowerCase().includes(q);
+      const matchTag = item.tag?.toLowerCase().includes(q);
+      return matchTitle || matchText || matchTag;
+    });
+  }, [testimonialsList, searchQuery]);
 
-  const certificationsList: any[] = Array.isArray(clientsData?.certifications)
-    ? clientsData.certifications
-    : [];
+  const featuredCount = useMemo(() => {
+    return testimonialsList.filter((i) => i.accent).length;
+  }, [testimonialsList]);
 
   const handleSaveAll = async (updatedData: any) => {
     try {
@@ -114,206 +112,75 @@ export default function ClientsManagementPage() {
         setSyncAlert(true);
         setTimeout(() => setSyncAlert(false), 3000);
       } else {
-        alert(data.error || 'Failed to save clients data');
+        alert(data.error || 'Failed to save testimonials data');
       }
     } catch (e) {
-      alert('Failed to save clients data');
+      alert('Failed to save testimonials data');
     } finally {
       setSaving(false);
     }
   };
 
-  // Certifications CRUD
-  const handleOpenAddCert = () => {
-    setEditingCertIndex(null);
-    setCertTag('Certification');
-    setCertTitle('');
-    setCertText('');
-    setCertImage('');
-    setCertAccent(false);
-    setCertModalOpen(true);
+  const handleOpenAdd = () => {
+    setEditingIndex(null);
+    setItemTag('Client Testimonial');
+    setItemTitle('');
+    setItemText('');
+    setItemImage('');
+    setItemAccent(false);
+    setModalOpen(true);
   };
 
-  const handleOpenEditCert = (index: number) => {
-    const cert = certificationsList[index];
-    if (!cert) return;
-    setEditingCertIndex(index);
-    setCertTag(cert.tag || 'Certification');
-    setCertTitle(cert.title || '');
-    setCertText(cert.text || '');
-    const imgVal = typeof cert.image === 'string' ? cert.image : cert.image?.src || '';
-    setCertImage(imgVal || '');
-    setCertAccent(!!cert.accent);
-    setCertModalOpen(true);
-  };
-
-  const handleSaveCert = (e: React.FormEvent) => {
-    e.preventDefault();
-    const updatedCerts = [...certificationsList];
-    const existingCert = editingCertIndex !== null ? updatedCerts[editingCertIndex] : null;
-
-    const newCert = {
-      id: existingCert?.id || `cert-${Date.now()}`,
-      tag: certTag,
-      title: certTitle,
-      text: certText,
-      image: certImage,
-      accent: certAccent,
-      order: existingCert?.order || (updatedCerts.length + 1),
-    };
-
-    if (editingCertIndex !== null) {
-      updatedCerts[editingCertIndex] = newCert;
-    } else {
-      updatedCerts.push(newCert);
-    }
-
-    const updatedData = { ...clientsData, certifications: updatedCerts };
-    handleSaveAll(updatedData);
-    setCertModalOpen(false);
-  };
-
-  const handleDeleteCert = (index: number) => {
-    const cert = certificationsList[index];
-    setDeleteDialog({
-      isOpen: true,
-      title: 'Delete Certification',
-      description: 'Are you sure you want to delete this accreditation and certification card? This action cannot be undone.',
-      itemName: cert?.title || 'Certification Card',
-      onConfirm: () => {
-        const updatedCerts = certificationsList.filter((_: any, i: number) => i !== index);
-        const updatedData = { ...clientsData, certifications: updatedCerts };
-        handleSaveAll(updatedData);
-        setDeleteDialog((prev) => ({ ...prev, isOpen: false }));
-      },
-    });
-  };
-
-  // Technical Domains (Expertise) CRUD
-  const handleOpenAddDomain = () => {
-    setEditingDomainIndex(null);
-    setDomainName('');
-    setDomainTechnologies('');
-    setDomainModalOpen(true);
-  };
-
-  const handleOpenEditDomain = (index: number) => {
-    const item = expertiseItems[index];
+  const handleOpenEdit = (index: number) => {
+    const item = testimonialsList[index];
     if (!item) return;
-    setEditingDomainIndex(index);
-    setDomainName(item.domain || '');
-    setDomainTechnologies(
-      Array.isArray(item.technologies) ? item.technologies.join(', ') : item.technologies || ''
-    );
-    setDomainModalOpen(true);
+    setEditingIndex(index);
+    setItemTag(item.tag || 'Client Testimonial');
+    setItemTitle(item.title || '');
+    setItemText(item.text || '');
+    const imgVal = typeof item.image === 'string' ? item.image : (item.image as any)?.src || '';
+    setItemImage(imgVal || '');
+    setItemAccent(!!item.accent);
+    setModalOpen(true);
   };
 
-  const handleSaveDomain = (e: React.FormEvent) => {
+  const handleSaveItem = (e: React.FormEvent) => {
     e.preventDefault();
-    const updatedItems = [...expertiseItems];
-    const existing = editingDomainIndex !== null ? updatedItems[editingDomainIndex] : null;
+    const updatedList = [...testimonialsList];
+    const existing = editingIndex !== null ? updatedList[editingIndex] : null;
 
-    const newItem = {
-      id: existing?.id || `exp-${Date.now()}`,
-      domain: domainName.trim(),
-      technologies: domainTechnologies.trim(),
+    const newItem: TestimonialItem = {
+      id: existing?.id || `testimonial-${Date.now()}`,
+      tag: itemTag.trim() || 'Client Testimonial',
+      title: itemTitle.trim(),
+      text: itemText.trim(),
+      image: itemImage.trim(),
+      accent: itemAccent,
+      order: existing?.order || updatedList.length + 1,
     };
 
-    if (editingDomainIndex !== null) {
-      updatedItems[editingDomainIndex] = newItem;
+    if (editingIndex !== null) {
+      updatedList[editingIndex] = newItem;
     } else {
-      updatedItems.push(newItem);
+      updatedList.push(newItem);
     }
 
-    let updatedExpertise: any;
-    if (Array.isArray(clientsData?.expertise)) {
-      updatedExpertise = updatedItems;
-    } else if (clientsData?.expertise && typeof clientsData.expertise === 'object') {
-      updatedExpertise = {
-        ...clientsData.expertise,
-        items: updatedItems,
-      };
-    } else {
-      updatedExpertise = {
-        title: 'Expertise',
-        subheading: 'Proven track record in technical skills & experience',
-        items: updatedItems,
-      };
-    }
-
-    handleSaveAll({ ...clientsData, expertise: updatedExpertise });
-    setDomainModalOpen(false);
+    const updatedData = { ...clientsData, certifications: updatedList };
+    handleSaveAll(updatedData);
+    setModalOpen(false);
   };
 
-  const handleDeleteDomain = (index: number) => {
-    const item = expertiseItems[index];
+  const handleDeleteItem = (index: number) => {
+    const item = testimonialsList[index];
     setDeleteDialog({
       isOpen: true,
-      title: 'Delete Technical Domain',
-      description: 'Are you sure you want to delete this technical domain? This action cannot be undone.',
-      itemName: item?.domain || 'Technical Domain',
+      title: 'Delete Testimonial',
+      description: 'Are you sure you want to delete this testimonial? This action cannot be undone and will update the live website.',
+      itemName: item?.title || 'Testimonial',
       onConfirm: () => {
-        const updatedItems = expertiseItems.filter((_: any, i: number) => i !== index);
-
-        let updatedExpertise: any;
-        if (Array.isArray(clientsData?.expertise)) {
-          updatedExpertise = updatedItems;
-        } else if (clientsData?.expertise && typeof clientsData.expertise === 'object') {
-          updatedExpertise = {
-            ...clientsData.expertise,
-            items: updatedItems,
-          };
-        } else {
-          updatedExpertise = {
-            title: 'Expertise',
-            subheading: 'Proven track record in technical skills & experience',
-            items: updatedItems,
-          };
-        }
-
-        handleSaveAll({ ...clientsData, expertise: updatedExpertise });
-        setDeleteDialog((prev) => ({ ...prev, isOpen: false }));
-      },
-    });
-  };
-
-  // Industries Tag handlers
-  const handleAddIndustry = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newIndustryTag.trim()) return;
-    const currentTags = industryTags;
-    if (currentTags.includes(newIndustryTag.trim())) return;
-    const updatedTags = [...currentTags, newIndustryTag.trim()];
-
-    let updatedIndustries: any;
-    if (Array.isArray(clientsData?.industries)) {
-      updatedIndustries = updatedTags;
-    } else {
-      updatedIndustries = { ...clientsData?.industries, tags: updatedTags };
-    }
-
-    handleSaveAll({ ...clientsData, industries: updatedIndustries });
-    setNewIndustryTag('');
-  };
-
-  const handleDeleteIndustry = (tagToDelete: string) => {
-    setDeleteDialog({
-      isOpen: true,
-      title: 'Remove Industry Sector',
-      description: 'Are you sure you want to remove this industry sector tag?',
-      itemName: tagToDelete,
-      onConfirm: () => {
-        const currentTags = industryTags;
-        const updatedTags = currentTags.filter((t: string) => t !== tagToDelete);
-
-        let updatedIndustries: any;
-        if (Array.isArray(clientsData?.industries)) {
-          updatedIndustries = updatedTags;
-        } else {
-          updatedIndustries = { ...clientsData?.industries, tags: updatedTags };
-        }
-
-        handleSaveAll({ ...clientsData, industries: updatedIndustries });
+        const updatedList = testimonialsList.filter((_, i) => i !== index);
+        const updatedData = { ...clientsData, certifications: updatedList };
+        handleSaveAll(updatedData);
         setDeleteDialog((prev) => ({ ...prev, isOpen: false }));
       },
     });
@@ -324,403 +191,256 @@ export default function ClientsManagementPage() {
       <Topbar
         breadcrumbs={[
           { label: 'Dashboard', href: '/dashboard' },
-          { label: 'Client Partners' },
+          { label: 'Testimonials' },
         ]}
-        searchPlaceholder="Search clients & accreditations..."
+        searchPlaceholder="Search testimonials by client or quote..."
+        onSearch={(q) => setSearchQuery(q)}
       />
 
       <div className="p-6 sm:p-8 lg:p-10 max-w-[1440px] mx-auto space-y-6">
-        {/* Page Header (Editorial Serif) */}
-        <div className="space-y-1">
-          <h1 className="text-3xl sm:text-4xl font-serif text-[#111827] tracking-tight">
-            Client Partners & Accreditations
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-500">
-            Manage industry accreditations, sector capabilities, and client trust logos on macee.com.
-          </p>
-        </div>
+        {/* =================================================================
+            PAGE HEADER WITH 2 KPI CARDS ON THE RIGHT (Streamlined Layout)
+            ================================================================= */}
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pb-2 border-b border-slate-200/80">
+          <div className="space-y-1">
+            <h1 className="text-3xl sm:text-4xl font-serif text-[#111827] tracking-tight">
+              Testimonials
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500">
+              Manage client testimonials, partner quotes, and verified accreditations on macee.com.
+            </p>
+          </div>
 
-        {/* 4 KPI Metric Cards */}
-        {loading ? (
-          <SkeletonKpiGrid count={4} />
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-                <Award className="w-5 h-5" />
+          {/* Right side: 2 KPI Cards in same header line */}
+          <div className="flex items-center space-x-3 sm:space-x-4 shrink-0">
+            {/* Card 1: Total Testimonials */}
+            <div className="bg-white rounded-2xl px-4 py-3 sm:px-5 sm:py-3.5 border border-slate-100 shadow-2xs flex items-center space-x-3 sm:space-x-4 min-w-[170px] sm:min-w-[190px]">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
+                <MessageSquareQuote className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-xs font-medium text-slate-500">Accreditations</p>
-                <div className="flex items-baseline space-x-2 mt-0.5">
-                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                    {certificationsList.length}
-                  </span>
-                  <span className="text-xs font-semibold text-emerald-600">Active</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-                <Layers className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-xs font-medium text-slate-500">Industry Sectors</p>
-                <div className="flex items-baseline space-x-2 mt-0.5">
-                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                    {industryTags.length}
-                  </span>
-                  <span className="text-xs font-semibold text-sky-600">Supported</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-                <Cpu className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-xs font-medium text-slate-500">Technical Domains</p>
-                <div className="flex items-baseline space-x-2 mt-0.5">
-                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                    {expertiseItems.length}
-                  </span>
-                  <span className="text-xs font-semibold text-indigo-600">Frameworks</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-xs font-medium text-slate-500">Compliance Standard</p>
+                <p className="text-[11px] sm:text-xs font-medium text-slate-500">Total Stories</p>
                 <div className="flex items-baseline space-x-2 mt-0.5">
                   <span className="text-xl sm:text-2xl font-bold text-[#111827] font-sans">
-                    SNA NEN
+                    {testimonialsList.length}
                   </span>
-                  <span className="text-xs font-semibold text-emerald-600">4400-1</span>
+                  <span className="text-[10px] sm:text-xs font-semibold text-emerald-600">Active</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 2: Featured */}
+            <div className="bg-white rounded-2xl px-4 py-3 sm:px-5 sm:py-3.5 border border-slate-100 shadow-2xs flex items-center space-x-3 sm:space-x-4 min-w-[170px] sm:min-w-[190px]">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                <Star className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-[11px] sm:text-xs font-medium text-slate-500">Featured</p>
+                <div className="mt-0.5">
+                  <span className="text-xl sm:text-2xl font-bold text-[#111827] font-sans">
+                    {featuredCount}
+                  </span>
                 </div>
               </div>
             </div>
           </div>
-        )}
-
-        {/* Status Tabs */}
-        <div className="flex items-center space-x-6 border-b border-slate-200 text-xs font-medium pt-2">
-          {[
-            { id: 'certifications', label: 'Accreditations & Certifications' },
-            { id: 'industries', label: 'Industry Sectors' },
-            { id: 'expertise', label: 'Technical Domains' },
-          ].map((tab) => {
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`pb-3 transition-colors relative ${isActive
-                  ? 'font-bold text-[#111827] border-b-2 border-[#E30613]'
-                  : 'text-slate-500 hover:text-slate-800'
-                  }`}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
         </div>
 
+        {/* Sync Toast Alert */}
         {syncAlert && (
-          <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center justify-between animate-fadeIn">
-            <span>✓ Changes saved and synchronized with website files!</span>
+          <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium flex items-center justify-between shadow-2xs animate-fadeIn">
+            <div className="flex items-center space-x-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>✓ Testimonial changes saved and synchronized with website files!</span>
+            </div>
           </div>
         )}
 
-        {/* Tab 1: Certifications */}
-        {activeTab === 'certifications' && (
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <p className="text-xs text-slate-500">
-                Official accreditations displayed on the Macee homepage and compliance sections.
-              </p>
-              <button
-                onClick={handleOpenAddCert}
-                className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl bg-[#E30613] hover:bg-[#b80510] text-white text-xs font-semibold shadow-xs"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Add Certification</span>
-              </button>
-            </div>
-
-            {loading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <SkeletonCertCard key={i} />
-                ))}
-              </div>
-            ) : certificationsList.length === 0 ? (
-              <div className="bg-white rounded-2xl border border-slate-100 shadow-2xs p-12 text-center text-slate-400 text-xs">
-                No accreditations or certifications added yet.
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {certificationsList.map((cert: any, idx: number) => {
-                  const imgSrc = typeof cert.image === 'string' ? cert.image : cert.image?.src;
-                  return (
-                    <div
-                      key={idx}
-                      className={`bg-white rounded-2xl p-6 border shadow-2xs transition-all relative flex flex-col justify-between ${cert.accent ? 'border-[#E30613]/50 ring-1 ring-[#E30613]/20' : 'border-slate-100'
-                        }`}
-                    >
-                      <div>
-                        {/* Top Header: Tag, Logo & Actions */}
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="flex items-center space-x-3 min-w-0">
-                            {imgSrc ? (
-                              <div className="h-12 w-20 bg-slate-50 border border-slate-200/80 rounded-xl p-1.5 flex items-center justify-center shrink-0 shadow-2xs overflow-hidden">
-                                <img
-                                  src={imgSrc}
-                                  alt={cert.title}
-                                  className="max-h-full max-w-full object-contain"
-                                  onError={(e) => {
-                                    e.currentTarget.onerror = null;
-                                    e.currentTarget.src = '/uploads/favicon-96x96.png';
-                                  }}
-                                />
-                              </div>
-                            ) : (
-                              <div className="h-12 w-12 bg-slate-100 border border-slate-200 rounded-xl flex items-center justify-center shrink-0 text-slate-400">
-                                <Award className="w-5 h-5 text-slate-400" />
-                              </div>
-                            )}
-                            <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-[#F0F3FA] text-[#36427D] truncate">
-                              {cert.tag || 'Accreditation'}
-                            </span>
-                          </div>
-
-                            <div className="flex items-center space-x-1 shrink-0">
-                              <button
-                                onClick={() => handleOpenEditCert(idx)}
-                                className="p-1.5 rounded-lg text-slate-500 hover:text-[#111827] hover:bg-slate-100 transition-colors"
-                                title="Edit Certification"
-                              >
-                                <Edit2 className="w-3.5 h-3.5" />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteCert(idx)}
-                                className="p-1.5 rounded-lg text-rose-500 hover:text-rose-700 hover:bg-rose-50 transition-colors"
-                                title="Delete Certification"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                          </div>
-
-                          <h4 className="text-base font-bold text-[#111827] mt-3.5 font-sans">
-                            {cert.title}
-                          </h4>
-                          <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                            {cert.text}
-                          </p>
-                        </div>
-
-                        {imgSrc && (
-                          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
-                            <span className="truncate max-w-[260px] font-mono text-[10px] text-slate-500">{imgSrc}</span>
-                            <span className="text-emerald-600 font-semibold text-[10px]">✓ Logo Attached</span>
-                          </div>
-                        )}
-                      </div>
-                      );
-                })}
-                    </div>
-                  )
-                }
-            </div>
-            )}
-
-            {/* Tab 2: Industry Sectors */}
-            {activeTab === 'industries' && (
-              <div className="bg-white rounded-2xl border border-slate-100 shadow-2xs p-6 space-y-5">
-                <div>
-                  <h3 className="text-base font-bold text-[#111827] font-sans">
-                    Industry Sectors & Capable Fields
-                  </h3>
-                  <p className="text-xs text-slate-500 mt-1">
-                    These tags dictate the filter options on the Contact and Solution pages.
-                  </p>
-                </div>
-
-                {loading ? (
-                  <SkeletonTagChips count={10} />
-                ) : industryTags.length === 0 ? (
-                  <p className="text-xs text-slate-400">No industry sectors added yet.</p>
-                ) : (
-                  <div className="flex flex-wrap gap-2.5">
-                    {industryTags.map((tag: string, i: number) => (
-                      <span
-                        key={i}
-                        className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-[#F0F3FA] text-slate-800 text-xs font-semibold border border-slate-200/60"
-                      >
-                        <span>{tag}</span>
-                        <button
-                          onClick={() => handleDeleteIndustry(tag)}
-                          className="text-slate-400 hover:text-[#E30613] p-0.5"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                <form onSubmit={handleAddIndustry} className="flex gap-2 max-w-md pt-2">
-                  <input
-                    type="text"
-                    placeholder="New industry sector (e.g. Maritime & Offshore)..."
-                    value={newIndustryTag}
-                    onChange={(e) => setNewIndustryTag(e.target.value)}
-                    className="flex-1 p-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613]"
-                  />
-                  <button type="submit" className="is-btn py-2 px-4 text-xs font-semibold">
-                    Add Tag
-                  </button>
-                </form>
-              </div>
-            )}
-
-            {/* Tab 3: Technical Domains */}
-            {activeTab === 'expertise' && (
-              <div className="space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div>
-                    <h3 className="text-base font-bold text-[#111827] font-sans">
-                      Domain Competencies & Roles
-                    </h3>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      Specialized candidate allocation frameworks and skill profiles displayed on macee.com.
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleOpenAddDomain}
-                    className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl bg-[#E30613] hover:bg-[#b80510] text-white text-xs font-semibold shadow-xs transition-all shrink-0 self-start sm:self-auto"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>Add Technical Domain</span>
-                  </button>
-                </div>
-
-                {loading ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
-                    {Array.from({ length: 6 }).map((_, i) => (
-                      <SkeletonDomainCard key={i} />
-                    ))}
-                  </div>
-                ) : expertiseItems.length === 0 ? (
-                  <div className="bg-white rounded-2xl border border-slate-100 shadow-2xs p-12 text-center text-slate-400 text-xs">
-                    No technical domains added yet.
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
-                    {expertiseItems.map((item: any, idx: number) => (
-                      <div
-                        key={idx}
-                        className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between"
-                      >
-                        <div>
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="flex items-center space-x-2.5">
-                              <div className="w-8 h-8 rounded-lg bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-                                <Cpu className="w-4 h-4" />
-                              </div>
-                              <h4 className="text-xs font-bold text-[#111827] uppercase tracking-wider font-sans">
-                                {item.domain}
-                              </h4>
-                            </div>
-                            <div className="flex items-center space-x-1 shrink-0">
-                              <button
-                                type="button"
-                                onClick={() => handleOpenEditDomain(idx)}
-                                className="p-1.5 rounded-lg text-slate-500 hover:text-[#111827] hover:bg-slate-100 transition-colors"
-                                title="Edit Domain"
-                              >
-                                <Edit2 className="w-3.5 h-3.5" />
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteDomain(idx)}
-                                className="p-1.5 rounded-lg text-rose-500 hover:text-rose-700 hover:bg-rose-50 transition-colors"
-                                title="Delete Domain"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                          </div>
-                          <p className="text-xs text-slate-600 mt-3 leading-relaxed bg-slate-50/70 p-3 rounded-xl border border-slate-100">
-                            {Array.isArray(item.technologies) ? item.technologies.join(', ') : item.technologies}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
+        {/* =================================================================
+            TOOLBAR (Search Bar on Left + Add Testimonial on Right)
+            ================================================================= */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
+          <div className="relative flex-1 max-w-md">
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              placeholder="Search testimonials by client, tag, or quote..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-white border border-slate-200/90 rounded-xl pl-8 pr-3 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#E30613] shadow-2xs"
+            />
           </div>
 
-        {/* Certification Modal */}
-        {certModalOpen && (
+          <button
+            onClick={handleOpenAdd}
+            className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl bg-[#E30613] hover:bg-[#b80510] text-white text-xs font-semibold shadow-xs transition-all shrink-0"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Add Testimonial</span>
+          </button>
+        </div>
+
+        {/* =================================================================
+            TESTIMONIALS CARDS GRID
+            ================================================================= */}
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <SkeletonCertCard key={i} />
+            ))}
+          </div>
+        ) : filteredItems.length === 0 ? (
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-2xs p-12 text-center text-slate-400 text-xs">
+            {searchQuery ? 'No testimonials match your search.' : 'No testimonials added yet.'}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {filteredItems.map((item, idx) => {
+              const imgSrc = typeof item.image === 'string' ? item.image : (item.image as any)?.src;
+              return (
+                <div
+                  key={item.id || idx}
+                  className={`bg-white rounded-2xl p-6 border shadow-2xs transition-all relative flex flex-col justify-between ${
+                    item.accent
+                      ? 'border-[#E30613]/50 ring-1 ring-[#E30613]/20'
+                      : 'border-slate-100'
+                  }`}
+                >
+                  <div>
+                    {/* Top Header: Logo, Tag & Action Buttons */}
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center space-x-3 min-w-0">
+                        {imgSrc ? (
+                          <div className="h-12 w-20 bg-slate-50 border border-slate-200/80 rounded-xl p-1.5 flex items-center justify-center shrink-0 shadow-2xs overflow-hidden">
+                            <img
+                              src={imgSrc}
+                              alt={item.title}
+                              className="max-h-full max-w-full object-contain"
+                              onError={(e) => {
+                                e.currentTarget.onerror = null;
+                                e.currentTarget.src = '/uploads/favicon-96x96.png';
+                              }}
+                            />
+                          </div>
+                        ) : (
+                          <div className="h-12 w-12 bg-slate-100 border border-slate-200 rounded-xl flex items-center justify-center shrink-0 text-slate-400">
+                            <Quote className="w-5 h-5 text-slate-400" />
+                          </div>
+                        )}
+                        <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-[#F0F3FA] text-[#36427D] truncate">
+                          {item.tag || 'Testimonial'}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center space-x-1 shrink-0">
+                        <button
+                          onClick={() => handleOpenEdit(idx)}
+                          className="p-1.5 rounded-lg text-slate-500 hover:text-[#111827] hover:bg-slate-100 transition-colors"
+                          title="Edit Testimonial"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteItem(idx)}
+                          className="p-1.5 rounded-lg text-rose-500 hover:text-rose-700 hover:bg-rose-50 transition-colors"
+                          title="Delete Testimonial"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Client / Title */}
+                    <h4 className="text-base font-bold text-[#111827] mt-3.5 font-sans flex items-center gap-1.5">
+                      <span>{item.title}</span>
+                      {item.accent && (
+                        <span className="text-[10px] font-semibold text-[#E30613] bg-rose-50 px-2 py-0.5 rounded-md shrink-0">
+                          Featured
+                        </span>
+                      )}
+                    </h4>
+
+                    {/* Testimonial Quote */}
+                    <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+                      "{item.text}"
+                    </p>
+                  </div>
+
+                  {imgSrc && (
+                    <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+                      <span className="truncate max-w-[260px] font-mono text-[10px] text-slate-500">
+                        {imgSrc}
+                      </span>
+                      <span className="text-emerald-600 font-semibold text-[10px]">
+                        ✓ Image Attached
+                      </span>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* =================================================================
+            ADD / EDIT TESTIMONIAL MODAL
+            ================================================================= */}
+        {modalOpen && (
           <Modal
             isOpen={true}
-            onClose={() => setCertModalOpen(false)}
-            title={editingCertIndex !== null ? 'Edit Certification' : 'Add Certification'}
-            subtitle="Updates will sync with Macee's accreditation banners."
+            onClose={() => setModalOpen(false)}
+            title={editingIndex !== null ? 'Edit Testimonial' : 'Add New Testimonial'}
+            subtitle="Updates will sync live with Macee's client trust and testimonial sections."
             maxWidth="lg"
           >
-            <form onSubmit={handleSaveCert} className="space-y-4">
+            <form onSubmit={handleSaveItem} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Badge Tag</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Client / Company Name *
+                </label>
                 <input
                   type="text"
                   required
-                  value={certTag}
-                  onChange={(e) => setCertTag(e.target.value)}
-                  placeholder="e.g. SNA NEN 4400-1 Certified"
+                  value={itemTitle}
+                  onChange={(e) => setItemTitle(e.target.value)}
+                  placeholder="e.g. Maarten Koekebakker, Fintech Enterprise Lead"
                   className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Title *</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Tag / Designation / Industry
+                </label>
                 <input
                   type="text"
-                  required
-                  value={certTitle}
-                  onChange={(e) => setCertTitle(e.target.value)}
-                  placeholder="e.g. Verified Compliance"
+                  value={itemTag}
+                  onChange={(e) => setItemTag(e.target.value)}
+                  placeholder="e.g. Banking & Fintech, SNA Labour Partner..."
                   className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Description *</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Testimonial Quote / Review Text *
+                </label>
                 <textarea
                   required
-                  rows={3}
-                  value={certText}
-                  onChange={(e) => setCertText(e.target.value)}
-                  placeholder="Details of certification and legal standing..."
-                  className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613]"
+                  rows={4}
+                  value={itemText}
+                  onChange={(e) => setItemText(e.target.value)}
+                  placeholder="Quote from client about Macee's workforce solutions and service delivery..."
+                  className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613] leading-relaxed"
                 />
               </div>
 
               <div>
                 <ImagePicker
-                  value={certImage}
-                  onChange={(newUrl) => setCertImage(newUrl)}
-                  label="Accreditation Logo / Badge Image"
-                  helperText="Paste direct badge or logo image URL. (Direct upload requires plan upgrade)."
+                  value={itemImage}
+                  onChange={(newUrl) => setItemImage(newUrl)}
+                  label="Client Logo / Avatar Image"
+                  helperText="Upload or enter image URL for client avatar or corporate logo."
                   previewShape="rounded"
                   aspect="wide"
                 />
@@ -729,77 +449,20 @@ export default function ClientsManagementPage() {
               <div className="flex items-center space-x-2 pt-1">
                 <input
                   type="checkbox"
-                  id="certAccent"
-                  checked={certAccent}
-                  onChange={(e) => setCertAccent(e.target.checked)}
+                  id="itemAccent"
+                  checked={itemAccent}
+                  onChange={(e) => setItemAccent(e.target.checked)}
                   className="rounded border-slate-300 text-[#E30613] focus:ring-0"
                 />
-                <label htmlFor="certAccent" className="text-xs text-slate-700 font-medium">
-                  Highlight with Brand Red Border (Featured)
+                <label htmlFor="itemAccent" className="text-xs text-slate-700 font-medium">
+                  Highlight as Featured Testimonial (Brand Accent)
                 </label>
               </div>
 
               <div className="pt-2 flex justify-end space-x-2">
                 <button
                   type="button"
-                  onClick={() => setCertModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100"
-                >
-                  Cancel
-                </button>
-                <button type="submit" disabled={saving} className="is-btn py-2 px-5 text-xs font-semibold">
-                  {saving ? 'Saving...' : 'Save Certification'}
-                </button>
-              </div>
-            </form>
-          </Modal>
-        )}
-
-        {/* Technical Domain Modal */}
-        {domainModalOpen && (
-          <Modal
-            isOpen={true}
-            onClose={() => setDomainModalOpen(false)}
-            title={editingDomainIndex !== null ? 'Edit Technical Domain' : 'Add Technical Domain'}
-            subtitle="Updates will sync with Macee's technical competencies framework."
-            maxWidth="lg"
-          >
-            <form onSubmit={handleSaveDomain} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Domain Title *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={domainName}
-                  onChange={(e) => setDomainName(e.target.value)}
-                  placeholder="e.g. Software Development, Cloud & DevOps, AI & Data"
-                  className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Technologies, Stacks & Tools *
-                </label>
-                <textarea
-                  required
-                  rows={4}
-                  value={domainTechnologies}
-                  onChange={(e) => setDomainTechnologies(e.target.value)}
-                  placeholder="e.g. .NET, C / C++ / C#, JAVA, Python, TypeScript, React etc."
-                  className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613]"
-                />
-                <p className="text-[11px] text-slate-400 mt-1">
-                  Enter comma-separated technologies or specialization roles.
-                </p>
-              </div>
-
-              <div className="pt-2 flex justify-end space-x-2">
-                <button
-                  type="button"
-                  onClick={() => setDomainModalOpen(false)}
+                  onClick={() => setModalOpen(false)}
                   className="px-4 py-2 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100"
                 >
                   Cancel
@@ -809,7 +472,7 @@ export default function ClientsManagementPage() {
                   disabled={saving}
                   className="is-btn py-2 px-5 text-xs font-semibold"
                 >
-                  {saving ? 'Saving...' : 'Save Domain'}
+                  {saving ? 'Saving...' : 'Save Testimonial'}
                 </button>
               </div>
             </form>
@@ -826,5 +489,6 @@ export default function ClientsManagementPage() {
           itemName={deleteDialog.itemName}
         />
       </div>
-      );
-  }
+    </div>
+  );
+}

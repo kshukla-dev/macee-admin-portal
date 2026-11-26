@@ -210,7 +210,6 @@ export default function FaqManagementPage() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const pageSize = 10;
   const [loading, setLoading] = useState(true);
-  const [syncing, setSyncing] = useState(false);
   const [syncMessage, setSyncMessage] = useState<string | null>(null);
 
   // Accordion Expand State
@@ -452,24 +451,6 @@ export default function FaqManagementPage() {
     }
   };
 
-  const handleManualSync = async () => {
-    try {
-      setSyncing(true);
-      const res = await fetch('/api/sync', { method: 'POST' });
-      const data = await res.json();
-      if (data.success) {
-        setSyncMessage('✓ All page FAQs successfully synchronized to pageFaqs.ts and allFaqs.ts!');
-        setTimeout(() => setSyncMessage(null), 5000);
-      } else {
-        alert('Sync error: ' + (data.errors?.join(', ') || 'Unknown error'));
-      }
-    } catch (e) {
-      alert('Failed to trigger manual sync');
-    } finally {
-      setSyncing(false);
-    }
-  };
-
   const getPageMeta = (pageKey: string) => {
     return PAGE_TABS.find((t) => t.id === pageKey) || PAGE_TABS[1];
   };
@@ -487,35 +468,13 @@ export default function FaqManagementPage() {
 
       <div className="p-6 sm:p-8 lg:p-10 max-w-[1440px] mx-auto space-y-6">
         {/* Page Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/80">
-          <div>
-            <h1 className="text-3xl sm:text-4xl font-serif text-[#111827] tracking-tight">
-              FAQs
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Manage page-specific FAQs for Home, About Us, Clients, Professionals, Projects, and Contact with instant website sync.
-            </p>
-          </div>
-
-          <div className="flex items-center space-x-3">
-            <button
-              onClick={handleManualSync}
-              disabled={syncing}
-              className="inline-flex items-center space-x-2 px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 hover:border-slate-300 text-slate-700 text-xs font-semibold shadow-2xs hover:bg-slate-50 transition-all shrink-0"
-              title="Sync all page FAQs to macee-_update_contant"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 text-slate-500 ${syncing ? 'animate-spin text-[#E30613]' : ''}`} />
-              <span>{syncing ? 'Syncing...' : 'Sync to Website'}</span>
-            </button>
-
-            <button
-              onClick={() => handleOpenAdd(activeTab)}
-              className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl bg-[#E30613] hover:bg-[#b80510] text-white text-xs font-semibold shadow-xs transition-all shrink-0"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Add FAQ</span>
-            </button>
-          </div>
+        <div className="pb-2 border-b border-slate-200/80">
+          <h1 className="text-3xl sm:text-4xl font-serif text-[#111827] tracking-tight">
+            FAQs
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            Manage page-specific FAQs for Home, About Us, Clients, Professionals, Projects, and Contact with instant website sync.
+          </p>
         </div>
 
         {/* Sync Toast / Banner */}
@@ -559,16 +518,16 @@ export default function FaqManagementPage() {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={`inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap shrink-0 ${isActive
-                      ? 'bg-[#111827] text-white shadow-2xs font-semibold'
-                      : 'text-slate-600 hover:text-[#111827] hover:bg-slate-100/80'
+                    ? 'bg-[#111827] text-white shadow-2xs font-semibold'
+                    : 'text-slate-600 hover:text-[#111827] hover:bg-slate-100/80'
                     }`}
                 >
                   <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : 'text-slate-400'}`} />
                   <span>{tab.label}</span>
                   <span
                     className={`ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${isActive
-                        ? 'bg-white/20 text-white'
-                        : 'bg-slate-200/70 text-slate-600'
+                      ? 'bg-white/20 text-white'
+                      : 'bg-slate-200/70 text-slate-600'
                       }`}
                   >
                     {count}
@@ -623,6 +582,7 @@ export default function FaqManagementPage() {
 
         {/* Secondary Filter & Search Toolbar */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          {/* Left: Status Filter Buttons + Add FAQ Button */}
           <div className="relative flex-1 max-w-md">
             <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
@@ -634,7 +594,10 @@ export default function FaqManagementPage() {
             />
           </div>
 
-          <div className="flex items-center space-x-2 shrink-0">
+          {/* Right: Search Input */}
+
+
+          <div className="flex items-center space-x-2.5 shrink-0">
             <div className="flex items-center space-x-1 bg-white border border-slate-200/90 rounded-xl p-1 shadow-2xs text-xs">
               <button
                 onClick={() => setStatusFilter('all')}
@@ -658,6 +621,14 @@ export default function FaqManagementPage() {
                 Draft / Inactive
               </button>
             </div>
+
+            <button
+              onClick={() => handleOpenAdd(activeTab)}
+              className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-[#E30613] hover:bg-[#b80510] text-white text-xs font-semibold shadow-xs transition-all shrink-0"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Add FAQ</span>
+            </button>
           </div>
         </div>
 
@@ -725,8 +696,8 @@ export default function FaqManagementPage() {
                           <button
                             onClick={() => handleToggleActive(item)}
                             className={`text-xs font-semibold px-2.5 py-1 rounded-lg transition-colors ${item.active !== false
-                                ? 'text-slate-500 hover:text-amber-600 hover:bg-amber-50'
-                                : 'text-emerald-600 hover:bg-emerald-50'
+                              ? 'text-slate-500 hover:text-amber-600 hover:bg-amber-50'
+                              : 'text-emerald-600 hover:bg-emerald-50'
                               }`}
                             title={item.active !== false ? 'Deactivate Question' : 'Activate Question'}
                           >
@@ -845,8 +816,8 @@ export default function FaqManagementPage() {
                             setCurrentPage(page);
                           }}
                           className={`w-7 h-7 rounded-lg text-xs font-semibold transition-all ${currentPage === page
-                              ? 'bg-[#0E1726] text-white shadow-2xs'
-                              : 'border border-slate-200 hover:bg-slate-50 text-slate-700'
+                            ? 'bg-[#0E1726] text-white shadow-2xs'
+                            : 'border border-slate-200 hover:bg-slate-50 text-slate-700'
                             }`}
                         >
                           {page}
@@ -948,8 +919,8 @@ export default function FaqManagementPage() {
                       type="button"
                       onClick={() => setFormTag(suggested)}
                       className={`text-[10px] px-2 py-0.5 rounded-md border transition-colors ${formTag === suggested
-                          ? 'bg-[#111827] text-white border-[#111827]'
-                          : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                        ? 'bg-[#111827] text-white border-[#111827]'
+                        : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
                         }`}
                     >
                       {suggested}
@@ -966,8 +937,8 @@ export default function FaqManagementPage() {
                   type="button"
                   onClick={() => setModalTab('en')}
                   className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition-colors ${modalTab === 'en'
-                      ? 'border-[#E30613] text-[#111827]'
-                      : 'border-transparent text-slate-400 hover:text-slate-700'
+                    ? 'border-[#E30613] text-[#111827]'
+                    : 'border-transparent text-slate-400 hover:text-slate-700'
                     }`}
                 >
                   🇬🇧 English Content (Default)
@@ -976,8 +947,8 @@ export default function FaqManagementPage() {
                   type="button"
                   onClick={() => setModalTab('nl')}
                   className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition-colors ${modalTab === 'nl'
-                      ? 'border-[#E30613] text-[#111827]'
-                      : 'border-transparent text-slate-400 hover:text-slate-700'
+                    ? 'border-[#E30613] text-[#111827]'
+                    : 'border-transparent text-slate-400 hover:text-slate-700'
                     }`}
                 >
                   🇳🇱 Dutch Translation (Nederlands)

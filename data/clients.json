@@ -28,61 +28,6 @@
       "order": 3
     }
   ],
-  "industries": {
-    "title": "Industries",
-    "subheading": "Experience and proven track record",
-    "description": "Our clients range from start-ups to global multinational corporates and multinationals who demand seamless mobility of diverse nationalities and are open to attracting finest talent from all over the world.\n\nMACEE works with clients in various industries, such as Telecoms, FMCG, Oil and Gas, Consultancy, Healthcare, Pharma, Energy/Utilities and many more. MACEE has extensive experience in the finance sector, working with Banks, Investment and Asset Management, Pension funds, Payment Platforms and other Fintech companies.",
-    "tags": [
-      "Telecoms",
-      "FMCG",
-      "Oil & Gas",
-      "Consultancy",
-      "Healthcare & Pharma",
-      "Energy & Utilities",
-      "Banking & Fintech",
-      "Investment & Asset Management",
-      "Pension Funds",
-      "Payment Platforms"
-    ]
-  },
-  "expertise": {
-    "title": "Expertise",
-    "subheading": "Proven track record in technical skills & experience",
-    "intro": "We can supply a wide range of people, but our network is mainly focused on senior level professionals. These include professionals in positions such as: Business/Information Analyst, Data Engineer, (Cyber) Security Consultant, Testers, Software Developers, Reporting/Finance Specialists and technical/cultural PMO and Project Managers.",
-    "prompt": "Below our skills & experience where we have a proven track record in:",
-    "items": [
-      {
-        "id": "exp-1",
-        "domain": "Software Development",
-        "technologies": ".NET, C / C++ / C#, JAVA, Python etc."
-      },
-      {
-        "id": "exp-2",
-        "domain": "BI & Data",
-        "technologies": "Spark, MSBI, PowerBI, Informatica PowerCenter, AI, ML, Kafka, ETL, Datavault, Tableau, Hadoop etc."
-      },
-      {
-        "id": "exp-3",
-        "domain": "Project Management",
-        "technologies": "PMO, Program Manager, Change Manager, Transition Manager, Service Level Manager etc."
-      },
-      {
-        "id": "exp-4",
-        "domain": "Cloud",
-        "technologies": "AWS, Azure, Kubernetes etc."
-      },
-      {
-        "id": "exp-5",
-        "domain": "Security",
-        "technologies": "CISM, CISSP, CISO, Cyber Security, IAM, RBAC, DLP, CyberArk, Third Party Risk, Network, Information/Finance"
-      },
-      {
-        "id": "exp-6",
-        "domain": "Finance Risk Management",
-        "technologies": "Regulatory reporting, AML, FEC, KYC, Modelling, QRM, Audit, Trading, Markets, Corep, Finrep, EMIR etc."
-      }
-    ]
-  },
   "services": [
     {
       "id": "recruitment",

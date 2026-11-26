@@ -5,7 +5,7 @@ import { Topbar } from '@/components/Topbar';
 import { Modal } from '@/components/Modal';
 import { ImagePicker } from '@/components/ImagePicker';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
-import { SkeletonKpiGrid, SkeletonTableRow } from '@/components/Skeleton';
+import { SkeletonTableRow } from '@/components/Skeleton';
 import {
   FileText,
   Plus,
@@ -456,8 +456,8 @@ export default function BlogManagementPage() {
       />
 
       <div className="p-6 sm:p-8 lg:p-10 max-w-[1440px] mx-auto space-y-6">
-        {/* Page Header (Editorial Serif) */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/80">
+        {/* Page Header (Editorial Serif) with 2 KPI Metric Cards on the Right */}
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pb-2 border-b border-slate-200/80">
           <div className="space-y-1">
             <h1 className="text-3xl sm:text-4xl font-serif text-[#111827] tracking-tight">
               Articles & Blogs
@@ -467,78 +467,40 @@ export default function BlogManagementPage() {
             </p>
           </div>
 
-          <button
-            onClick={handleOpenAdd}
-            className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl bg-[#E30613] hover:bg-[#b80510] text-white text-xs font-semibold shadow-xs transition-all shrink-0 self-start sm:self-auto"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span>Create Article</span>
-          </button>
-        </div>
-
-        {/* 4 KPI Metric Cards */}
-        {loading ? (
-          <SkeletonKpiGrid count={4} />
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
+          {/* Right side: 2 KPI Cards in same header line */}
+          <div className="flex items-center space-x-3 sm:space-x-4 shrink-0">
+            {/* Card 1: Total Articles */}
+            <div className="bg-white rounded-2xl px-4 py-3 sm:px-5 sm:py-3.5 border border-slate-100 shadow-2xs flex items-center space-x-3 sm:space-x-4 min-w-[160px] sm:min-w-[180px]">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
                 <FileText className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-xs font-medium text-slate-500">Total Articles</p>
+                <p className="text-[11px] sm:text-xs font-medium text-slate-500">Total Articles</p>
                 <div className="flex items-baseline space-x-2 mt-0.5">
-                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                  <span className="text-xl sm:text-2xl font-bold text-[#111827] font-sans">
                     {blogs.length}
                   </span>
-                  <span className="text-xs font-semibold text-emerald-600">Active</span>
+                  <span className="text-[10px] sm:text-xs font-semibold text-emerald-600">Active</span>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
+            {/* Card 2: Published Posts */}
+            <div className="bg-white rounded-2xl px-4 py-3 sm:px-5 sm:py-3.5 border border-slate-100 shadow-2xs flex items-center space-x-3 sm:space-x-4 min-w-[160px] sm:min-w-[180px]">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
                 <BookOpen className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-xs font-medium text-slate-500">Published Posts</p>
+                <p className="text-[11px] sm:text-xs font-medium text-slate-500">Published Posts</p>
                 <div className="mt-0.5">
-                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                  <span className="text-xl sm:text-2xl font-bold text-[#111827] font-sans">
                     {publishedCount}
                   </span>
                 </div>
               </div>
             </div>
-
-            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-                <Clock className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-xs font-medium text-slate-500">Draft Articles</p>
-                <div className="mt-0.5">
-                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                    {draftCount}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-                <Tag className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-xs font-medium text-slate-500">Topic Categories</p>
-                <div className="mt-0.5">
-                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                    {CATEGORIES.length}
-                  </span>
-                </div>
-              </div>
-            </div>
           </div>
-        )}
+        </div>
 
         {/* Sync Toast Alert */}
         {syncAlert && (
@@ -557,18 +519,17 @@ export default function BlogManagementPage() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold capitalize whitespace-nowrap transition-all ${
-                  activeTab === tab
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold capitalize whitespace-nowrap transition-all ${activeTab === tab
                     ? 'bg-[#111827] text-white shadow-2xs'
                     : 'text-slate-600 hover:bg-slate-100'
-                }`}
+                  }`}
               >
                 {tab === 'all' ? 'All Articles' : tab}
               </button>
             ))}
           </div>
 
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2.5">
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
@@ -581,6 +542,14 @@ export default function BlogManagementPage() {
                 </option>
               ))}
             </select>
+
+            <button
+              onClick={handleOpenAdd}
+              className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-[#E30613] hover:bg-[#b80510] text-white text-xs font-semibold shadow-xs transition-all shrink-0"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Create Article</span>
+            </button>
           </div>
         </div>
 
@@ -590,11 +559,9 @@ export default function BlogManagementPage() {
             <table className="w-full text-left text-xs border-collapse">
               <thead>
                 <tr className="border-b border-slate-100 bg-slate-50/75 text-slate-500 font-medium">
-                  <th className="py-3 px-4">Article & Summary</th>
+                  <th className="py-3 px-4">Article</th>
                   <th className="py-3 px-4">Categories</th>
                   <th className="py-3 px-4">Author & Contributors</th>
-                  <th className="py-3 px-4">Reading Time</th>
-                  <th className="py-3 px-4">Related</th>
                   <th className="py-3 px-4">Status</th>
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
@@ -602,11 +569,11 @@ export default function BlogManagementPage() {
               <tbody className="divide-y divide-slate-100">
                 {loading ? (
                   Array.from({ length: 4 }).map((_, i) => (
-                    <SkeletonTableRow key={i} cols={7} />
+                    <SkeletonTableRow key={i} cols={5} />
                   ))
                 ) : filteredBlogs.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-12 text-center text-slate-400">
+                    <td colSpan={5} className="py-12 text-center text-slate-400">
                       No articles found matching criteria.
                     </td>
                   </tr>
@@ -620,37 +587,30 @@ export default function BlogManagementPage() {
                           : ['General'];
 
                     const contribCount = blog.contributors?.length || 0;
-                    const relatedCount = blog.relatedPosts?.length || 0;
 
                     return (
                       <tr key={blog.id} className="hover:bg-slate-50/70 transition-colors">
-                        {/* Article & Summary */}
+                        {/* Article Title */}
                         <td className="py-3.5 px-4 max-w-sm">
-                          <div className="flex items-start space-x-3">
+                          <div className="flex items-center space-x-3">
                             {blog.coverImage ? (
                               <img
                                 src={blog.coverImage}
                                 alt={blog.coverImageAlt || blog.title}
-                                className="w-12 h-12 rounded-lg object-cover border border-slate-200 shrink-0 mt-0.5"
+                                className="w-11 h-11 rounded-lg object-cover border border-slate-200 shrink-0"
                                 onError={(e) => {
                                   (e.target as HTMLElement).style.display = 'none';
                                 }}
                               />
                             ) : (
-                              <div className="w-12 h-12 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0 mt-0.5 text-slate-400">
+                              <div className="w-11 h-11 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0 text-slate-400">
                                 <FileText className="w-5 h-5" />
                               </div>
                             )}
 
                             <div className="min-w-0">
-                              <p className="font-bold text-[#111827] truncate font-sans text-[13px]" title={blog.title}>
+                              <p className="font-bold text-[#111827] truncate font-sans text-[13.5px]" title={blog.title}>
                                 {blog.title}
-                              </p>
-                              <p className="text-[11px] text-slate-400 font-mono truncate">
-                                /{blog.slug}
-                              </p>
-                              <p className="text-[11px] text-slate-500 line-clamp-1 mt-0.5">
-                                {blog.excerpt}
                               </p>
                             </div>
                           </div>
@@ -684,25 +644,6 @@ export default function BlogManagementPage() {
                               </span>
                             )}
                           </div>
-                        </td>
-
-                        {/* Reading Time */}
-                        <td className="py-3.5 px-4 whitespace-nowrap text-slate-600">
-                          <span className="inline-flex items-center space-x-1 font-medium">
-                            <Clock className="w-3.5 h-3.5 text-slate-400" />
-                            <span>{blog.estimatedReadingTime || parseInt(blog.readTime, 10) || 4} min</span>
-                          </span>
-                        </td>
-
-                        {/* Related Posts */}
-                        <td className="py-3.5 px-4 whitespace-nowrap text-slate-500">
-                          {relatedCount > 0 ? (
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">
-                              {relatedCount} linked
-                            </span>
-                          ) : (
-                            <span className="text-slate-400 text-[11px]">—</span>
-                          )}
                         </td>
 
                         {/* Status */}
@@ -873,13 +814,12 @@ export default function BlogManagementPage() {
                     Article Title *
                   </label>
                   <span
-                    className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-                      title.length >= 40 && title.length <= 60
+                    className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${title.length >= 40 && title.length <= 60
                         ? 'bg-emerald-100 text-emerald-800'
                         : title.length > 60
                           ? 'bg-amber-100 text-amber-800'
                           : 'bg-slate-200 text-slate-700'
-                    }`}
+                      }`}
                   >
                     {title.length} / 60 chars {title.length >= 40 && title.length <= 60 ? '(SEO Optimal)' : '(40-60 ideal)'}
                   </span>
@@ -1012,7 +952,7 @@ export default function BlogManagementPage() {
                   >
                     {teamMembers.map((m) => (
                       <option key={m.id} value={m.id}>
-                        {m.name} — {m.role}
+                        {m.name} - {m.role}
                       </option>
                     ))}
                     <option value="custom">Custom Author Name</option>
@@ -1137,11 +1077,10 @@ export default function BlogManagementPage() {
                         key={cat}
                         type="button"
                         onClick={() => toggleCategory(cat)}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-1.5 transition-all ${
-                          isSelected
+                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-1.5 transition-all ${isSelected
                             ? 'bg-[#36427D] text-white shadow-xs'
                             : 'bg-white text-slate-700 border border-slate-200 hover:border-slate-300'
-                        }`}
+                          }`}
                       >
                         {isSelected && <Check className="w-3 h-3 text-white" />}
                         <span>{cat}</span>
@@ -1171,18 +1110,16 @@ export default function BlogManagementPage() {
                           key={otherBlog.id}
                           type="button"
                           onClick={() => toggleRelatedPost(otherBlog.id)}
-                          className={`p-2 rounded-lg text-left text-xs transition-colors flex items-start space-x-2 ${
-                            isSelected
+                          className={`p-2 rounded-lg text-left text-xs transition-colors flex items-start space-x-2 ${isSelected
                               ? 'bg-blue-50 border border-blue-300 text-blue-900 font-semibold'
                               : 'hover:bg-slate-50 border border-transparent text-slate-700'
-                          }`}
+                            }`}
                         >
                           <div
-                            className={`w-4 h-4 rounded mt-0.5 border flex items-center justify-center shrink-0 ${
-                              isSelected
+                            className={`w-4 h-4 rounded mt-0.5 border flex items-center justify-center shrink-0 ${isSelected
                                 ? 'bg-blue-600 border-blue-600 text-white'
                                 : 'border-slate-300 bg-white'
-                            }`}
+                              }`}
                           >
                             {isSelected && <Check className="w-3 h-3" />}
                           </div>
