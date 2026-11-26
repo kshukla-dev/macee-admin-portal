@@ -5,6 +5,7 @@ import { Topbar } from '@/components/Topbar';
 import { Modal } from '@/components/Modal';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { SkeletonAccordion } from '@/components/Skeleton';
+import { CustomSelect } from '@/components/CustomSelect';
 import {
   HelpCircle,
   Plus,
@@ -859,25 +860,24 @@ export default function FaqManagementPage() {
                 <label className="block text-xs font-bold text-slate-700 mb-1">
                   Target Website Page *
                 </label>
-                <select
+                <CustomSelect
                   value={formPage}
-                  onChange={(e) => {
-                    const newPage = e.target.value;
+                  onChange={(newPage) => {
                     setFormPage(newPage);
-                    // Autofill suggested tag
                     if (SUGGESTED_TAGS_BY_PAGE[newPage]?.[0]) {
                       setFormTag(SUGGESTED_TAGS_BY_PAGE[newPage][0]);
                     }
                   }}
-                  className="w-full p-2.5 text-xs rounded-xl border border-slate-200 bg-white focus:outline-none focus:border-[#E30613] font-medium"
-                >
-                  <option value="home">Home</option>
-                  <option value="about">About Us</option>
-                  <option value="clients">Clients</option>
-                  <option value="professionals">Professionals</option>
-                  <option value="projects">Projects</option>
-                  <option value="contact">Contact</option>
-                </select>
+                  options={[
+                    { value: 'home', label: 'Home' },
+                    { value: 'about', label: 'About Us' },
+                    { value: 'clients', label: 'Clients' },
+                    { value: 'professionals', label: 'Professionals' },
+                    { value: 'projects', label: 'Projects' },
+                    { value: 'contact', label: 'Contact' },
+                  ]}
+                  placeholder="Select Target Page"
+                />
               </div>
 
               <div>

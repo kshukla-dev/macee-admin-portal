@@ -6,6 +6,7 @@ import { Modal } from '@/components/Modal';
 import { ImagePicker } from '@/components/ImagePicker';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { SkeletonMemberCard } from '@/components/Skeleton';
+import { CustomSelect } from '@/components/CustomSelect';
 import {
   Users2,
   Plus,
@@ -404,16 +405,12 @@ export default function TeamManagementPage() {
               </div>
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Department / Desk</label>
-                <select
+                <CustomSelect
                   value={desk}
-                  onChange={(e) => setDesk(e.target.value)}
-                  className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613]"
-                >
-                  <option>Management</option>
-                  <option>Consultants</option>
-                  <option>Recruitment</option>
-                  <option>Operations</option>
-                </select>
+                  onChange={(val) => setDesk(val)}
+                  options={['Management', 'Consultants', 'Recruitment', 'Operations']}
+                  placeholder="Select Department / Desk"
+                />
               </div>
             </div>
 

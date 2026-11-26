@@ -5,6 +5,7 @@ import { Topbar } from '@/components/Topbar';
 import { Modal } from '@/components/Modal';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { SkeletonTableRow } from '@/components/Skeleton';
+import { CustomSelect } from '@/components/CustomSelect';
 import {
   Users2,
   Mail,
@@ -389,60 +390,43 @@ export default function ContactsManagementPage() {
           {/* Left: Filter Controls */}
           <div className="flex flex-wrap items-center gap-2.5">
             {/* Date Range Dropdown */}
-            <div className="relative">
-              <select
+            <div className="w-auto min-w-[145px]">
+              <CustomSelect
                 value={selectedDateRange}
-                onChange={(e) => setSelectedDateRange(e.target.value)}
-                className="appearance-none bg-white border border-slate-200/90 text-slate-700 text-xs font-medium rounded-xl pl-8 pr-7 py-2.5 focus:outline-none focus:border-[#E30613] shadow-2xs"
-              >
-                <option>Last 30 Days</option>
-                <option>Last 7 Days</option>
-                <option>This Month</option>
-                <option>All Time</option>
-              </select>
-              <Calendar className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-              <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 text-[10px]">
-                ▼
-              </div>
+                onChange={setSelectedDateRange}
+                icon={<Calendar className="w-3.5 h-3.5" />}
+                options={['Last 30 Days', 'Last 7 Days', 'This Month', 'All Time']}
+                aria-label="Filter by date range"
+              />
             </div>
 
             {/* Services Dropdown */}
-            <div className="relative">
-              <select
+            <div className="w-auto min-w-[160px]">
+              <CustomSelect
                 value={selectedService}
-                onChange={(e) => setSelectedService(e.target.value)}
-                className="appearance-none bg-white border border-slate-200/90 text-slate-700 text-xs font-medium rounded-xl pl-8 pr-7 py-2.5 focus:outline-none focus:border-[#E30613] shadow-2xs"
-              >
-                <option>All Services</option>
-                <option>Employer of Record</option>
-                <option>Payroll Services</option>
-                <option>Global Mobility</option>
-                <option>Staffing Solutions</option>
-                <option>Work Permit Support</option>
-              </select>
-              <Briefcase className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-              <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 text-[10px]">
-                ▼
-              </div>
+                onChange={setSelectedService}
+                icon={<Briefcase className="w-3.5 h-3.5" />}
+                options={[
+                  'All Services',
+                  'Employer of Record',
+                  'Payroll Services',
+                  'Global Mobility',
+                  'Staffing Solutions',
+                  'Work Permit Support',
+                ]}
+                aria-label="Filter by service"
+              />
             </div>
 
             {/* Status Dropdown */}
-            <div className="relative">
-              <select
+            <div className="w-auto min-w-[135px]">
+              <CustomSelect
                 value={selectedStatusFilter}
-                onChange={(e) => setSelectedStatusFilter(e.target.value)}
-                className="appearance-none bg-white border border-slate-200/90 text-slate-700 text-xs font-medium rounded-xl pl-8 pr-7 py-2.5 focus:outline-none focus:border-[#E30613] shadow-2xs"
-              >
-                <option>All Status</option>
-                <option>New</option>
-                <option>In Progress</option>
-                <option>Converted</option>
-                <option>Archived</option>
-              </select>
-              <SlidersHorizontal className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-              <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 text-[10px]">
-                ▼
-              </div>
+                onChange={setSelectedStatusFilter}
+                icon={<SlidersHorizontal className="w-3.5 h-3.5" />}
+                options={['All Status', 'New', 'In Progress', 'Converted', 'Archived']}
+                aria-label="Filter by status"
+              />
             </div>
 
             {/* Table Search Input */}
@@ -886,17 +870,18 @@ export default function ContactsManagementPage() {
               </div>
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Service Required</label>
-                <select
+                <CustomSelect
                   value={newLeadForm.topic}
-                  onChange={(e) => setNewLeadForm({ ...newLeadForm, topic: e.target.value })}
-                  className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613]"
-                >
-                  <option>Employer of Record</option>
-                  <option>Payroll Services</option>
-                  <option>Global Mobility</option>
-                  <option>Staffing Solutions</option>
-                  <option>Work Permit Support</option>
-                </select>
+                  onChange={(val) => setNewLeadForm({ ...newLeadForm, topic: val })}
+                  options={[
+                    'Employer of Record',
+                    'Payroll Services',
+                    'Global Mobility',
+                    'Staffing Solutions',
+                    'Work Permit Support',
+                  ]}
+                  placeholder="Select service..."
+                />
               </div>
             </div>
 

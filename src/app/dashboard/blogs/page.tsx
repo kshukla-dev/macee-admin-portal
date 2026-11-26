@@ -6,6 +6,7 @@ import { Modal } from '@/components/Modal';
 import { ImagePicker } from '@/components/ImagePicker';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { SkeletonTableRow } from '@/components/Skeleton';
+import { CustomSelect } from '@/components/CustomSelect';
 import {
   FileText,
   Plus,
@@ -530,18 +531,17 @@ export default function BlogManagementPage() {
           </div>
 
           <div className="flex items-center space-x-2.5">
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="p-2 text-xs rounded-xl border border-slate-200 bg-white font-medium text-slate-700 focus:outline-none focus:border-[#E30613]"
-            >
-              <option value="all">All Categories</option>
-              {CATEGORIES.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
+            <div className="w-44">
+              <CustomSelect
+                value={selectedCategory}
+                onChange={setSelectedCategory}
+                options={[
+                  { value: 'all', label: 'All Categories' },
+                  ...CATEGORIES.map((c) => ({ value: c, label: c })),
+                ]}
+                placeholder="All Categories"
+              />
+            </div>
 
             <button
               onClick={handleOpenAdd}
@@ -945,18 +945,18 @@ export default function BlogManagementPage() {
                   <label className="block text-xs font-bold text-slate-800 mb-1">
                     Primary Author (Person Relation) *
                   </label>
-                  <select
+                  <CustomSelect
                     value={authorId || 'custom'}
-                    onChange={(e) => handleAuthorSelect(e.target.value)}
-                    className="w-full p-2.5 text-xs rounded-xl border border-slate-200 bg-white focus:outline-none focus:border-[#E30613] font-medium"
-                  >
-                    {teamMembers.map((m) => (
-                      <option key={m.id} value={m.id}>
-                        {m.name} - {m.role}
-                      </option>
-                    ))}
-                    <option value="custom">Custom Author Name</option>
-                  </select>
+                    onChange={(val) => handleAuthorSelect(val)}
+                    options={[
+                      ...teamMembers.map((m) => ({
+                        value: m.id,
+                        label: `${m.name} - ${m.role}`,
+                      })),
+                      { value: 'custom', label: 'Custom Author Name' },
+                    ]}
+                    placeholder="Select author..."
+                  />
                 </div>
 
                 <div>
@@ -1009,19 +1009,21 @@ export default function BlogManagementPage() {
 
                 {/* Add new contributor row */}
                 <div className="flex flex-col sm:flex-row items-center gap-2 bg-slate-100/70 p-2.5 rounded-xl border border-slate-200">
-                  <select
-                    value={newContribPersonId}
-                    onChange={(e) => setNewContribPersonId(e.target.value)}
-                    className="w-full sm:w-1/2 p-2 text-xs rounded-lg border border-slate-200 bg-white focus:outline-none"
-                  >
-                    <option value="">Select Team Member...</option>
-                    {teamMembers.map((m) => (
-                      <option key={m.id} value={m.id}>
-                        {m.name} ({m.role})
-                      </option>
-                    ))}
-                    <option value="custom">Other / Custom Name</option>
-                  </select>
+                  <div className="w-full sm:w-1/2">
+                    <CustomSelect
+                      value={newContribPersonId}
+                      onChange={setNewContribPersonId}
+                      options={[
+                        { value: '', label: 'Select Team Member...' },
+                        ...teamMembers.map((m) => ({
+                          value: m.id,
+                          label: `${m.name} (${m.role})`,
+                        })),
+                        { value: 'custom', label: 'Other / Custom Name' },
+                      ]}
+                      placeholder="Select Team Member..."
+                    />
+                  </div>
 
                   {newContribPersonId === 'custom' && (
                     <input
@@ -1033,17 +1035,17 @@ export default function BlogManagementPage() {
                     />
                   )}
 
-                  <select
-                    value={newContribRole}
-                    onChange={(e) => setNewContribRole(e.target.value as any)}
-                    className="w-full sm:w-1/3 p-2 text-xs rounded-lg border border-slate-200 bg-white focus:outline-none"
-                  >
-                    {CONTRIBUTOR_ROLES.map((r) => (
-                      <option key={r} value={r}>
-                        Role: {r}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="w-full sm:w-1/3">
+                    <CustomSelect
+                      value={newContribRole}
+                      onChange={(val) => setNewContribRole(val as any)}
+                      options={CONTRIBUTOR_ROLES.map((r) => ({
+                        value: r,
+                        label: `Role: ${r}`,
+                      }))}
+                      placeholder="Select Role"
+                    />
+                  </div>
 
                   <button
                     type="button"
@@ -1161,14 +1163,15 @@ export default function BlogManagementPage() {
                   <label className="block text-xs font-bold text-slate-800 mb-1">
                     Publication Status
                   </label>
-                  <select
+                  <CustomSelect
                     value={status}
-                    onChange={(e) => setStatus(e.target.value as any)}
-                    className="w-full p-2.5 text-xs rounded-xl border border-slate-200 bg-white focus:outline-none focus:border-[#E30613] font-medium"
-                  >
-                    <option value="published">Published</option>
-                    <option value="draft">Draft (Unpublished)</option>
-                  </select>
+                    onChange={(val) => setStatus(val as any)}
+                    options={[
+                      { value: 'published', label: 'Published' },
+                      { value: 'draft', label: 'Draft (Unpublished)' },
+                    ]}
+                    placeholder="Select status"
+                  />
                 </div>
               </div>
             </div>
