@@ -4,12 +4,10 @@ import React, { useEffect, useState } from 'react';
 import { Topbar } from '@/components/Topbar';
 import { Modal } from '@/components/Modal';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
-import { SkeletonKpiGrid, SkeletonTableRow } from '@/components/Skeleton';
+import { SkeletonTableRow } from '@/components/Skeleton';
 import {
   Users2,
   Mail,
-  Clock,
-  Check,
   Search,
   Download,
   Plus,
@@ -47,7 +45,6 @@ export default function ContactsManagementPage() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [filteredContacts, setFilteredContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'all' | 'new' | 'in_progress' | 'converted'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedService, setSelectedService] = useState('All Services');
   const [selectedStatusFilter, setSelectedStatusFilter] = useState('All Status');
@@ -112,11 +109,6 @@ export default function ContactsManagementPage() {
   useEffect(() => {
     let result = [...contacts];
 
-    // Filter by Tab
-    if (activeTab !== 'all') {
-      result = result.filter((c) => c.status === activeTab);
-    }
-
     // Filter by Service Dropdown
     if (selectedService !== 'All Services') {
       result = result.filter((c) => c.topic === selectedService);
@@ -151,7 +143,7 @@ export default function ContactsManagementPage() {
 
     setFilteredContacts(result);
     setCurrentPage(1);
-  }, [contacts, activeTab, selectedService, selectedStatusFilter, searchQuery]);
+  }, [contacts, selectedService, selectedStatusFilter, searchQuery]);
 
   // Metric counts
   const totalCount = contacts.length > 0 ? contacts.length : 0;
@@ -344,33 +336,29 @@ export default function ContactsManagementPage() {
 
       <div className="p-6 sm:p-8 lg:p-10 max-w-[1440px] mx-auto space-y-6">
         {/* =================================================================
-            PAGE HEADER (Exact Editorial Serif Typography from Screenshot)
+            PAGE HEADER WITH 2 KPI CARDS ON THE RIGHT
             ================================================================= */}
-        <div className="space-y-1">
-          <h1 className="text-3xl sm:text-4xl font-serif text-[#111827] tracking-tight">
-            Contact Leads
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-500">
-            Manage enquiries submitted through your website.
-          </p>
-        </div>
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pb-2 border-b border-slate-200/80">
+          <div className="space-y-1">
+            <h1 className="text-3xl sm:text-4xl font-serif text-[#111827] tracking-tight">
+              Contact Leads
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500">
+              Manage enquiries submitted through your website.
+            </p>
+          </div>
 
-        {/* =================================================================
-            ROW OF 4 KPI METRIC CARDS (Exact Match to Screenshot)
-            ================================================================= */}
-        {loading ? (
-          <SkeletonKpiGrid count={4} />
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+          {/* Right side: 2 KPI Cards in same header line */}
+          <div className="flex items-center space-x-3 sm:space-x-4 shrink-0">
             {/* Card 1: Total Leads */}
-            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
+            <div className="bg-white rounded-2xl px-4 py-3 sm:px-5 sm:py-3.5 border border-slate-100 shadow-2xs flex items-center space-x-3 sm:space-x-4 min-w-[160px] sm:min-w-[180px]">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
                 <Users2 className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-xs font-medium text-slate-500">Total Leads</p>
+                <p className="text-[11px] sm:text-xs font-medium text-slate-500">Total Leads</p>
                 <div className="flex items-baseline space-x-2 mt-0.5">
-                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                  <span className="text-xl sm:text-2xl font-bold text-[#111827] font-sans">
                     {totalCount}
                   </span>
                 </div>
@@ -378,76 +366,20 @@ export default function ContactsManagementPage() {
             </div>
 
             {/* Card 2: New */}
-            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
+            <div className="bg-white rounded-2xl px-4 py-3 sm:px-5 sm:py-3.5 border border-slate-100 shadow-2xs flex items-center space-x-3 sm:space-x-4 min-w-[160px] sm:min-w-[180px]">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
                 <Mail className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-xs font-medium text-slate-500">New</p>
+                <p className="text-[11px] sm:text-xs font-medium text-slate-500">New</p>
                 <div className="mt-0.5">
-                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                  <span className="text-xl sm:text-2xl font-bold text-[#111827] font-sans">
                     {newCount}
                   </span>
                 </div>
               </div>
             </div>
-
-            {/* Card 3: In Progress */}
-            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-                <Clock className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-xs font-medium text-slate-500">In Progress</p>
-                <div className="mt-0.5">
-                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                    {inProgressCount}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Card 4: Converted */}
-            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-                <Check className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-xs font-medium text-slate-500">Converted</p>
-                <div className="mt-0.5">
-                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                    {convertedCount}
-                  </span>
-                </div>
-              </div>
-            </div>
           </div>
-        )}
-
-        {/* =================================================================
-            STATUS TABS (All Leads | New | In Progress | Converted)
-            ================================================================= */}
-        <div className="flex items-center space-x-6 border-b border-slate-200 text-xs font-medium pt-2">
-          {[
-            { id: 'all', label: 'All Leads' },
-            { id: 'new', label: 'New' },
-            { id: 'in_progress', label: 'In Progress' },
-            { id: 'converted', label: 'Converted' },
-          ].map((tab) => {
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`pb-3 transition-colors relative ${isActive
-                  ? 'font-bold text-[#111827] border-b-2 border-[#E30613]'
-                  : 'text-slate-500 hover:text-slate-800'
-                  }`}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
         </div>
 
         {/* =================================================================

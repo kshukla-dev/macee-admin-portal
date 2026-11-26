@@ -5,7 +5,7 @@ import { Topbar } from '@/components/Topbar';
 import { Modal } from '@/components/Modal';
 import { ImagePicker } from '@/components/ImagePicker';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
-import { SkeletonKpiGrid, SkeletonMemberCard } from '@/components/Skeleton';
+import { SkeletonMemberCard } from '@/components/Skeleton';
 import {
   Users2,
   Plus,
@@ -18,8 +18,6 @@ import {
   Search,
   Filter,
   UserCheck,
-  Building,
-  ShieldCheck,
   Download,
   Linkedin,
   User,
@@ -44,7 +42,6 @@ export default function TeamManagementPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
   const [syncedAlert, setSyncedAlert] = useState(false);
-  const [activeTab, setActiveTab] = useState('All Members');
   const [searchQuery, setSearchQuery] = useState('');
 
   // Form state
@@ -183,18 +180,12 @@ export default function TeamManagementPage() {
 
   // Filtered members
   const filteredTeam = team.filter((m) => {
-    const matchesSearch =
+    return (
       !searchQuery.trim() ||
       m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       m.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (m.desk && m.desk.toLowerCase().includes(searchQuery.toLowerCase()));
-
-    if (!matchesSearch) return false;
-    if (activeTab === 'All Members') return true;
-    if (activeTab === 'Management') return m.desk === 'Management' || m.role.toLowerCase().includes('director') || m.role.toLowerCase().includes('founder');
-    if (activeTab === 'Consultants') return m.desk === 'Consultants' || m.role.toLowerCase().includes('consultant');
-    if (activeTab === 'Recruitment') return m.desk === 'Recruitment' || m.role.toLowerCase().includes('specialist');
-    return true;
+      (m.desk && m.desk.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
   });
 
   return (
@@ -209,97 +200,48 @@ export default function TeamManagementPage() {
       />
 
       <div className="p-6 sm:p-8 lg:p-10 max-w-[1440px] mx-auto space-y-6">
-        {/* Page Header (Editorial Serif) */}
-        <div className="space-y-1">
-          <h1 className="text-3xl sm:text-4xl font-serif text-[#111827] tracking-tight">
-            Team Profiles
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-500">
-            Manage consultants, recruitment specialists, and public leadership profiles.
-          </p>
-        </div>
+        {/* Page Header with 2 KPI Metric Cards on the Right */}
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pb-2 border-b border-slate-200/80">
+          <div className="space-y-1">
+            <h1 className="text-3xl sm:text-4xl font-serif text-[#111827] tracking-tight">
+              Team Profiles
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500">
+              Manage consultants, recruitment specialists, and public leadership profiles.
+            </p>
+          </div>
 
-        {/* 4 KPI Metric Cards */}
-        {loading ? (
-          <SkeletonKpiGrid count={4} />
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
+          {/* Right side: 2 KPI Cards in same header line */}
+          <div className="flex items-center space-x-3 sm:space-x-4 shrink-0">
+            <div className="bg-white rounded-2xl px-4 py-3 sm:px-5 sm:py-3.5 border border-slate-100 shadow-2xs flex items-center space-x-3 sm:space-x-4 min-w-[170px] sm:min-w-[190px]">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
                 <Users2 className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-xs font-medium text-slate-500">Total Specialists</p>
+                <p className="text-[11px] sm:text-xs font-medium text-slate-500">Total Specialists</p>
                 <div className="flex items-baseline space-x-2 mt-0.5">
-                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                  <span className="text-xl sm:text-2xl font-bold text-[#111827] font-sans">
                     {team.length > 0 ? team.length : 0}
                   </span>
-                  <span className="text-xs font-semibold text-emerald-600">Active</span>
+                  <span className="text-[10px] sm:text-xs font-semibold text-emerald-600">Active</span>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
+            <div className="bg-white rounded-2xl px-4 py-3 sm:px-5 sm:py-3.5 border border-slate-100 shadow-2xs flex items-center space-x-3 sm:space-x-4 min-w-[170px] sm:min-w-[190px]">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
                 <UserCheck className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-xs font-medium text-slate-500">Public on Website</p>
+                <p className="text-[11px] sm:text-xs font-medium text-slate-500">Public on Website</p>
                 <div className="mt-0.5">
-                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
+                  <span className="text-xl sm:text-2xl font-bold text-[#111827] font-sans">
                     {team.length > 0 ? team.length : 0}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-                <Building className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-xs font-medium text-slate-500">Departments</p>
-                <div className="mt-0.5">
-                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                    {new Set(team.map((m) => m.desk).filter(Boolean)).size} Desks
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-              <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-xs font-medium text-slate-500">Compliance</p>
-                <div className="mt-0.5">
-                  <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                    100%
                   </span>
                 </div>
               </div>
             </div>
           </div>
-        )}
-
-        {/* Status Tabs */}
-        <div className="flex items-center space-x-6 border-b border-slate-200 text-xs font-medium pt-2">
-          {['All Members', 'Management', 'Consultants', 'Recruitment'].map((tab) => {
-            const isActive = activeTab === tab;
-            return (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`pb-3 transition-colors relative ${isActive
-                  ? 'font-bold text-[#111827] border-b-2 border-[#E30613]'
-                  : 'text-slate-500 hover:text-slate-800'
-                  }`}
-              >
-                {tab}
-              </button>
-            );
-          })}
         </div>
 
         {/* Toolbar */}
