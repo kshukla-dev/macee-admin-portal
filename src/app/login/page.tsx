@@ -87,9 +87,6 @@ export default function LoginPage() {
             <h1 className="text-2xl sm:text-3xl font-bold text-[#111827] font-heading tracking-tight">
               Sign in
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500">
-              Welcome back! Please enter your administrative credentials.
-            </p>
           </div>
 
           {/* Quick Demo Credentials Chip */}
@@ -204,12 +201,7 @@ export default function LoginPage() {
           </form>
         </div>
 
-        {/* Bottom: Dutch Compliance Accreditations (Full Width of Left Column) */}
-        <div className="w-full pt-6 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-[11px] sm:text-xs text-slate-400 font-medium">
-          <span>SNA NEN 4400-1</span>
-          <span className="text-[#36427D] font-semibold">IND Recognised Sponsor</span>
-          <span>100% WAADI Compliant</span>
-        </div>
+
       </div>
 
       {/* =================================================================
@@ -262,47 +254,10 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* Social Proof Avatars Row (matching reference image) */}
-          <div className="pt-2 flex flex-col sm:flex-row sm:items-center gap-3">
-            <div className="flex -space-x-2.5 overflow-hidden shrink-0">
-              <img
-                className="inline-block h-10 w-10 rounded-full ring-2 ring-[#0E1726] object-cover"
-                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80"
-                alt="Specialist"
-              />
-              <img
-                className="inline-block h-10 w-10 rounded-full ring-2 ring-[#0E1726] object-cover"
-                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80"
-                alt="Specialist"
-              />
-              <img
-                className="inline-block h-10 w-10 rounded-full ring-2 ring-[#0E1726] object-cover"
-                src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80"
-                alt="Specialist"
-              />
-              <img
-                className="inline-block h-10 w-10 rounded-full ring-2 ring-[#0E1726] object-cover"
-                src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80"
-                alt="Specialist"
-              />
-            </div>
 
-            <p className="text-xs text-slate-300 font-medium">
-              Over <strong className="text-white font-bold">85+ trusted client partners</strong> and verified specialists active on macee.com
-            </p>
-          </div>
         </div>
 
-        {/* Bottom Feature Badges (Full Width of Right Column) */}
-        <div className="relative z-10 w-full pt-6 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-3 text-[11px] sm:text-xs text-slate-400">
-          <div className="flex items-center space-x-2">
-            <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span>Encrypted Session & 2FA Ready</span>
-          </div>
-          <div className="text-[11px] font-mono text-slate-500">
-            v2.4 Enterprise
-          </div>
-        </div>
+
       </div>
     </div>
   );
