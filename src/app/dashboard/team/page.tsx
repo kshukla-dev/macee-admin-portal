@@ -22,6 +22,8 @@ import {
   Download,
   Linkedin,
   User,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 
 interface TeamMember {
@@ -44,6 +46,8 @@ export default function TeamManagementPage() {
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
   const [syncedAlert, setSyncedAlert] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const pageSize = 10;
 
   // Form state
   const [name, setName] = useState('');
@@ -179,6 +183,11 @@ export default function TeamManagementPage() {
     });
   };
 
+  // Reset page when search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
   // Filtered members
   const filteredTeam = team.filter((m) => {
     return (
@@ -188,6 +197,13 @@ export default function TeamManagementPage() {
       (m.desk && m.desk.toLowerCase().includes(searchQuery.toLowerCase()))
     );
   });
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredTeam.length / pageSize) || 1;
+  const paginatedTeam = filteredTeam.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
@@ -285,87 +301,131 @@ export default function TeamManagementPage() {
             No team members found matching your criteria.
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {filteredTeam.map((member) => (
-              <div
-                key={member.id}
-                className="bg-white rounded-2xl border border-slate-100 shadow-2xs p-5 hover:shadow-md transition-all flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-start space-x-3.5">
-                    {member.image ? (
-                      <img
-                        src={member.image}
-                        alt={member.name}
-                        className="w-14 h-14 rounded-full object-cover border-2 border-slate-100 shrink-0"
-                        onError={(e) => {
-                          (e.currentTarget as HTMLImageElement).style.display = 'none';
-                        }}
-                      />
-                    ) : (
-                      <div className="w-14 h-14 rounded-full bg-[#EAF0FC] text-[#36427D] border-2 border-slate-100 flex items-center justify-center font-bold text-sm shrink-0">
-                        {member.name ? member.name.charAt(0).toUpperCase() : <User className="w-5 h-5 text-slate-400" />}
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {paginatedTeam.map((member) => (
+                <div
+                  key={member.id}
+                  className="bg-white rounded-2xl border border-slate-100 shadow-2xs p-5 hover:shadow-md transition-all flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="flex items-start space-x-3.5">
+                      {member.image ? (
+                        <img
+                          src={member.image}
+                          alt={member.name}
+                          className="w-14 h-14 rounded-full object-cover border-2 border-slate-100 shrink-0"
+                          onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).style.display = 'none';
+                          }}
+                        />
+                      ) : (
+                        <div className="w-14 h-14 rounded-full bg-[#EAF0FC] text-[#36427D] border-2 border-slate-100 flex items-center justify-center font-bold text-sm shrink-0">
+                          {member.name ? member.name.charAt(0).toUpperCase() : <User className="w-5 h-5 text-slate-400" />}
+                        </div>
+                      )}
+                      <div className="overflow-hidden">
+                        <h4 className="text-sm font-bold text-[#111827] truncate font-sans">
+                          {member.name}
+                        </h4>
+                        <p className="text-xs text-[#E30613] font-medium truncate mt-0.5">
+                          {member.role}
+                        </p>
                       </div>
-                    )}
-                    <div className="overflow-hidden">
-                      <h4 className="text-sm font-bold text-[#111827] truncate font-sans">
-                        {member.name}
-                      </h4>
-                      <p className="text-xs text-[#E30613] font-medium truncate mt-0.5">
-                        {member.role}
-                      </p>
+                    </div>
+
+                    <div className="mt-4 pt-3 border-t border-slate-100 space-y-1.5 text-xs text-slate-500">
+                      {member.email && (
+                        <div className="flex items-center space-x-2 truncate">
+                          <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                          <span className="truncate">{member.email}</span>
+                        </div>
+                      )}
+                      {member.phone && (
+                        <div className="flex items-center space-x-2">
+                          <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                          <span>{member.phone}</span>
+                        </div>
+                      )}
+                      {member.linkedin && (
+                        <div className="flex items-center space-x-2 truncate">
+                          <Linkedin className="w-3.5 h-3.5 text-[#0A66C2] shrink-0" />
+                          <a
+                            href={member.linkedin}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="truncate text-[#0A66C2] hover:underline"
+                            title={member.linkedin}
+                          >
+                            {member.linkedin.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//, '').replace(/\/$/, '') || 'LinkedIn Profile'}
+                          </a>
+                        </div>
+                      )}
                     </div>
                   </div>
 
-                  <div className="mt-4 pt-3 border-t border-slate-100 space-y-1.5 text-xs text-slate-500">
-                    {member.email && (
-                      <div className="flex items-center space-x-2 truncate">
-                        <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                        <span className="truncate">{member.email}</span>
-                      </div>
-                    )}
-                    {member.phone && (
-                      <div className="flex items-center space-x-2">
-                        <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                        <span>{member.phone}</span>
-                      </div>
-                    )}
-                    {member.linkedin && (
-                      <div className="flex items-center space-x-2 truncate">
-                        <Linkedin className="w-3.5 h-3.5 text-[#0A66C2] shrink-0" />
-                        <a
-                          href={member.linkedin}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="truncate text-[#0A66C2] hover:underline"
-                          title={member.linkedin}
-                        >
-                          {member.linkedin.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//, '').replace(/\/$/, '') || 'LinkedIn Profile'}
-                        </a>
-                      </div>
-                    )}
+                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+                    <button
+                      onClick={() => handleOpenEdit(member)}
+                      className="text-xs font-semibold text-slate-600 hover:text-[#111827] flex items-center space-x-1"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                      <span>Edit Profile</span>
+                    </button>
+                    <button
+                      onClick={() => handleDeleteMember(member)}
+                      className="text-xs font-semibold text-rose-500 hover:text-rose-700 flex items-center space-x-1"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Remove</span>
+                    </button>
                   </div>
                 </div>
+              ))}
+            </div>
 
-                <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-                  <button
-                    onClick={() => handleOpenEdit(member)}
-                    className="text-xs font-semibold text-slate-600 hover:text-[#111827] flex items-center space-x-1"
-                  >
-                    <Edit2 className="w-3.5 h-3.5" />
-                    <span>Edit Profile</span>
-                  </button>
-                  <button
-                    onClick={() => handleDeleteMember(member)}
-                    className="text-xs font-semibold text-rose-500 hover:text-rose-700 flex items-center space-x-1"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    <span>Remove</span>
-                  </button>
-                </div>
+            {/* Pagination Controls Footer matching screenshot */}
+            <div className="bg-white rounded-2xl border border-slate-100 shadow-2xs p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+              <div>
+                Showing {filteredTeam.length === 0 ? 0 : (currentPage - 1) * pageSize + 1}–
+                {Math.min(currentPage * pageSize, filteredTeam.length)} of {filteredTeam.length} specialists
               </div>
-            ))}
-          </div>
+
+              <div className="flex items-center space-x-1">
+                <button
+                  disabled={currentPage <= 1}
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-slate-600"
+                  title="Previous page"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                </button>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`w-7 h-7 rounded-lg text-xs font-semibold transition-all ${
+                      currentPage === page
+                        ? 'bg-[#0E1726] text-white shadow-2xs'
+                        : 'border border-slate-200 hover:bg-slate-50 text-slate-700'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+
+                <button
+                  disabled={currentPage >= totalPages}
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-slate-600"
+                  title="Next page"
+                >
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          </>
         )}
       </div>
 

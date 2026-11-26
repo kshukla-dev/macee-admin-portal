@@ -26,6 +26,8 @@ import {
   X,
   ExternalLink,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Layers,
   Info,
   Calendar,
@@ -92,6 +94,8 @@ export default function BlogManagementPage() {
   const [activeTab, setActiveTab] = useState<'all' | 'published' | 'draft'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const pageSize = 10;
 
   // Modal & Form State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -174,7 +178,15 @@ export default function BlogManagementPage() {
     }
 
     setFilteredBlogs(result);
+    setCurrentPage(1);
   }, [blogs, activeTab, selectedCategory, searchQuery]);
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredBlogs.length / pageSize) || 1;
+  const paginatedBlogs = filteredBlogs.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
 
   // Helper to generate slug from title (Max 120 chars)
   const generateSlug = (text: string) => {
@@ -571,14 +583,14 @@ export default function BlogManagementPage() {
                   Array.from({ length: 4 }).map((_, i) => (
                     <SkeletonTableRow key={i} cols={5} />
                   ))
-                ) : filteredBlogs.length === 0 ? (
+                ) : paginatedBlogs.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="py-12 text-center text-slate-400">
                       No articles found matching criteria.
                     </td>
                   </tr>
                 ) : (
-                  filteredBlogs.map((blog) => {
+                  paginatedBlogs.map((blog) => {
                     const postCategories =
                       blog.categories && blog.categories.length > 0
                         ? blog.categories
@@ -691,6 +703,48 @@ export default function BlogManagementPage() {
                 )}
               </tbody>
             </table>
+          </div>
+
+          {/* Table Footer: Pagination matching screenshot */}
+          <div className="p-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+            <div>
+              Showing {filteredBlogs.length === 0 ? 0 : (currentPage - 1) * pageSize + 1}–
+              {Math.min(currentPage * pageSize, filteredBlogs.length)} of {filteredBlogs.length} articles
+            </div>
+
+            <div className="flex items-center space-x-1">
+              <button
+                disabled={currentPage <= 1}
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-slate-600"
+                title="Previous page"
+              >
+                <ChevronLeft className="w-3.5 h-3.5" />
+              </button>
+
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`w-7 h-7 rounded-lg text-xs font-semibold transition-all ${
+                    currentPage === page
+                      ? 'bg-[#0E1726] text-white shadow-2xs'
+                      : 'border border-slate-200 hover:bg-slate-50 text-slate-700'
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+
+              <button
+                disabled={currentPage >= totalPages}
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-slate-600"
+                title="Next page"
+              >
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
         </div>
       </div>

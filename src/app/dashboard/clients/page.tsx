@@ -16,6 +16,8 @@ import {
   Sparkles,
   Quote,
   Star,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 
 export interface TestimonialItem {
@@ -34,6 +36,8 @@ export default function TestimonialsManagementPage() {
   const [saving, setSaving] = useState(false);
   const [syncAlert, setSyncAlert] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const pageSize = 10;
 
   // Modal State
   const [modalOpen, setModalOpen] = useState(false);
@@ -93,6 +97,18 @@ export default function TestimonialsManagementPage() {
       return matchTitle || matchText || matchTag;
     });
   }, [testimonialsList, searchQuery]);
+
+  // Reset page when search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredItems.length / pageSize) || 1;
+  const paginatedTestimonials = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredItems.slice(start, start + pageSize);
+  }, [filteredItems, currentPage, pageSize]);
 
   const featuredCount = useMemo(() => {
     return testimonialsList.filter((i) => i.accent).length;
@@ -294,92 +310,137 @@ export default function TestimonialsManagementPage() {
             {searchQuery ? 'No testimonials match your search.' : 'No testimonials added yet.'}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {filteredItems.map((item, idx) => {
-              const imgSrc = typeof item.image === 'string' ? item.image : (item.image as any)?.src;
-              return (
-                <div
-                  key={item.id || idx}
-                  className={`bg-white rounded-2xl p-6 border shadow-2xs transition-all relative flex flex-col justify-between ${
-                    item.accent
-                      ? 'border-[#E30613]/50 ring-1 ring-[#E30613]/20'
-                      : 'border-slate-100'
-                  }`}
-                >
-                  <div>
-                    {/* Top Header: Logo, Tag & Action Buttons */}
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-center space-x-3 min-w-0">
-                        {imgSrc ? (
-                          <div className="h-12 w-20 bg-slate-50 border border-slate-200/80 rounded-xl p-1.5 flex items-center justify-center shrink-0 shadow-2xs overflow-hidden">
-                            <img
-                              src={imgSrc}
-                              alt={item.title}
-                              className="max-h-full max-w-full object-contain"
-                              onError={(e) => {
-                                e.currentTarget.onerror = null;
-                                e.currentTarget.src = '/uploads/favicon-96x96.png';
-                              }}
-                            />
-                          </div>
-                        ) : (
-                          <div className="h-12 w-12 bg-slate-100 border border-slate-200 rounded-xl flex items-center justify-center shrink-0 text-slate-400">
-                            <Quote className="w-5 h-5 text-slate-400" />
-                          </div>
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {paginatedTestimonials.map((item, idx) => {
+                const realIndex = (currentPage - 1) * pageSize + idx;
+                const imgSrc = typeof item.image === 'string' ? item.image : (item.image as any)?.src;
+                return (
+                  <div
+                    key={item.id || realIndex}
+                    className={`bg-white rounded-2xl p-6 border shadow-2xs transition-all relative flex flex-col justify-between ${
+                      item.accent
+                        ? 'border-[#E30613]/50 ring-1 ring-[#E30613]/20'
+                        : 'border-slate-100'
+                    }`}
+                  >
+                    <div>
+                      {/* Top Header: Logo, Tag & Action Buttons */}
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-center space-x-3 min-w-0">
+                          {imgSrc ? (
+                            <div className="h-12 w-20 bg-slate-50 border border-slate-200/80 rounded-xl p-1.5 flex items-center justify-center shrink-0 shadow-2xs overflow-hidden">
+                              <img
+                                src={imgSrc}
+                                alt={item.title}
+                                className="max-h-full max-w-full object-contain"
+                                onError={(e) => {
+                                  e.currentTarget.onerror = null;
+                                  e.currentTarget.src = '/uploads/favicon-96x96.png';
+                                }}
+                              />
+                            </div>
+                          ) : (
+                            <div className="h-12 w-12 bg-slate-100 border border-slate-200 rounded-xl flex items-center justify-center shrink-0 text-slate-400">
+                              <Quote className="w-5 h-5 text-slate-400" />
+                            </div>
+                          )}
+                          <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-[#F0F3FA] text-[#36427D] truncate">
+                            {item.tag || 'Testimonial'}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center space-x-1 shrink-0">
+                          <button
+                            onClick={() => handleOpenEdit(realIndex)}
+                            className="p-1.5 rounded-lg text-slate-500 hover:text-[#111827] hover:bg-slate-100 transition-colors"
+                            title="Edit Testimonial"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteItem(realIndex)}
+                            className="p-1.5 rounded-lg text-rose-500 hover:text-rose-700 hover:bg-rose-50 transition-colors"
+                            title="Delete Testimonial"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Client / Title */}
+                      <h4 className="text-base font-bold text-[#111827] mt-3.5 font-sans flex items-center gap-1.5">
+                        <span>{item.title}</span>
+                        {item.accent && (
+                          <span className="text-[10px] font-semibold text-[#E30613] bg-rose-50 px-2 py-0.5 rounded-md shrink-0">
+                            Featured
+                          </span>
                         )}
-                        <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-[#F0F3FA] text-[#36427D] truncate">
-                          {item.tag || 'Testimonial'}
-                        </span>
-                      </div>
+                      </h4>
 
-                      <div className="flex items-center space-x-1 shrink-0">
-                        <button
-                          onClick={() => handleOpenEdit(idx)}
-                          className="p-1.5 rounded-lg text-slate-500 hover:text-[#111827] hover:bg-slate-100 transition-colors"
-                          title="Edit Testimonial"
-                        >
-                          <Edit2 className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteItem(idx)}
-                          className="p-1.5 rounded-lg text-rose-500 hover:text-rose-700 hover:bg-rose-50 transition-colors"
-                          title="Delete Testimonial"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
+                      {/* Testimonial Quote */}
+                      <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+                        "{item.text}"
+                      </p>
                     </div>
 
-                    {/* Client / Title */}
-                    <h4 className="text-base font-bold text-[#111827] mt-3.5 font-sans flex items-center gap-1.5">
-                      <span>{item.title}</span>
-                      {item.accent && (
-                        <span className="text-[10px] font-semibold text-[#E30613] bg-rose-50 px-2 py-0.5 rounded-md shrink-0">
-                          Featured
+                    {imgSrc && (
+                      <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+                        <span className="truncate max-w-[260px] font-mono text-[10px] text-slate-500">
+                          {imgSrc}
                         </span>
-                      )}
-                    </h4>
-
-                    {/* Testimonial Quote */}
-                    <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                      "{item.text}"
-                    </p>
+                        <span className="text-emerald-600 font-semibold text-[10px]">
+                          ✓ Image Attached
+                        </span>
+                      </div>
+                    )}
                   </div>
+                );
+              })}
+            </div>
 
-                  {imgSrc && (
-                    <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
-                      <span className="truncate max-w-[260px] font-mono text-[10px] text-slate-500">
-                        {imgSrc}
-                      </span>
-                      <span className="text-emerald-600 font-semibold text-[10px]">
-                        ✓ Image Attached
-                      </span>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+            {/* Pagination Controls Footer matching screenshot */}
+            <div className="bg-white rounded-2xl border border-slate-100 shadow-2xs p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+              <div>
+                Showing {filteredItems.length === 0 ? 0 : (currentPage - 1) * pageSize + 1}–
+                {Math.min(currentPage * pageSize, filteredItems.length)} of {filteredItems.length} testimonials
+              </div>
+
+              <div className="flex items-center space-x-1">
+                <button
+                  disabled={currentPage <= 1}
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-slate-600"
+                  title="Previous page"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                </button>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`w-7 h-7 rounded-lg text-xs font-semibold transition-all ${
+                      currentPage === page
+                        ? 'bg-[#0E1726] text-white shadow-2xs'
+                        : 'border border-slate-200 hover:bg-slate-50 text-slate-700'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+
+                <button
+                  disabled={currentPage >= totalPages}
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-slate-600"
+                  title="Next page"
+                >
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          </>
         )}
 
         {/* =================================================================

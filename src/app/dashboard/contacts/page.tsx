@@ -652,27 +652,29 @@ export default function ContactsManagementPage() {
           {/* Table Footer: Pagination matching screenshot */}
           <div className="p-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
             <div>
-              Showing {filteredContacts.length === 0 ? 0 : 1}–
-              {Math.min(filteredContacts.length, pageSize)} of {filteredContacts.length} leads
+              Showing {filteredContacts.length === 0 ? 0 : (currentPage - 1) * pageSize + 1}–
+              {Math.min(currentPage * pageSize, filteredContacts.length)} of {filteredContacts.length} leads
             </div>
 
             <div className="flex items-center space-x-1">
               <button
                 disabled={currentPage <= 1}
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-slate-600"
+                title="Previous page"
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
               </button>
 
-              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => i + 1).map((page) => (
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`w-7 h-7 rounded-lg text-xs font-semibold transition-all ${currentPage === page
-                    ? 'bg-[#0E1726] text-white shadow-2xs'
-                    : 'border border-slate-200 hover:bg-slate-50 text-slate-700'
-                    }`}
+                  className={`w-7 h-7 rounded-lg text-xs font-semibold transition-all ${
+                    currentPage === page
+                      ? 'bg-[#0E1726] text-white shadow-2xs'
+                      : 'border border-slate-200 hover:bg-slate-50 text-slate-700'
+                  }`}
                 >
                   {page}
                 </button>
@@ -681,7 +683,8 @@ export default function ContactsManagementPage() {
               <button
                 disabled={currentPage >= totalPages}
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-slate-600"
+                title="Next page"
               >
                 <ChevronRight className="w-3.5 h-3.5" />
               </button>
