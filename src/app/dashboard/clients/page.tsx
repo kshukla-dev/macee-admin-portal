@@ -37,7 +37,7 @@ export default function TestimonialsManagementPage() {
   const [syncAlert, setSyncAlert] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const pageSize = 10;
+  const pageSize = 4;
 
   // Modal State
   const [modalOpen, setModalOpen] = useState(false);
@@ -178,7 +178,8 @@ export default function TestimonialsManagementPage() {
     if (editingIndex !== null) {
       updatedList[editingIndex] = newItem;
     } else {
-      updatedList.push(newItem);
+      // Place newly added testimonial directly at the top
+      updatedList.unshift(newItem);
     }
 
     const updatedData = { ...clientsData, certifications: updatedList };

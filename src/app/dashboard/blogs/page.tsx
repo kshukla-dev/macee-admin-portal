@@ -28,6 +28,7 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  MoreVertical,
   Layers,
   Info,
   Calendar,
@@ -101,6 +102,7 @@ export default function BlogManagementPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [previewBlog, setPreviewBlog] = useState<BlogPost | null>(null);
   const [editingBlog, setEditingBlog] = useState<BlogPost | null>(null);
+  const [activeActionMenuId, setActiveActionMenuId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [syncAlert, setSyncAlert] = useState(false);
 
@@ -671,31 +673,55 @@ export default function BlogManagementPage() {
                           )}
                         </td>
 
-                        {/* Actions */}
-                        <td className="py-3.5 px-4 text-right whitespace-nowrap">
-                          <div className="flex items-center justify-end space-x-1.5">
-                            <button
-                              onClick={() => setPreviewBlog(blog)}
-                              className="p-1.5 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-colors"
-                              title="Preview Article details"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => handleOpenEdit(blog)}
-                              className="p-1.5 rounded-lg text-slate-500 hover:text-[#111827] hover:bg-slate-100 transition-colors"
-                              title="Edit article"
-                            >
-                              <Edit2 className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteBlog(blog)}
-                              className="p-1.5 rounded-lg text-rose-500 hover:text-rose-700 hover:bg-rose-50 transition-colors"
-                              title="Delete article"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
+                        {/* Actions: 3-dot dropdown menu */}
+                        <td className="py-3.5 px-4 text-right relative whitespace-nowrap">
+                          <button
+                            onClick={() =>
+                              setActiveActionMenuId(
+                                activeActionMenuId === blog.id ? null : blog.id
+                              )
+                            }
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors"
+                            title="Article Actions"
+                          >
+                            <MoreVertical className="w-4 h-4" />
+                          </button>
+
+                          {activeActionMenuId === blog.id && (
+                            <div className="absolute right-4 mt-1 w-44 bg-white rounded-xl shadow-lg border border-slate-100 py-1.5 z-40 text-left animate-fadeIn">
+                              <button
+                                onClick={() => {
+                                  setPreviewBlog(blog);
+                                  setActiveActionMenuId(null);
+                                }}
+                                className="w-full px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center space-x-2"
+                              >
+                                <Eye className="w-3.5 h-3.5 text-blue-500" />
+                                <span>Preview Article</span>
+                              </button>
+                              <button
+                                onClick={() => {
+                                  handleOpenEdit(blog);
+                                  setActiveActionMenuId(null);
+                                }}
+                                className="w-full px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center space-x-2"
+                              >
+                                <Edit2 className="w-3.5 h-3.5 text-slate-500" />
+                                <span>Edit Article</span>
+                              </button>
+                              <div className="border-t border-slate-100 my-1" />
+                              <button
+                                onClick={() => {
+                                  handleDeleteBlog(blog);
+                                  setActiveActionMenuId(null);
+                                }}
+                                className="w-full px-3 py-2 text-xs text-rose-600 hover:bg-rose-50 flex items-center space-x-2"
+                              >
+                                <Trash2 className="w-3.5 h-3.5 text-rose-500" />
+                                <span>Delete Article</span>
+                              </button>
+                            </div>
+                          )}
                         </td>
                       </tr>
                     );

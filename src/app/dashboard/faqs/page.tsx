@@ -758,30 +758,6 @@ export default function FaqManagementPage() {
                               </div>
                             </div>
                           </div>
-
-                          {/* Export & Routing Info Footer */}
-                          <div className="flex flex-wrap items-center justify-between text-[11px] text-slate-500 pt-2 border-t border-slate-100">
-                            <div className="flex items-center space-x-3">
-                              <span>
-                                Page: <strong className="text-slate-800">{item.pageName}</strong>
-                              </span>
-                              <span className="text-slate-300">/</span>
-                              <span>
-                                Route: <strong className="text-slate-800">{pageMeta.route}</strong>
-                              </span>
-                              <span className="text-slate-300">/</span>
-                              <span>
-                                Constant: <strong className="text-slate-800 font-mono">{pageMeta.constName}</strong>
-                              </span>
-                            </div>
-
-                            <button
-                              onClick={() => handleOpenEdit(item)}
-                              className="text-xs font-semibold text-[#E30613] hover:underline"
-                            >
-                              Edit this question & translations →
-                            </button>
-                          </div>
                         </div>
                       )}
                     </div>

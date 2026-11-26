@@ -47,7 +47,7 @@ export default function TeamManagementPage() {
   const [syncedAlert, setSyncedAlert] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const pageSize = 10;
+  const pageSize = 6;
 
   // Form state
   const [name, setName] = useState('');

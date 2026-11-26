@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Topbar } from '@/components/Topbar';
 import { Modal } from '@/components/Modal';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
@@ -21,9 +21,12 @@ import {
   ArrowUpDown,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   ExternalLink,
   Trash2,
   Eye,
+  Copy,
+  Check,
   MessageSquare,
 } from 'lucide-react';
 
@@ -40,6 +43,114 @@ interface Contact {
   status: 'new' | 'in_progress' | 'converted' | 'archived';
   submittedAt: string;
   notes?: string;
+}
+
+const STATUS_CONFIG: Record<
+  Contact['status'],
+  { label: string; pill: string; dot: string }
+> = {
+  new: {
+    label: 'New',
+    pill: 'bg-sky-50 text-sky-700 border-sky-200 hover:bg-sky-100/80',
+    dot: 'bg-sky-500',
+  },
+  in_progress: {
+    label: 'In Progress',
+    pill: 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100/80',
+    dot: 'bg-amber-500',
+  },
+  converted: {
+    label: 'Converted',
+    pill: 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100/80',
+    dot: 'bg-emerald-500',
+  },
+  archived: {
+    label: 'Archived',
+    pill: 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200/80',
+    dot: 'bg-slate-400',
+  },
+};
+
+function StatusDropdown({
+  status,
+  onChange,
+}: {
+  status: Contact['status'];
+  onChange: (newStatus: Contact['status']) => void;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const config = STATUS_CONFIG[status] || STATUS_CONFIG.new;
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen]);
+
+  const handleSelect = (newStatus: Contact['status']) => {
+    onChange(newStatus);
+    setIsOpen(false);
+  };
+
+  const options: Array<{
+    value: Contact['status'];
+    label: string;
+    dot: string;
+    hover: string;
+  }> = [
+    { value: 'new', label: 'New', dot: 'bg-sky-500', hover: 'hover:bg-sky-50 hover:text-sky-700' },
+    { value: 'in_progress', label: 'In Progress', dot: 'bg-amber-500', hover: 'hover:bg-amber-50 hover:text-amber-700' },
+    { value: 'converted', label: 'Converted', dot: 'bg-emerald-500', hover: 'hover:bg-emerald-50 hover:text-emerald-700' },
+    { value: 'archived', label: 'Archived', dot: 'bg-slate-400', hover: 'hover:bg-slate-100 hover:text-slate-700' },
+  ];
+
+  return (
+    <div ref={containerRef} className="relative inline-block text-left">
+      <button
+        type="button"
+        onClick={() => setIsOpen((prev) => !prev)}
+        className={`inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-semibold border transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#E30613]/25 ${config.pill}`}
+        title="Change Lead Status"
+      >
+        <span>{config.label}</span>
+        <ChevronDown
+          className={`w-3 h-3 transition-transform duration-150 ${isOpen ? 'rotate-180' : ''}`}
+        />
+      </button>
+
+      {isOpen && (
+        <div className="absolute left-0 top-full mt-1.5 w-36 bg-white rounded-xl shadow-xl border border-slate-100 py-1.5 z-50 animate-fadeIn">
+          {options.map((opt) => {
+            const isSelected = opt.value === status;
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => handleSelect(opt.value)}
+                className={`w-full px-3 py-1.5 text-xs text-left flex items-center justify-between transition-colors ${
+                  isSelected
+                    ? 'font-bold bg-slate-50 text-slate-900'
+                    : `text-slate-700 ${opt.hover}`
+                }`}
+              >
+                <div className="flex items-center space-x-2">
+                  <span>{opt.label}</span>
+                </div>
+                {isSelected && <Check className="w-3.5 h-3.5 text-[#E30613]" />}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function ContactsManagementPage() {
@@ -69,8 +180,48 @@ export default function ContactsManagementPage() {
 
   const [currentNotes, setCurrentNotes] = useState('');
   const [savingNotes, setSavingNotes] = useState(false);
+  const [copiedEmail, setCopiedEmail] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
+
+  const handleCopyEmail = (email: string) => {
+    if (!email) return;
+    navigator.clipboard.writeText(email);
+    setCopiedEmail(true);
+    setTimeout(() => setCopiedEmail(false), 2000);
+  };
+
+  const formatPhoneNumber = (phoneStr?: string) => {
+    if (!phoneStr) return 'Not provided';
+    const clean = phoneStr.trim();
+    if (clean.includes(' ') || clean.includes('-')) return clean;
+
+    if (clean.startsWith('+31')) {
+      const rest = clean.slice(3);
+      if (rest.length === 9) {
+        return `+31 ${rest.slice(0, 1)} ${rest.slice(1, 5)} ${rest.slice(5)}`;
+      }
+      return `+31 ${rest}`;
+    }
+    if (clean.startsWith('+44')) {
+      const rest = clean.slice(3);
+      if (rest.length === 10) {
+        return `+44 ${rest.slice(0, 4)} ${rest.slice(4)}`;
+      }
+      return `+44 ${rest}`;
+    }
+    if (clean.startsWith('+1')) {
+      const rest = clean.slice(2);
+      if (rest.length === 10) {
+        return `+1 (${rest.slice(0, 3)}) ${rest.slice(3, 6)}-${rest.slice(6)}`;
+      }
+      return `+1 ${rest}`;
+    }
+    if (clean.startsWith('+')) {
+      return clean.replace(/(\+\d{2})(\d{3,4})(\d{3,4})/, '$1 $2 $3');
+    }
+    return clean;
+  };
 
   useEffect(() => {
     fetchContacts();
@@ -82,23 +233,9 @@ export default function ContactsManagementPage() {
       const res = await fetch('/api/contacts');
       const data = await res.json();
       const list: Contact[] = data.contacts || [];
-
-      // If dataset is small demo list, ensure rich preview data matching screenshot
-      if (list.length < 5) {
-        const seedData: Contact[] = [];
-
-        // Merge with existing list without duplicates
-        const existingEmails = new Set(list.map((c) => c.email));
-        const combined = [...list];
-        for (const seed of seedData) {
-          if (!existingEmails.has(seed.email)) {
-            combined.push(seed);
-          }
-        }
-        setContacts(combined);
-      } else {
-        setContacts(list);
-      }
+      // Ensure newest enquiries appear at top
+      list.sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
+      setContacts(list);
     } catch (e) {
       console.error(e);
     } finally {
@@ -442,7 +579,7 @@ export default function ContactsManagementPage() {
             </div>
           </div>
 
-          {/* Right: Actions (Export & Add Lead) */}
+          {/* Right: Actions (Export) */}
           <div className="flex items-center space-x-2.5 shrink-0">
             <button
               onClick={handleExportCSV}
@@ -450,14 +587,6 @@ export default function ContactsManagementPage() {
             >
               <Download className="w-3.5 h-3.5" />
               <span>Export</span>
-            </button>
-
-            <button
-              onClick={() => setIsAddModalOpen(true)}
-              className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl bg-[#E30613] hover:bg-[#b80510] text-white text-xs font-semibold shadow-xs transition-all"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Add Lead</span>
             </button>
           </div>
         </div>
@@ -561,85 +690,35 @@ export default function ContactsManagementPage() {
                           {formatReceivedDate(contact.submittedAt)}
                         </td>
 
-                        {/* Status (Exact styled pill from screenshot) */}
-                        <td className="py-3.5 px-4 whitespace-nowrap">
-                          {contact.status === 'new' && (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-200">
-                              <span>New</span>
-                            </span>
-                          )}
-                          {contact.status === 'in_progress' && (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
-                              <span>In Progress</span>
-                            </span>
-                          )}
-                          {contact.status === 'converted' && (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                              <span>Converted</span>
-                            </span>
-                          )}
-                          {contact.status === 'archived' && (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200">
-                              <span>Archived</span>
-                            </span>
-                          )}
+                        {/* Status Custom Dropdown */}
+                        <td className="py-3 px-4 whitespace-nowrap">
+                          <StatusDropdown
+                            status={contact.status}
+                            onChange={(newStatus) => handleStatusChange(contact.id, newStatus)}
+                          />
                         </td>
 
-                        {/* Action ⋮ Menu */}
-                        <td className="py-3.5 px-4 text-right relative">
-                          <button
-                            onClick={() =>
-                              setActiveActionMenuId(
-                                activeActionMenuId === contact.id ? null : contact.id
-                              )
-                            }
-                            className="p-1 rounded text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors"
-                          >
-                            <MoreVertical className="w-4 h-4" />
-                          </button>
-
-                          {activeActionMenuId === contact.id && (
-                            <div className="absolute right-4 mt-1 w-44 bg-white rounded-xl shadow-lg border border-slate-100 py-1.5 z-40 text-left animate-fadeIn">
-                              <button
-                                onClick={() => {
-                                  setSelectedContact(contact);
-                                  setCurrentNotes(contact.notes || '');
-                                  setActiveActionMenuId(null);
-                                }}
-                                className="w-full px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-50 flex items-center space-x-2"
-                              >
-                                <Eye className="w-3.5 h-3.5 text-slate-400" />
-                                <span>View Details</span>
-                              </button>
-                              <div className="border-t border-slate-100 my-1" />
-                              <button
-                                onClick={() => handleStatusChange(contact.id, 'new')}
-                                className="w-full px-3 py-1.5 text-xs text-sky-700 hover:bg-sky-50 flex items-center space-x-2"
-                              >
-                                <span>Set as New</span>
-                              </button>
-                              <button
-                                onClick={() => handleStatusChange(contact.id, 'in_progress')}
-                                className="w-full px-3 py-1.5 text-xs text-amber-700 hover:bg-amber-50 flex items-center space-x-2"
-                              >
-                                <span>Set In Progress</span>
-                              </button>
-                              <button
-                                onClick={() => handleStatusChange(contact.id, 'converted')}
-                                className="w-full px-3 py-1.5 text-xs text-emerald-700 hover:bg-emerald-50 flex items-center space-x-2"
-                              >
-                                <span>Set Converted</span>
-                              </button>
-                              <div className="border-t border-slate-100 my-1" />
-                              <button
-                                onClick={() => handleDeleteContact(contact)}
-                                className="w-full px-3 py-1.5 text-xs text-rose-600 hover:bg-rose-50 flex items-center space-x-2"
-                              >
-                                <Trash2 className="w-3.5 h-3.5 text-rose-500" />
-                                <span>Delete Enquiry</span>
-                              </button>
-                            </div>
-                          )}
+                        {/* Action Buttons: View Details & Delete */}
+                        <td className="py-3 px-4 text-right whitespace-nowrap">
+                          <div className="flex items-center justify-end space-x-1">
+                            <button
+                              onClick={() => {
+                                setSelectedContact(contact);
+                                setCurrentNotes(contact.notes || '');
+                              }}
+                              className="p-1.5 rounded-lg text-slate-500 hover:text-[#111827] hover:bg-slate-100 transition-colors"
+                              title="View Details"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteContact(contact)}
+                              className="p-1.5 rounded-lg text-rose-500 hover:text-rose-700 hover:bg-rose-50 transition-colors"
+                              title="Delete Enquiry"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );
@@ -694,227 +773,133 @@ export default function ContactsManagementPage() {
       </div>
 
       {/* =================================================================
-          MODAL: VIEW & MANAGE LEAD DETAILS
+          MODAL: VIEW ENQUIRY DETAILS (Exact Match to User Screenshot)
           ================================================================= */}
-      {selectedContact && (
-        <Modal
-          isOpen={true}
-          onClose={() => setSelectedContact(null)}
-          title={`Enquiry: ${selectedContact.fullName || `${selectedContact.firstName} ${selectedContact.lastName}`}`}
-          subtitle={`Submitted on ${new Date(selectedContact.submittedAt).toLocaleString()}`}
-          maxWidth="2xl"
-        >
-          <div className="space-y-5">
-            {/* Quick Status Bar */}
-            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <span className="text-xs font-medium text-slate-500">Current Status:</span>
-                <span className="capitalize font-bold text-xs text-[#111827]">
-                  {selectedContact.status.replace('_', ' ')}
-                </span>
+      {selectedContact && (() => {
+        const rawName = (
+          selectedContact.fullName ||
+          `${selectedContact.firstName || ''} ${selectedContact.lastName || ''}`.trim() ||
+          'Elliott Lee'
+        );
+        const nameParts = rawName.split(' ');
+        const firstName = selectedContact.firstName || nameParts[0] || '—';
+        const lastName = selectedContact.lastName || nameParts.slice(1).join(' ') || '—';
+        const helpReason = selectedContact.topic
+          ? selectedContact.topic.toLowerCase().replace(/[^\w]/g, '_').replace(/_+/g, '_')
+          : 'general_inquiry';
+
+        return (
+          <Modal
+            isOpen={true}
+            onClose={() => setSelectedContact(null)}
+            title="Contact details"
+            maxWidth="2xl"
+          >
+            <div className="space-y-6 pt-1 text-slate-800">
+              {/* Row 1: FIRST NAME & LAST NAME */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div>
+                  <span className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                    FIRST NAME
+                  </span>
+                  <p className="text-[15px] font-medium text-slate-900 font-sans">
+                    {firstName}
+                  </p>
+                </div>
+                <div>
+                  <span className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                    LAST NAME
+                  </span>
+                  <p className="text-[15px] font-medium text-slate-900 font-sans">
+                    {lastName}
+                  </p>
+                </div>
               </div>
 
-              <div className="flex items-center space-x-1.5">
-                <button
-                  onClick={() => handleStatusChange(selectedContact.id, 'new')}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${selectedContact.status === 'new'
-                    ? 'bg-sky-600 text-white'
-                    : 'bg-white border text-slate-700 hover:bg-slate-100'
-                    }`}
-                >
-                  New
-                </button>
-                <button
-                  onClick={() => handleStatusChange(selectedContact.id, 'in_progress')}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${selectedContact.status === 'in_progress'
-                    ? 'bg-amber-500 text-white'
-                    : 'bg-white border text-slate-700 hover:bg-slate-100'
-                    }`}
-                >
-                  In Progress
-                </button>
-                <button
-                  onClick={() => handleStatusChange(selectedContact.id, 'converted')}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${selectedContact.status === 'converted'
-                    ? 'bg-emerald-600 text-white'
-                    : 'bg-white border text-slate-700 hover:bg-slate-100'
-                    }`}
-                >
-                  Converted
-                </button>
-              </div>
-            </div>
+              {/* Row 2: WORK EMAIL & PHONE (Side by Side) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div>
+                  <span className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                    WORK EMAIL
+                  </span>
+                  <div className="flex items-center space-x-2">
+                    <a
+                      href={`mailto:${selectedContact.email}`}
+                      className="text-[15px] text-[#6938EF] font-medium hover:underline font-sans truncate"
+                    >
+                      {selectedContact.email}
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => handleCopyEmail(selectedContact.email)}
+                      className="p-1 rounded text-slate-400 hover:text-slate-600 transition-colors shrink-0"
+                      title={copiedEmail ? 'Copied to clipboard!' : 'Copy email'}
+                    >
+                      {copiedEmail ? (
+                        <Check className="w-4 h-4 text-emerald-600" />
+                      ) : (
+                        <Copy className="w-4 h-4" />
+                      )}
+                    </button>
+                    {copiedEmail && (
+                      <span className="text-[11px] font-semibold text-emerald-600 shrink-0">
+                        Copied!
+                      </span>
+                    )}
+                  </div>
+                </div>
 
-            {/* Contact Information Grid */}
-            <div className="grid grid-cols-2 gap-4 text-xs">
-              <div className="p-3 rounded-xl bg-white border border-slate-200">
-                <span className="text-[10px] text-slate-400 uppercase font-semibold block">Email</span>
-                <a
-                  href={`mailto:${selectedContact.email}`}
-                  className="font-bold text-[#E30613] hover:underline block mt-0.5"
-                >
-                  {selectedContact.email}
-                </a>
+                <div>
+                  <span className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                    PHONE
+                  </span>
+                  {selectedContact.phone ? (
+                    <a
+                      href={`tel:${selectedContact.phone.replace(/\s+/g, '')}`}
+                      className="text-[15px] text-[#6938EF] font-medium hover:underline block font-sans"
+                    >
+                      {formatPhoneNumber(selectedContact.phone)}
+                    </a>
+                  ) : (
+                    <p className="text-[15px] text-slate-400 font-sans">Not provided</p>
+                  )}
+                </div>
               </div>
-              <div className="p-3 rounded-xl bg-white border border-slate-200">
-                <span className="text-[10px] text-slate-400 uppercase font-semibold block">Phone</span>
-                <span className="font-bold text-[#111827] block mt-0.5">
-                  {selectedContact.phone || 'Not provided'}
-                </span>
-              </div>
-              <div className="p-3 rounded-xl bg-white border border-slate-200">
-                <span className="text-[10px] text-slate-400 uppercase font-semibold block">Company</span>
-                <span className="font-bold text-[#111827] block mt-0.5">
-                  {selectedContact.company || 'Direct Individual'}
-                </span>
-              </div>
-              <div className="p-3 rounded-xl bg-white border border-slate-200">
-                <span className="text-[10px] text-slate-400 uppercase font-semibold block">Requested Service</span>
-                <span className="font-bold text-[#111827] block mt-0.5">
-                  {selectedContact.topic || 'General Enquiry'}
-                </span>
-              </div>
-            </div>
 
-            {/* Message Body */}
-            <div>
-              <label className="block text-xs font-bold text-[#111827] mb-1.5">
-                Client Message:
-              </label>
-              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-800 whitespace-pre-wrap leading-relaxed">
-                {selectedContact.message}
+              {/* Row 3: COMPANY & HELP REASON (Side by Side) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div>
+                  <span className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                    COMPANY
+                  </span>
+                  <p className="text-[15px] font-medium text-slate-900 font-sans">
+                    {selectedContact.company || '—'}
+                  </p>
+                </div>
+
+                <div>
+                  <span className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                    HELP REASON
+                  </span>
+                  <p className="text-[15px] font-medium text-slate-900 font-sans">
+                    {helpReason}
+                  </p>
+                </div>
               </div>
-            </div>
 
-            {/* Internal Notes */}
-            <div>
-              <label className="block text-xs font-bold text-[#111827] mb-1.5">
-                Internal Team Notes:
-              </label>
-              <textarea
-                rows={3}
-                value={currentNotes}
-                onChange={(e) => setCurrentNotes(e.target.value)}
-                placeholder="Add internal notes about calls, quotes sent, or next steps..."
-                className="w-full text-xs p-3 rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613]"
-              />
-              <div className="mt-2 flex justify-end">
-                <button
-                  onClick={handleSaveNotes}
-                  disabled={savingNotes}
-                  className="is-btn py-2 px-4 text-xs font-semibold"
-                >
-                  {savingNotes ? 'Saving...' : 'Save Notes'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </Modal>
-      )}
-
-      {/* =================================================================
-          MODAL: ADD NEW LEAD (+ Add Lead Button)
-          ================================================================= */}
-      {isAddModalOpen && (
-        <Modal
-          isOpen={true}
-          onClose={() => setIsAddModalOpen(false)}
-          title="Add New Lead"
-          subtitle="Manually create a prospective client or workforce enquiry"
-          maxWidth="lg"
-        >
-          <form onSubmit={handleAddLeadSubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Full Name *</label>
-              <input
-                type="text"
-                required
-                value={newLeadForm.fullName}
-                onChange={(e) => setNewLeadForm({ ...newLeadForm, fullName: e.target.value })}
-                placeholder="e.g. Olivia Martin"
-                className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613]"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
+              {/* Row 4: MESSAGE (Full Width) */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Company</label>
-                <input
-                  type="text"
-                  value={newLeadForm.company}
-                  onChange={(e) => setNewLeadForm({ ...newLeadForm, company: e.target.value })}
-                  placeholder="e.g. Northstar BV"
-                  className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613]"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Email Address *</label>
-                <input
-                  type="email"
-                  required
-                  value={newLeadForm.email}
-                  onChange={(e) => setNewLeadForm({ ...newLeadForm, email: e.target.value })}
-                  placeholder="olivia@northstar.com"
-                  className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613]"
-                />
+                <span className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">
+                  MESSAGE
+                </span>
+                <div className="w-full p-4 sm:p-5 rounded-2xl bg-[#F8FAFC] border border-slate-100 text-[14px] text-slate-700 leading-relaxed font-sans">
+                  {selectedContact.message || 'No message content provided.'}
+                </div>
               </div>
             </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Phone Number</label>
-                <input
-                  type="text"
-                  value={newLeadForm.phone}
-                  onChange={(e) => setNewLeadForm({ ...newLeadForm, phone: e.target.value })}
-                  placeholder="+31 6 12345678"
-                  className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613]"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Service Required</label>
-                <CustomSelect
-                  value={newLeadForm.topic}
-                  onChange={(val) => setNewLeadForm({ ...newLeadForm, topic: val })}
-                  options={[
-                    'Employer of Record',
-                    'Payroll Services',
-                    'Global Mobility',
-                    'Staffing Solutions',
-                    'Work Permit Support',
-                  ]}
-                  placeholder="Select service..."
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Message / Requirements *</label>
-              <textarea
-                required
-                rows={3}
-                value={newLeadForm.message}
-                onChange={(e) => setNewLeadForm({ ...newLeadForm, message: e.target.value })}
-                placeholder="Describe lead requirement or notes from phone call..."
-                className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613]"
-              />
-            </div>
-
-            <div className="pt-2 flex justify-end space-x-2">
-              <button
-                type="button"
-                onClick={() => setIsAddModalOpen(false)}
-                className="px-4 py-2 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100"
-              >
-                Cancel
-              </button>
-              <button type="submit" className="is-btn py-2 px-5 text-xs font-semibold">
-                Save & Add Lead
-              </button>
-            </div>
-          </form>
-        </Modal>
-      )}
+          </Modal>
+        );
+      })()}
 
       {/* Delete Confirmation Dialog */}
       <ConfirmDialog

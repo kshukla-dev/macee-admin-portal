@@ -40,10 +40,14 @@ export async function POST(request: Request) {
       linkedin: body.linkedin || '',
       desk: body.desk || 'Macee Desk',
       active: body.active !== undefined ? body.active : true,
-      order: body.order || team.length + 1,
+      order: 1,
     };
 
-    team.push(newMember);
+    // Place latest added member at the very top
+    team.unshift(newMember);
+    team.forEach((m, idx) => {
+      m.order = idx + 1;
+    });
     await saveStoredData('team', team);
 
     // Auto-sync with local Macee website if in local dev
