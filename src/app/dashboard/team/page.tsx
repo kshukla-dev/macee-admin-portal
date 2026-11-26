@@ -1,12 +1,10 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { Topbar } from '@/components/Topbar';
-import { Modal } from '@/components/Modal';
-import { ImagePicker } from '@/components/ImagePicker';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { SkeletonMemberCard } from '@/components/Skeleton';
-import { CustomSelect } from '@/components/CustomSelect';
 import {
   Users2,
   Plus,
@@ -14,12 +12,8 @@ import {
   Phone,
   Edit2,
   Trash2,
-  CheckCircle2,
-  ExternalLink,
   Search,
-  Filter,
   UserCheck,
-  Download,
   Linkedin,
   User,
   ChevronLeft,
@@ -42,23 +36,10 @@ interface TeamMember {
 export default function TeamManagementPage() {
   const [team, setTeam] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
   const [syncedAlert, setSyncedAlert] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const pageSize = 6;
-
-  // Form state
-  const [name, setName] = useState('');
-  const [role, setRole] = useState('');
-  const [image, setImage] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [linkedin, setLinkedin] = useState('');
-  const [desk, setDesk] = useState('');
-  const [order, setOrder] = useState<number>(1);
-  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     fetchTeam();
@@ -74,70 +55,6 @@ export default function TeamManagementPage() {
       console.error(e);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleOpenAdd = () => {
-    setEditingMember(null);
-    setName('');
-    setRole('');
-    setImage('');
-    setEmail('');
-    setPhone('');
-    setLinkedin('');
-    setDesk('Management');
-    setOrder(team.length + 1);
-    setIsModalOpen(true);
-  };
-
-  const handleOpenEdit = (member: TeamMember) => {
-    setEditingMember(member);
-    setName(member.name);
-    setRole(member.role);
-    setImage(member.image || '');
-    setEmail(member.email || '');
-    setPhone(member.phone || '');
-    setLinkedin(member.linkedin || '');
-    setDesk(member.desk || 'Staff');
-    setOrder(member.order || 1);
-    setIsModalOpen(true);
-  };
-
-  const handleSaveMember = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      setSaving(true);
-      const payload = {
-        id: editingMember ? editingMember.id : undefined,
-        name,
-        role,
-        image,
-        email,
-        phone,
-        linkedin,
-        desk,
-        order: Number(order),
-        active: true,
-      };
-
-      const method = editingMember ? 'PUT' : 'POST';
-      const res = await fetch('/api/team', {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await res.json();
-      if (data.success) {
-        setIsModalOpen(false);
-        fetchTeam();
-        setSyncedAlert(true);
-        setTimeout(() => setSyncedAlert(false), 3000);
-      }
-    } catch (e) {
-      alert('Failed to save team member');
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -274,13 +191,13 @@ export default function TeamManagementPage() {
             />
           </div>
 
-          <button
-            onClick={handleOpenAdd}
+          <Link
+            href="/dashboard/team/create"
             className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl bg-[#E30613] hover:bg-[#b80510] text-white text-xs font-semibold shadow-xs transition-all shrink-0"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Add Member</span>
-          </button>
+          </Link>
         </div>
 
         {syncedAlert && (
@@ -365,13 +282,13 @@ export default function TeamManagementPage() {
                   </div>
 
                   <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-                    <button
-                      onClick={() => handleOpenEdit(member)}
+                    <Link
+                      href={`/dashboard/team/edit/${member.id}`}
                       className="text-xs font-semibold text-slate-600 hover:text-[#111827] flex items-center space-x-1"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
                       <span>Edit Profile</span>
-                    </button>
+                    </Link>
                     <button
                       onClick={() => handleDeleteMember(member)}
                       className="text-xs font-semibold text-rose-500 hover:text-rose-700 flex items-center space-x-1"
@@ -429,111 +346,7 @@ export default function TeamManagementPage() {
         )}
       </div>
 
-      {/* Edit/Add Modal */}
-      {isModalOpen && (
-        <Modal
-          isOpen={true}
-          onClose={() => setIsModalOpen(false)}
-          title={editingMember ? 'Edit Team Member' : 'Add New Team Member'}
-          subtitle="Updates will reflect automatically on the Macee About Us page."
-          maxWidth="lg"
-        >
-          <form onSubmit={handleSaveMember} className="space-y-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Full Name *</label>
-              <input
-                type="text"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. Maarten Koekebakker"
-                className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613]"
-              />
-            </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Job Title *</label>
-                <input
-                  type="text"
-                  required
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  placeholder="e.g. Managing Partner"
-                  className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613]"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Department / Desk</label>
-                <CustomSelect
-                  value={desk}
-                  onChange={(val) => setDesk(val)}
-                  options={['Management', 'Consultants', 'Recruitment', 'Operations']}
-                  placeholder="Select Department / Desk"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Email</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="m.koekebakker@macee.com"
-                  className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613]"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Phone</label>
-                <input
-                  type="text"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="+31 6 12345678"
-                  className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613]"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">LinkedIn Profile URL</label>
-              <div className="relative">
-                <Linkedin className="w-3.5 h-3.5 text-[#0A66C2] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <input
-                  type="url"
-                  value={linkedin}
-                  onChange={(e) => setLinkedin(e.target.value)}
-                  placeholder="https://www.linkedin.com/in/username"
-                  className="w-full pl-9 pr-3 py-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613]"
-                />
-              </div>
-            </div>
-
-            <ImagePicker
-              value={image}
-              onChange={(newUrl) => setImage(newUrl)}
-              label="Profile Photo"
-              helperText="Paste direct portrait photo URL. (Direct upload requires plan upgrade)."
-              previewShape="circle"
-            />
-
-            <div className="pt-2 flex justify-end space-x-2">
-              <button
-                type="button"
-                onClick={() => setIsModalOpen(false)}
-                className="px-4 py-2 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100"
-              >
-                Cancel
-              </button>
-              <button type="submit" disabled={saving} className="is-btn py-2 px-5 text-xs font-semibold">
-                {saving ? 'Saving...' : 'Save Profile'}
-              </button>
-            </div>
-          </form>
-        </Modal>
-      )}
 
       {/* Delete Confirmation Dialog */}
       <ConfirmDialog

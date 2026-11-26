@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
+import Link from 'next/link';
 import { Topbar } from '@/components/Topbar';
 import { Modal } from '@/components/Modal';
 import { ImagePicker } from '@/components/ImagePicker';
@@ -137,56 +138,6 @@ export default function TestimonialsManagementPage() {
     }
   };
 
-  const handleOpenAdd = () => {
-    setEditingIndex(null);
-    setItemTag('Client Testimonial');
-    setItemTitle('');
-    setItemText('');
-    setItemImage('');
-    setItemAccent(false);
-    setModalOpen(true);
-  };
-
-  const handleOpenEdit = (index: number) => {
-    const item = testimonialsList[index];
-    if (!item) return;
-    setEditingIndex(index);
-    setItemTag(item.tag || 'Client Testimonial');
-    setItemTitle(item.title || '');
-    setItemText(item.text || '');
-    const imgVal = typeof item.image === 'string' ? item.image : (item.image as any)?.src || '';
-    setItemImage(imgVal || '');
-    setItemAccent(!!item.accent);
-    setModalOpen(true);
-  };
-
-  const handleSaveItem = (e: React.FormEvent) => {
-    e.preventDefault();
-    const updatedList = [...testimonialsList];
-    const existing = editingIndex !== null ? updatedList[editingIndex] : null;
-
-    const newItem: TestimonialItem = {
-      id: existing?.id || `testimonial-${Date.now()}`,
-      tag: itemTag.trim() || 'Client Testimonial',
-      title: itemTitle.trim(),
-      text: itemText.trim(),
-      image: itemImage.trim(),
-      accent: itemAccent,
-      order: existing?.order || updatedList.length + 1,
-    };
-
-    if (editingIndex !== null) {
-      updatedList[editingIndex] = newItem;
-    } else {
-      // Place newly added testimonial directly at the top
-      updatedList.unshift(newItem);
-    }
-
-    const updatedData = { ...clientsData, certifications: updatedList };
-    handleSaveAll(updatedData);
-    setModalOpen(false);
-  };
-
   const handleDeleteItem = (index: number) => {
     const item = testimonialsList[index];
     setDeleteDialog({
@@ -288,13 +239,13 @@ export default function TestimonialsManagementPage() {
             />
           </div>
 
-          <button
-            onClick={handleOpenAdd}
+          <Link
+            href="/dashboard/clients/create"
             className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl bg-[#E30613] hover:bg-[#b80510] text-white text-xs font-semibold shadow-xs transition-all shrink-0"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Add Testimonial</span>
-          </button>
+          </Link>
         </div>
 
         {/* =================================================================
@@ -352,13 +303,13 @@ export default function TestimonialsManagementPage() {
                         </div>
 
                         <div className="flex items-center space-x-1 shrink-0">
-                          <button
-                            onClick={() => handleOpenEdit(realIndex)}
+                          <Link
+                            href={`/dashboard/clients/edit/${item.id}`}
                             className="p-1.5 rounded-lg text-slate-500 hover:text-[#111827] hover:bg-slate-100 transition-colors"
                             title="Edit Testimonial"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
-                          </button>
+                          </Link>
                           <button
                             onClick={() => handleDeleteItem(realIndex)}
                             className="p-1.5 rounded-lg text-rose-500 hover:text-rose-700 hover:bg-rose-50 transition-colors"
@@ -442,103 +393,6 @@ export default function TestimonialsManagementPage() {
               </div>
             </div>
           </>
-        )}
-
-        {/* =================================================================
-            ADD / EDIT TESTIMONIAL MODAL
-            ================================================================= */}
-        {modalOpen && (
-          <Modal
-            isOpen={true}
-            onClose={() => setModalOpen(false)}
-            title={editingIndex !== null ? 'Edit Testimonial' : 'Add New Testimonial'}
-            subtitle="Updates will sync live with Macee's client trust and testimonial sections."
-            maxWidth="lg"
-          >
-            <form onSubmit={handleSaveItem} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Client / Company Name *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={itemTitle}
-                  onChange={(e) => setItemTitle(e.target.value)}
-                  placeholder="e.g. Maarten Koekebakker, Fintech Enterprise Lead"
-                  className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Tag / Designation / Industry
-                </label>
-                <input
-                  type="text"
-                  value={itemTag}
-                  onChange={(e) => setItemTag(e.target.value)}
-                  placeholder="e.g. Banking & Fintech, SNA Labour Partner..."
-                  className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Testimonial Quote / Review Text *
-                </label>
-                <textarea
-                  required
-                  rows={4}
-                  value={itemText}
-                  onChange={(e) => setItemText(e.target.value)}
-                  placeholder="Quote from client about Macee's workforce solutions and service delivery..."
-                  className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613] leading-relaxed"
-                />
-              </div>
-
-              <div>
-                <ImagePicker
-                  value={itemImage}
-                  onChange={(newUrl) => setItemImage(newUrl)}
-                  label="Client Logo / Avatar Image"
-                  helperText="Upload or enter image URL for client avatar or corporate logo."
-                  previewShape="rounded"
-                  aspect="wide"
-                />
-              </div>
-
-              <div className="flex items-center space-x-2 pt-1">
-                <input
-                  type="checkbox"
-                  id="itemAccent"
-                  checked={itemAccent}
-                  onChange={(e) => setItemAccent(e.target.checked)}
-                  className="rounded border-slate-300 text-[#E30613] focus:ring-0"
-                />
-                <label htmlFor="itemAccent" className="text-xs text-slate-700 font-medium">
-                  Highlight as Featured Testimonial (Brand Accent)
-                </label>
-              </div>
-
-              <div className="pt-2 flex justify-end space-x-2">
-                <button
-                  type="button"
-                  onClick={() => setModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="is-btn py-2 px-5 text-xs font-semibold"
-                >
-                  {saving ? 'Saving...' : 'Save Testimonial'}
-                </button>
-              </div>
-            </form>
-          </Modal>
         )}
 
         {/* Delete Confirmation Dialog */}

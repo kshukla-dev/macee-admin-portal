@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useMemo, useRef } from 'react';
+import Link from 'next/link';
 import { Topbar } from '@/components/Topbar';
 import { Modal } from '@/components/Modal';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
@@ -318,75 +319,6 @@ export default function FaqManagementPage() {
     return filteredItems.slice(start, start + pageSize);
   }, [filteredItems, currentPage, pageSize]);
 
-  const handleOpenAdd = (defaultPage?: string) => {
-    setEditingItem(null);
-    const targetPage = defaultPage && defaultPage !== 'all' ? defaultPage : activeTab !== 'all' ? activeTab : 'home';
-    setFormPage(targetPage);
-    const pageItems = items.filter((i) => i.page === targetPage);
-    setFormOrder(pageItems.length + 1);
-    setFormActive(true);
-    setFormTag(SUGGESTED_TAGS_BY_PAGE[targetPage]?.[0] || 'General');
-    setFormQuestion('');
-    setFormAnswer('');
-    setFormQuestionNl('');
-    setFormAnswerNl('');
-    setModalTab('en');
-    setIsModalOpen(true);
-  };
-
-  const handleOpenEdit = (item: FaqItem) => {
-    setEditingItem(item);
-    setFormPage(item.page || 'home');
-    setFormTag(item.tag || '');
-    setFormOrder(item.order || 1);
-    setFormActive(item.active !== false);
-    setFormQuestion(item.question);
-    setFormAnswer(item.answer);
-    setFormQuestionNl(item.question_nl || '');
-    setFormAnswerNl(item.answer_nl || '');
-    setModalTab('en');
-    setIsModalOpen(true);
-  };
-
-  const handleSaveFaq = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      setSaving(true);
-      const payload = {
-        id: editingItem ? editingItem.id : undefined,
-        page: formPage,
-        tag: formTag,
-        order: Number(formOrder),
-        active: formActive,
-        question: formQuestion,
-        answer: formAnswer,
-        question_nl: formQuestionNl || formQuestion,
-        answer_nl: formAnswerNl || formAnswer,
-      };
-
-      const method = editingItem ? 'PUT' : 'POST';
-      const res = await fetch('/api/faqs', {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await res.json();
-      if (data.success) {
-        setIsModalOpen(false);
-        fetchFaqs();
-        setSyncMessage(`✓ Saved and synchronized to ${formPage.toUpperCase()} page on Macee website!`);
-        setTimeout(() => setSyncMessage(null), 4500);
-      } else {
-        alert(data.error || 'Failed to save FAQ');
-      }
-    } catch (e) {
-      alert('Failed to save FAQ');
-    } finally {
-      setSaving(false);
-    }
-  };
-
   // Delete Confirmation Dialog state
   const [deleteDialog, setDeleteDialog] = useState<{
     isOpen: boolean;
@@ -571,13 +503,13 @@ export default function FaqManagementPage() {
               </div>
             </div>
 
-            <button
-              onClick={() => handleOpenAdd(activeTab)}
+            <Link
+              href="/dashboard/faqs/create"
               className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-slate-300 text-slate-800 text-xs font-semibold shadow-2xs hover:bg-slate-50 transition-all shrink-0 self-start sm:self-auto"
             >
               <Plus className="w-3.5 h-3.5 text-[#E30613]" />
               <span>Add to {currentTabMeta.label}</span>
-            </button>
+            </Link>
           </div>
         )}
 
@@ -623,13 +555,13 @@ export default function FaqManagementPage() {
               </button>
             </div>
 
-            <button
-              onClick={() => handleOpenAdd(activeTab)}
+            <Link
+              href="/dashboard/faqs/create"
               className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-[#E30613] hover:bg-[#b80510] text-white text-xs font-semibold shadow-xs transition-all shrink-0"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Add FAQ</span>
-            </button>
+            </Link>
           </div>
         </div>
 
@@ -643,13 +575,13 @@ export default function FaqManagementPage() {
               <p className="text-xs text-slate-500 font-medium">
                 No questions found for the current filter.
               </p>
-              <button
-                onClick={() => handleOpenAdd(activeTab)}
+              <Link
+                href="/dashboard/faqs/create"
                 className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-[#E30613] text-white text-xs font-semibold shadow-xs"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Add First Question</span>
-              </button>
+              </Link>
             </div>
           ) : (
             <>
@@ -705,13 +637,13 @@ export default function FaqManagementPage() {
                             {item.active !== false ? 'Deactivate' : 'Publish'}
                           </button>
 
-                          <button
-                            onClick={() => handleOpenEdit(item)}
+                          <Link
+                            href={`/dashboard/faqs/edit/${item.id}`}
                             className="inline-flex items-center text-slate-500 hover:text-[#111827] p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
                             title="Edit FAQ"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
-                          </button>
+                          </Link>
 
                           <button
                             onClick={() => handleDeleteFaq(item.id, item.question)}
@@ -817,231 +749,6 @@ export default function FaqManagementPage() {
           )}
         </div>
       </div>
-
-      {/* ADD / EDIT MODAL */}
-      {isModalOpen && (
-        <Modal
-          isOpen={true}
-          onClose={() => setIsModalOpen(false)}
-          title={editingItem ? 'Edit FAQ Question' : 'Add New FAQ Question'}
-          subtitle={`Assign to a specific page on macee.com with instant live synchronization.`}
-          maxWidth="2xl"
-        >
-          <form onSubmit={handleSaveFaq} className="space-y-4">
-            {/* Page Destination & Status */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="sm:col-span-2">
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Target Website Page *
-                </label>
-                <CustomSelect
-                  value={formPage}
-                  onChange={(newPage) => {
-                    setFormPage(newPage);
-                    if (SUGGESTED_TAGS_BY_PAGE[newPage]?.[0]) {
-                      setFormTag(SUGGESTED_TAGS_BY_PAGE[newPage][0]);
-                    }
-                  }}
-                  options={[
-                    { value: 'home', label: 'Home' },
-                    { value: 'about', label: 'About Us' },
-                    { value: 'clients', label: 'Clients' },
-                    { value: 'professionals', label: 'Professionals' },
-                    { value: 'projects', label: 'Projects' },
-                    { value: 'contact', label: 'Contact' },
-                  ]}
-                  placeholder="Select Target Page"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Display Order
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  value={formOrder}
-                  onChange={(e) => setFormOrder(Number(e.target.value))}
-                  className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613]"
-                />
-              </div>
-            </div>
-
-            {/* Tag / Category Topic */}
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <label className="block text-xs font-bold text-slate-700">
-                  Topic Tag / Keyword
-                </label>
-                <span className="text-[10px] text-slate-400">Pill badge shown on cards</span>
-              </div>
-              <input
-                type="text"
-                value={formTag}
-                onChange={(e) => setFormTag(e.target.value)}
-                placeholder="e.g. Turnkey Workforce Management, SNA NEN 4400-1..."
-                className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613]"
-              />
-
-              {/* Tag suggestions */}
-              {SUGGESTED_TAGS_BY_PAGE[formPage] && (
-                <div className="flex flex-wrap gap-1.5 mt-2">
-                  {SUGGESTED_TAGS_BY_PAGE[formPage].map((suggested) => (
-                    <button
-                      key={suggested}
-                      type="button"
-                      onClick={() => setFormTag(suggested)}
-                      className={`text-[10px] px-2 py-0.5 rounded-md border transition-colors ${formTag === suggested
-                        ? 'bg-[#111827] text-white border-[#111827]'
-                        : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
-                        }`}
-                    >
-                      {suggested}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Language Switcher Tabs */}
-            <div className="pt-2">
-              <div className="flex items-center space-x-2 border-b border-slate-200">
-                <button
-                  type="button"
-                  onClick={() => setModalTab('en')}
-                  className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition-colors ${modalTab === 'en'
-                    ? 'border-[#E30613] text-[#111827]'
-                    : 'border-transparent text-slate-400 hover:text-slate-700'
-                    }`}
-                >
-                  🇬🇧 English Content (Default)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setModalTab('nl')}
-                  className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition-colors ${modalTab === 'nl'
-                    ? 'border-[#E30613] text-[#111827]'
-                    : 'border-transparent text-slate-400 hover:text-slate-700'
-                    }`}
-                >
-                  🇳🇱 Dutch Translation (Nederlands)
-                </button>
-              </div>
-            </div>
-
-            {/* English Content Fields */}
-            {modalTab === 'en' && (
-              <div className="space-y-3 pt-1 animate-fadeIn">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
-                    English Question *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formQuestion}
-                    onChange={(e) => setFormQuestion(e.target.value)}
-                    placeholder="e.g. How does Macee guarantee 100% compliance with Dutch labor regulations?"
-                    className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613] font-medium"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
-                    English Answer *
-                  </label>
-                  <textarea
-                    required
-                    rows={5}
-                    value={formAnswer}
-                    onChange={(e) => setFormAnswer(e.target.value)}
-                    placeholder="Detailed explanation with bullet points if applicable..."
-                    className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613] leading-relaxed font-sans"
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Dutch Content Fields */}
-            {modalTab === 'nl' && (
-              <div className="space-y-3 pt-1 animate-fadeIn">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
-                    Dutch Question (Vraag in het Nederlands)
-                  </label>
-                  <input
-                    type="text"
-                    value={formQuestionNl}
-                    onChange={(e) => setFormQuestionNl(e.target.value)}
-                    placeholder="bijv. Hoe garandeert Macee 100% compliance met de Nederlandse arbeidswetgeving?"
-                    className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613] font-medium"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
-                    Dutch Answer (Antwoord in het Nederlands)
-                  </label>
-                  <textarea
-                    rows={5}
-                    value={formAnswerNl}
-                    onChange={(e) => setFormAnswerNl(e.target.value)}
-                    placeholder="Gedetailleerd antwoord voor Nederlandstalige bezoekers..."
-                    className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613] leading-relaxed font-sans"
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Active Checkbox */}
-            <div className="flex items-center space-x-2 pt-1">
-              <input
-                type="checkbox"
-                id="faq-active"
-                checked={formActive}
-                onChange={(e) => setFormActive(e.target.checked)}
-                className="rounded text-[#E30613] focus:ring-[#E30613] w-4 h-4 cursor-pointer"
-              />
-              <label htmlFor="faq-active" className="text-xs text-slate-700 font-medium cursor-pointer">
-                Publish immediately on live website (active status)
-              </label>
-            </div>
-
-            {/* Modal Actions */}
-            <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-[11px] text-slate-400">
-                Exports to <strong className="text-slate-600 font-mono">pageFaqs.ts</strong> and <strong className="text-slate-600 font-mono">allFaqs.ts</strong>
-              </span>
-
-              <div className="flex items-center space-x-2">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors"
-                >
-                  Cancel
-                </button>
-
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="px-5 py-2.5 rounded-xl bg-[#E30613] hover:bg-[#b80510] text-white text-xs font-semibold shadow-xs transition-all flex items-center space-x-1.5"
-                >
-                  {saving ? (
-                    <>
-                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                      <span>Saving & Syncing...</span>
-                    </>
-                  ) : (
-                    <span>{editingItem ? 'Update & Sync FAQ' : 'Create & Sync FAQ'}</span>
-                  )}
-                </button>
-              </div>
-            </div>
-          </form>
-        </Modal>
-      )}
 
       {/* Delete Confirmation Dialog */}
       <ConfirmDialog
