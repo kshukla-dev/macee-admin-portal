@@ -53,7 +53,6 @@ export function Sidebar({ className = '' }: SidebarProps) {
       name: 'Articles & Blogs',
       href: '/dashboard/blogs',
       icon: FileText,
-      badge: 'For future purpose',
     },
     {
       name: 'FAQs',
@@ -143,7 +142,7 @@ export function Sidebar({ className = '' }: SidebarProps) {
 
                   {/* Sleek Right Hover Tooltip */}
                   <div className="absolute left-full ml-3 px-3 py-1.5 bg-[#1F2937] text-white text-xs font-semibold rounded-lg shadow-xl border border-slate-700 whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 top-1/2 -translate-y-1/2">
-                    {item.name} {(item as any).badge ? `(${(item as any).badge})` : ''}
+                    {item.name}
                     <div className="absolute right-full top-1/2 -translate-y-1/2 -mr-1 border-4 border-transparent border-r-[#1F2937]" />
                   </div>
                 </div>
@@ -160,20 +159,13 @@ export function Sidebar({ className = '' }: SidebarProps) {
                     : 'text-slate-400 hover:text-white hover:bg-slate-800/45'
                 }`}
               >
-                <div className="flex items-center space-x-3.5 min-w-0">
+                <div className="flex items-center space-x-3.5">
                   <Icon
                     className={`w-5 h-5 transition-colors shrink-0 ${
                       isActive ? 'text-[#E30613]' : 'text-slate-400'
                     }`}
                   />
-                  <div className="flex flex-col min-w-0">
-                    <span className="tracking-wide leading-snug">{item.name}</span>
-                    {(item as any).badge && (
-                      <span className="text-[10.5px] text-amber-400 font-medium tracking-normal mt-0.5">
-                        ({(item as any).badge})
-                      </span>
-                    )}
-                  </div>
+                  <span className="tracking-wide">{item.name}</span>
                 </div>
 
                 {isActive && (

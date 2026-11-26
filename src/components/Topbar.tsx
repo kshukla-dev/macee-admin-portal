@@ -3,18 +3,11 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import {
-  Home,
-  ChevronRight,
-  Search,
-  Bell,
   ChevronDown,
   User,
   LogOut,
-  RefreshCw,
-  Menu,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useSidebar } from '@/context/SidebarContext';
 
 interface TopbarProps {
   breadcrumbs?: { label: string; href?: string }[];
@@ -24,25 +17,10 @@ interface TopbarProps {
 }
 
 export function Topbar({
-  breadcrumbs = [
-    { label: 'Dashboard', href: '/dashboard' },
-    { label: 'Overview' },
-  ],
-  searchPlaceholder = 'Search leads...',
-  onSearch,
   actionButton,
 }: TopbarProps) {
   const router = useRouter();
-  const { isCollapsed, toggleSidebar } = useSidebar();
-  const [searchValue, setSearchValue] = useState('');
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchValue(e.target.value);
-    if (onSearch) {
-      onSearch(e.target.value);
-    }
-  };
 
   const handleLogout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' });
@@ -51,54 +29,9 @@ export function Topbar({
   };
 
   return (
-    <header className="h-16 bg-white border-b border-slate-100 px-6 sm:px-8 flex items-center justify-between sticky top-0 z-30">
-      {/* Left: Breadcrumbs (Exact match to screenshot: 🏠 > Section / Page) */}
-      <div className="flex items-center space-x-2 text-xs text-slate-500 font-medium">
-        <button
-          type="button"
-          onClick={toggleSidebar}
-          title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          aria-label="Toggle sidebar"
-          className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors mr-1 cursor-pointer"
-        >
-          <Menu className="w-4 h-4" />
-        </button>
-
-        <Link
-          href="/dashboard"
-          className="text-slate-400 hover:text-slate-600 transition-colors p-1"
-        >
-          <Home className="w-3.5 h-3.5" />
-        </Link>
-
-        {breadcrumbs.map((crumb, idx) => {
-          const isLast = idx === breadcrumbs.length - 1;
-          return (
-            <React.Fragment key={idx}>
-              <span className="text-slate-300">
-                {idx === 0 ? '>' : '/'}
-              </span>
-              {isLast ? (
-                <span className="font-bold text-[#111827]">{crumb.label}</span>
-              ) : crumb.href ? (
-                <Link
-                  href={crumb.href}
-                  className="hover:text-slate-800 transition-colors"
-                >
-                  {crumb.label}
-                </Link>
-              ) : (
-                <span>{crumb.label}</span>
-              )}
-            </React.Fragment>
-          );
-        })}
-      </div>
-
-      {/* Right: Search + Notification Bell + User Profile Dropdown */}
+    <header className="h-16 bg-white border-b border-slate-100 px-6 sm:px-8 flex items-center justify-end sticky top-0 z-30">
+      {/* Right: User Profile Dropdown + Action Button */}
       <div className="flex items-center space-x-3 sm:space-x-4">
-
-
         {/* User Profile (Avatar circle with Macee logo + dropdown arrow) */}
         <div className="relative">
           <button

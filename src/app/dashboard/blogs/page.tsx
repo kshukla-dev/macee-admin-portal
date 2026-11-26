@@ -449,7 +449,7 @@ export default function BlogManagementPage() {
       <Topbar
         breadcrumbs={[
           { label: 'Dashboard', href: '/dashboard' },
-          { label: 'Articles & Blogs (For Future Purpose)' },
+          { label: 'Articles & Blogs' },
         ]}
         searchPlaceholder="Search articles by title, author, tag..."
         onSearch={(q) => setSearchQuery(q)}
@@ -459,14 +459,9 @@ export default function BlogManagementPage() {
         {/* Page Header (Editorial Serif) */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/80">
           <div className="space-y-1">
-            <div className="flex flex-wrap items-center gap-3">
-              <h1 className="text-3xl sm:text-4xl font-serif text-[#111827] tracking-tight">
-                Articles & Blogs
-              </h1>
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200 shadow-2xs">
-                For Future Purpose
-              </span>
-            </div>
+            <h1 className="text-3xl sm:text-4xl font-serif text-[#111827] tracking-tight">
+              Articles & Blogs
+            </h1>
             <p className="text-xs sm:text-sm text-slate-500">
               Manage articles with SEO titles, slugs, contributors, multiple categories, related posts, and reading times.
             </p>
@@ -496,7 +491,7 @@ export default function BlogManagementPage() {
                   <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
                     {blogs.length}
                   </span>
-                  <span className="text-xs font-semibold text-amber-600">Future Use</span>
+                  <span className="text-xs font-semibold text-emerald-600">Active</span>
                 </div>
               </div>
             </div>
@@ -860,7 +855,7 @@ export default function BlogManagementPage() {
           isOpen={true}
           onClose={() => setIsModalOpen(false)}
           title={editingBlog ? 'Edit Article' : 'Create New Article'}
-          subtitle="All 10 fields are synchronized and prepared for future macee.com release."
+          subtitle="Articles will display on macee.com/blogs and synchronize automatically."
           maxWidth="3xl"
         >
           <form onSubmit={handleSaveBlog} className="space-y-5">
