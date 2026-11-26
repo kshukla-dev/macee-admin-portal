@@ -66,7 +66,7 @@ export function Sidebar({ className = '' }: SidebarProps) {
       icon: MessageSquareQuote,
     },
     {
-      name: 'Website Sync & Setup',
+      name: 'System Settings',
       href: '/dashboard/settings',
       icon: Settings,
     },

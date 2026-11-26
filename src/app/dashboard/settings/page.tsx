@@ -1,80 +1,72 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Topbar } from '@/components/Topbar';
-import {
-  Settings,
-  RefreshCw,
-  FolderGit2,
-  Key,
-  ShieldCheck,
-  CheckCircle2,
-  Download,
-  ExternalLink,
-  Code2,
-  Server,
-  Database,
-  Lock,
-} from 'lucide-react';
+import { Eye, EyeOff, CheckCircle2, AlertCircle } from 'lucide-react';
 
-export default function SettingsPage() {
-  const [websitePath, setWebsitePath] = useState('');
-  const [syncStatus, setSyncStatus] = useState<any>(null);
-  const [syncing, setSyncing] = useState(false);
-  const [adminEmail, setAdminEmail] = useState('admin@macee.com');
+export default function SecuritySettingsPage() {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
-  const [passwordMsg, setPasswordMsg] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
-  useEffect(() => {
-    fetch('/api/sync')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.websitePath) setWebsitePath(data.websitePath);
-      })
-      .catch(() => {});
-  }, []);
+  // Password visibility toggles
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
-  const handleFullSync = async () => {
-    try {
-      setSyncing(true);
-      const res = await fetch('/api/sync', { method: 'POST' });
-      const data = await res.json();
-      setSyncStatus(data);
-    } catch (e) {
-      alert('Sync failed');
-    } finally {
-      setSyncing(false);
+  // Status and feedback
+  const [saving, setSaving] = useState(false);
+  const [successMsg, setSuccessMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg('');
+    setSuccessMsg('');
+
+    if (!currentPassword) {
+      setErrorMsg('Please enter your current password.');
+      return;
     }
-  };
 
-  const handleBackupDownload = async () => {
-    const [team, contacts, blogs, faqs, clients] = await Promise.all([
-      fetch('/api/team').then((r) => r.json()),
-      fetch('/api/contacts').then((r) => r.json()),
-      fetch('/api/blogs').then((r) => r.json()),
-      fetch('/api/faqs').then((r) => r.json()),
-      fetch('/api/clients').then((r) => r.json()),
-    ]);
+    if (newPassword.length < 8) {
+      setErrorMsg('New password must be at least 8 characters long.');
+      return;
+    }
 
-    const backupData = {
-      backupDate: new Date().toISOString(),
-      team: team.team,
-      contacts: contacts.contacts,
-      blogs: blogs.blogs,
-      faqs: faqs.items,
-      clients: clients.clients,
-    };
+    if (newPassword !== confirmPassword) {
+      setErrorMsg('New password and confirm password do not match.');
+      return;
+    }
 
-    const blob = new Blob([JSON.stringify(backupData, null, 2)], {
-      type: 'application/json',
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `macee_complete_backup_${new Date().toISOString().slice(0, 10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    try {
+      setSaving(true);
+      const res = await fetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          currentPassword,
+          newPassword,
+          confirmPassword,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setSuccessMsg('Your password has been updated successfully.');
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+        setTimeout(() => setSuccessMsg(''), 5000);
+      } else {
+        setErrorMsg(data.error || 'Failed to update password.');
+      }
+    } catch (err) {
+      setErrorMsg('An unexpected error occurred. Please try again.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -82,177 +74,127 @@ export default function SettingsPage() {
       <Topbar
         breadcrumbs={[
           { label: 'Dashboard', href: '/dashboard' },
-          { label: 'Website Sync & Setup' },
+          { label: 'System Settings' },
         ]}
-        searchPlaceholder="Search system settings..."
+        searchPlaceholder="Search settings..."
       />
 
       <div className="p-6 sm:p-8 lg:p-10 max-w-[1440px] mx-auto space-y-6">
-        {/* Page Header (Editorial Serif) */}
-        <div className="space-y-1">
+        {/* Page Title */}
+        <div>
           <h1 className="text-3xl sm:text-4xl font-serif text-[#111827] tracking-tight">
-            Website Sync & Setup
+            Security
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500">
-            Control automated two-way file synchronization with the live Macee website.
-          </p>
         </div>
 
-        {/* 4 KPI Metric Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-          <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-              <Server className="w-5 h-5" />
+        {/* Change Password Card (Matches reference mockup layout in brand red theme) */}
+        <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-10 border border-slate-100 shadow-2xs max-w-xl">
+          <h2 className="text-lg sm:text-xl font-bold text-[#111827] font-sans">
+            Change your password
+          </h2>
+
+          {/* Feedback alerts */}
+          {successMsg && (
+            <div className="mt-4 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium flex items-center space-x-2 animate-fadeIn">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>{successMsg}</span>
             </div>
+          )}
+
+          {errorMsg && (
+            <div className="mt-4 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-medium flex items-center space-x-2 animate-fadeIn">
+              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+              <span>{errorMsg}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="mt-6 space-y-5">
+            {/* Current Password Field */}
             <div>
-              <p className="text-xs font-medium text-slate-500">Target Folder</p>
-              <div className="flex items-baseline space-x-2 mt-0.5">
-                <span className="text-base font-bold text-[#111827] font-mono truncate max-w-[140px]">
-                  macee-_update
-                </span>
+              <label className="block text-xs sm:text-sm font-medium text-[#111827] mb-1.5">
+                Current password*
+              </label>
+              <div className="relative">
+                <input
+                  type={showCurrent ? 'text' : 'password'}
+                  required
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  className="w-full px-4 py-3 pr-11 rounded-xl sm:rounded-2xl border border-slate-200/90 text-sm text-[#111827] placeholder-slate-400 focus:outline-none focus:border-[#E30613] focus:ring-1 focus:ring-[#E30613] transition-all"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowCurrent(!showCurrent)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 transition-colors"
+                  aria-label={showCurrent ? 'Hide password' : 'Show password'}
+                >
+                  {showCurrent ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
             </div>
-          </div>
 
-          <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-              <RefreshCw className="w-5 h-5" />
-            </div>
+            {/* New Password Field */}
             <div>
-              <p className="text-xs font-medium text-slate-500">Sync Status</p>
-              <div className="mt-0.5">
-                <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                  Live Active
-                </span>
+              <label className="block text-xs sm:text-sm font-medium text-[#111827] mb-1.5">
+                New password*
+              </label>
+              <div className="relative">
+                <input
+                  type={showNew ? 'text' : 'password'}
+                  required
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="w-full px-4 py-3 pr-11 rounded-xl sm:rounded-2xl border border-slate-200/90 text-sm text-[#111827] placeholder-slate-400 focus:outline-none focus:border-[#E30613] focus:ring-1 focus:ring-[#E30613] transition-all"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNew(!showNew)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 transition-colors"
+                  aria-label={showNew ? 'Hide password' : 'Show password'}
+                >
+                  {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-              <Database className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-xs font-medium text-slate-500">Synced Modules</p>
-              <div className="mt-0.5">
-                <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                  5 Files
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-              <ShieldCheck className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-xs font-medium text-slate-500">Security Gate</p>
-              <div className="mt-0.5">
-                <span className="text-2xl sm:text-3xl font-bold text-[#111827] font-sans">
-                  Verified
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Sync Controls */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Card 1: Live Website Synchronization */}
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-2xs p-6 sm:p-7 space-y-5">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-xl bg-[#EAF0FC] text-[#36427D] flex items-center justify-center">
-                <FolderGit2 className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-base font-bold text-[#111827] font-sans">
-                  Website Synchronization Engine
-                </h3>
-                <p className="text-xs text-slate-500">
-                  Transfers team, blogs, FAQs, and clients data directly to your website.
-                </p>
-              </div>
-            </div>
-
-            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 text-xs text-slate-700">
-              <span className="text-[10px] text-slate-400 uppercase font-semibold block">Configured Website Path</span>
-              <p className="font-mono text-[11px] text-[#111827] mt-0.5 break-all">
-                {websitePath || 'd:\\J&F\\Maceee\\macee-_update_contant'}
+              <p className="text-xs text-slate-400 mt-2 font-normal">
+                Minimum 8 characters. Must include numbers, letters and special characters.
               </p>
             </div>
 
-            {syncStatus && (
-              <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs space-y-1 animate-fadeIn">
-                <p className="font-bold flex items-center space-x-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  <span>Files Synced Successfully</span>
-                </p>
-                <p className="text-[11px] font-mono">
-                  {syncStatus.filesSynced ? syncStatus.filesSynced.join(', ') : 'All data files'}
-                </p>
-              </div>
-            )}
-
-            <div className="flex items-center space-x-3 pt-2">
-              <button
-                onClick={handleFullSync}
-                disabled={syncing}
-                className="is-btn py-2.5 px-5 text-xs font-semibold flex items-center space-x-2"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${syncing ? 'animate-spin' : ''}`} />
-                <span>{syncing ? 'Synchronizing Files...' : 'Run Full Sync'}</span>
-              </button>
-
-              <button
-                onClick={handleBackupDownload}
-                className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl bg-[#0E1726] hover:bg-black text-white text-xs font-semibold shadow-xs"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>Download Backup</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Card 2: Security & Admin Credentials */}
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-2xs p-6 sm:p-7 space-y-5">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-xl bg-[#EAF0FC] text-[#36427D] flex items-center justify-center">
-                <Lock className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-base font-bold text-[#111827] font-sans">
-                  Admin Credentials
-                </h3>
-                <p className="text-xs text-slate-500">
-                  Current portal operator authentication settings.
-                </p>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Admin Email</label>
+            {/* Confirm Password Field */}
+            <div>
+              <label className="block text-xs sm:text-sm font-medium text-[#111827] mb-1.5">
+                Confirm password*
+              </label>
+              <div className="relative">
                 <input
-                  type="email"
-                  disabled
-                  value={adminEmail}
-                  className="w-full p-2.5 text-xs rounded-xl border border-slate-200 bg-slate-50 text-slate-600 font-mono"
+                  type={showConfirm ? 'text' : 'password'}
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full px-4 py-3 pr-11 rounded-xl sm:rounded-2xl border border-slate-200/90 text-sm text-[#111827] placeholder-slate-400 focus:outline-none focus:border-[#E30613] focus:ring-1 focus:ring-[#E30613] transition-all"
                 />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Role & Authority</label>
-                <div className="p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold text-[#36427D]">
-                  Super Admin (Full Website & Data Access)
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowConfirm(!showConfirm)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 transition-colors"
+                  aria-label={showConfirm ? 'Hide password' : 'Show password'}
+                >
+                  {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
             </div>
 
-            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600">
-              To update password or add secondary admin accounts, configure `data/admin.json`.
+            {/* Save Button (Pill shaped, right aligned, Macee brand red theme) */}
+            <div className="flex justify-end pt-3">
+              <button
+                type="submit"
+                disabled={saving}
+                className="px-8 py-3 rounded-full bg-[#E30613] hover:bg-[#b80510] text-white text-xs sm:text-sm font-semibold shadow-xs transition-all disabled:opacity-50 cursor-pointer"
+              >
+                {saving ? 'Saving...' : 'Save'}
+              </button>
             </div>
-          </div>
+          </form>
         </div>
       </div>
     </div>

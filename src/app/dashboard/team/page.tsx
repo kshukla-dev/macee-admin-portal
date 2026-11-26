@@ -313,9 +313,6 @@ export default function TeamManagementPage() {
                       <p className="text-xs text-[#E30613] font-medium truncate mt-0.5">
                         {member.role}
                       </p>
-                      <span className="inline-block mt-1 text-[10px] font-semibold px-2 py-0.5 rounded-md bg-[#F0F3FA] text-[#36427D]">
-                        {member.desk || 'Specialist'}
-                      </span>
                     </div>
                   </div>
 
