@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Topbar } from '@/components/Topbar';
 import { ImagePicker } from '@/components/ImagePicker';
 import { CustomSelect } from '@/components/CustomSelect';
+import { formatArticleHtml } from '@/lib/formatArticleHtml';
 import {
   FileText,
   Image as ImageIcon,
@@ -18,6 +19,7 @@ import {
   Clock,
   Sparkles,
   Eye,
+  Code,
   Plus,
   Trash2,
   Calendar,
@@ -97,6 +99,7 @@ export function BlogStepForm({ initialData, isEdit = false }: BlogStepFormProps)
   const [isCustomSlug, setIsCustomSlug] = useState(Boolean(initialData?.slug));
   const [excerpt, setExcerpt] = useState(initialData?.excerpt || '');
   const [content, setContent] = useState(initialData?.content || '');
+  const [contentViewMode, setContentViewMode] = useState<'write' | 'preview'>('write');
   
   // Media
   const [coverImage, setCoverImage] = useState(initialData?.coverImage || '');
@@ -553,22 +556,75 @@ export function BlogStepForm({ initialData, isEdit = false }: BlogStepFormProps)
 
               {/* Content Body */}
               <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-bold text-slate-800">
-                    Article Full Content *
-                  </label>
-                  <span className="text-[11px] text-slate-400 font-mono">
-                    {content.trim() ? content.trim().split(/\s+/).length : 0} words
-                  </span>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                  <div className="flex items-center space-x-2">
+                    <label className="text-xs font-bold text-slate-800">
+                      Article Full Content *
+                    </label>
+                    <span className="px-2 py-0.5 rounded-md text-[10.5px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      HTML & Markdown Supported
+                    </span>
+                  </div>
+
+                  <div className="flex items-center space-x-3">
+                    <span className="text-[11px] text-slate-400 font-mono">
+                      {content.trim() ? content.trim().split(/\s+/).length : 0} words
+                    </span>
+
+                    {/* Mode Toggle Tabs */}
+                    <div className="inline-flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-xs">
+                      <button
+                        type="button"
+                        onClick={() => setContentViewMode('write')}
+                        className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all cursor-pointer flex items-center space-x-1 ${
+                          contentViewMode === 'write'
+                            ? 'bg-white text-slate-900 shadow-2xs font-bold'
+                            : 'text-slate-500 hover:text-slate-900'
+                        }`}
+                      >
+                        <Code className="w-3.5 h-3.5" />
+                        <span>HTML Editor</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setContentViewMode('preview')}
+                        className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all cursor-pointer flex items-center space-x-1 ${
+                          contentViewMode === 'preview'
+                            ? 'bg-white text-slate-900 shadow-2xs font-bold'
+                            : 'text-slate-500 hover:text-slate-900'
+                        }`}
+                      >
+                        <Eye className="w-3.5 h-3.5 text-[#E30613]" />
+                        <span>Live Preview</span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <textarea
-                  rows={14}
-                  required
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  placeholder="Write or paste your article markdown / text content here..."
-                  className="w-full p-4 text-xs font-sans text-slate-800 placeholder-slate-400 rounded-xl border border-slate-200/90 focus:outline-none focus:border-[#E30613] focus:ring-2 focus:ring-[#E30613]/20 shadow-2xs leading-relaxed"
-                />
+
+                {contentViewMode === 'write' ? (
+                  <textarea
+                    rows={14}
+                    required
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    placeholder="Write or paste your article HTML (e.g. <h2>Title</h2>, <p>Paragraph with <strong>bold</strong> text</p>, <ul><li>List items</li></ul>) or Markdown here..."
+                    className="w-full p-4 text-xs font-mono text-slate-800 placeholder-slate-400 rounded-xl border border-slate-200/90 focus:outline-none focus:border-[#E30613] focus:ring-2 focus:ring-[#E30613]/20 shadow-2xs leading-relaxed"
+                  />
+                ) : (
+                  <div className="min-h-[350px] p-6 rounded-xl border border-slate-200 bg-white shadow-2xs overflow-y-auto max-h-[500px]">
+                    {content.trim() ? (
+                      <div
+                        className="article-content"
+                        dangerouslySetInnerHTML={{ __html: formatArticleHtml(content) }}
+                      />
+                    ) : (
+                      <div className="h-48 flex flex-col items-center justify-center text-slate-400 text-xs italic">
+                        <FileText className="w-8 h-8 text-slate-300 mb-2 stroke-1" />
+                        <span>No content entered yet. Type or paste HTML in the editor tab to preview it here.</span>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           )}

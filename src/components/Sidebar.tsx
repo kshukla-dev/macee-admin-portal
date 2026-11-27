@@ -135,7 +135,7 @@ export function Sidebar({ className = '' }: SidebarProps) {
                 aria-label="Macee Dashboard"
                 className="flex items-center justify-center p-1 rounded-xl hover:bg-slate-800/60 transition-all focus:outline-none"
               >
-                <div className="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center p-1.5 shadow-2xs hover:scale-105 transition-transform">
+                <div className="w-11 h-11 rounded-xl flex items-center justify-center p-1.5 shadow-2xs hover:scale-105 transition-transform">
                   <img
                     src="/images/macee-icon.png"
                     alt="Macee"

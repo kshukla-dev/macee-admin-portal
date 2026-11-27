@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Topbar } from '@/components/Topbar';
-import { Modal } from '@/components/Modal';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { SkeletonTableRow } from '@/components/Skeleton';
 import { CustomSelect } from '@/components/CustomSelect';
@@ -99,8 +98,7 @@ export default function BlogManagementPage() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const pageSize = 10;
 
-  // Preview & Action Menu State
-  const [previewBlog, setPreviewBlog] = useState<BlogPost | null>(null);
+  // Action Menu & Alerts State
   const [activeActionMenuId, setActiveActionMenuId] = useState<string | null>(null);
   const [syncAlert, setSyncAlert] = useState(false);
 
@@ -306,8 +304,8 @@ export default function BlogManagementPage() {
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-semibold capitalize whitespace-nowrap transition-all ${activeTab === tab
-                    ? 'bg-[#111827] text-white shadow-2xs'
-                    : 'text-slate-600 hover:bg-slate-100'
+                  ? 'bg-[#111827] text-white shadow-2xs'
+                  : 'text-slate-600 hover:bg-slate-100'
                   }`}
               >
                 {tab === 'all' ? 'All Articles' : tab}
@@ -394,79 +392,81 @@ export default function BlogManagementPage() {
                             )}
 
                             <div className="min-w-0">
-                              <p className="font-bold text-[#111827] truncate font-sans text-[13.5px]" title={blog.title}>
-                                {blog.title}
-                              </p>
-                            </div>
+                                <Link
+                                  href={`/dashboard/blogs/preview/${blog.id}`}
+                                  className="font-bold text-[#111827] hover:text-[#E30613] transition-colors truncate font-sans text-[13.5px] block"
+                                  title={blog.title}
+                                >
+                                  {blog.title}
+                            </Link>
                           </div>
-                        </td>
+                        </div>
+                      </td>
 
-                        {/* Categories */}
-                        <td className="py-3.5 px-4">
-                          <div className="flex flex-wrap gap-1 max-w-[180px]">
-                            {postCategories.map((cat, idx) => (
-                              <span
-                                key={idx}
-                                className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-[#F0F3FA] text-[#36427D] whitespace-nowrap"
-                              >
-                                {cat}
-                              </span>
-                            ))}
-                          </div>
-                        </td>
-
-                        {/* Author & Contributors */}
-                        <td className="py-3.5 px-4 whitespace-nowrap">
-                          <div className="flex flex-col">
-                            <span className="font-semibold text-slate-800">{blog.author}</span>
-                            {contribCount > 0 && (
-                              <span
-                                className="text-[10px] text-slate-500 font-medium inline-flex items-center space-x-1 mt-0.5 cursor-help"
-                                title={blog.contributors?.map((c) => `${c.name} (${c.role})`).join(', ')}
-                              >
-                                <Users className="w-3 h-3" />
-                                <span>+{contribCount} contributor{contribCount > 1 ? 's' : ''}</span>
-                              </span>
-                            )}
-                          </div>
-                        </td>
-
-                        {/* Status */}
-                        <td className="py-3.5 px-4 whitespace-nowrap">
-                          <StatusDropdown
-                            status={blog.status}
-                            preset="blog"
-                            onChange={(newStatus) => handleStatusChange(blog.id, newStatus)}
-                            title="Change Article Status"
-                          />
-                        </td>
-
-                        {/* Actions: 3-dot dropdown menu */}
-                        <td className="py-3.5 px-4 text-right relative whitespace-nowrap">
-                          <button
-                            onClick={() =>
-                              setActiveActionMenuId(
-                                activeActionMenuId === blog.id ? null : blog.id
-                              )
-                            }
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors"
-                            title="Article Actions"
+                        {/* Categories */ }
+                    <td className="py-3.5 px-4">
+                      <div className="flex flex-wrap gap-1 max-w-[180px]">
+                        {postCategories.map((cat, idx) => (
+                          <span
+                            key={idx}
+                            className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-[#F0F3FA] text-[#36427D] whitespace-nowrap"
                           >
-                            <MoreVertical className="w-4 h-4" />
-                          </button>
+                            {cat}
+                          </span>
+                        ))}
+                      </div>
+                    </td>
 
-                          {activeActionMenuId === blog.id && (
+                    {/* Author & Contributors */ }
+                    <td className="py-3.5 px-4 whitespace-nowrap">
+                      <div className="flex flex-col">
+                        <span className="font-semibold text-slate-800">{blog.author}</span>
+                        {contribCount > 0 && (
+                          <span
+                            className="text-[10px] text-slate-500 font-medium inline-flex items-center space-x-1 mt-0.5 cursor-help"
+                            title={blog.contributors?.map((c) => `${c.name} (${c.role})`).join(', ')}
+                          >
+                            <Users className="w-3 h-3" />
+                            <span>+{contribCount} contributor{contribCount > 1 ? 's' : ''}</span>
+                          </span>
+                        )}
+                      </div>
+                    </td>
+
+                    {/* Status */ }
+                    <td className="py-3.5 px-4 whitespace-nowrap">
+                      <StatusDropdown
+                        status={blog.status}
+                        preset="blog"
+                        onChange={(newStatus) => handleStatusChange(blog.id, newStatus)}
+                        title="Change Article Status"
+                      />
+                    </td>
+
+                    {/* Actions: 3-dot dropdown menu */ }
+                    <td className="py-3.5 px-4 text-right relative whitespace-nowrap">
+                      <button
+                        onClick={() =>
+                          setActiveActionMenuId(
+                            activeActionMenuId === blog.id ? null : blog.id
+                          )
+                        }
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors"
+                        title="Article Actions"
+                      >
+                        <MoreVertical className="w-4 h-4" />
+                      </button>
+
+                      {activeActionMenuId === blog.id && (
                             <div className="absolute right-4 mt-1 w-44 bg-white rounded-xl shadow-lg border border-slate-100 py-1.5 z-40 text-left animate-fadeIn">
-                              <button
-                                onClick={() => {
-                                  setPreviewBlog(blog);
-                                  setActiveActionMenuId(null);
-                                }}
+                              <Link
+                                href={`/dashboard/blogs/preview/${blog.id}`}
+                                onClick={() => setActiveActionMenuId(null)}
                                 className="w-full px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center space-x-2"
                               >
                                 <Eye className="w-3.5 h-3.5 text-[#36427D]" />
                                 <span>Preview Article</span>
-                              </button>
+                              </Link>
                               <Link
                                 href={`/dashboard/blogs/edit/${blog.id}`}
                                 onClick={() => setActiveActionMenuId(null)}
@@ -488,164 +488,68 @@ export default function BlogManagementPage() {
                               </button>
                             </div>
                           )}
-                        </td>
-                      </tr>
-                    );
+              </td>
+            </tr>
+            );
                   })
                 )}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Table Footer: Pagination matching screenshot */}
-          <div className="p-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
-            <div>
-              Showing {filteredBlogs.length === 0 ? 0 : (currentPage - 1) * pageSize + 1}–
-              {Math.min(currentPage * pageSize, filteredBlogs.length)} of {filteredBlogs.length} articles
-            </div>
-
-            <div className="flex items-center space-x-1">
-              <button
-                disabled={currentPage <= 1}
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-slate-600"
-                title="Previous page"
-              >
-                <ChevronLeft className="w-3.5 h-3.5" />
-              </button>
-
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <button
-                  key={page}
-                  onClick={() => setCurrentPage(page)}
-                  className={`w-7 h-7 rounded-lg text-xs font-semibold transition-all ${
-                    currentPage === page
-                      ? 'bg-[#0E1726] text-white shadow-2xs'
-                      : 'border border-slate-200 hover:bg-slate-50 text-slate-700'
-                  }`}
-                >
-                  {page}
-                </button>
-              ))}
-
-              <button
-                disabled={currentPage >= totalPages}
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-slate-600"
-                title="Next page"
-              >
-                <ChevronRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </div>
-        </div>
+          </tbody>
+        </table>
       </div>
 
-      {/* Preview Modal */}
-      {previewBlog && (
-        <Modal
-          isOpen={true}
-          onClose={() => setPreviewBlog(null)}
-          title={previewBlog.title}
-          subtitle={`Slug: /${previewBlog.slug} • ${previewBlog.status.toUpperCase()}`}
-          maxWidth="2xl"
-        >
-          <div className="space-y-5 text-xs">
-            {previewBlog.coverImage && (
-              <div className="rounded-xl overflow-hidden border border-slate-200 bg-slate-100">
-                <img
-                  src={previewBlog.coverImage}
-                  alt={previewBlog.coverImageAlt || previewBlog.title}
-                  className="w-full h-48 object-cover"
-                />
-                {previewBlog.coverImageAlt && (
-                  <p className="p-2 text-[11px] text-slate-500 bg-slate-50 border-t border-slate-200 italic">
-                    Alt Text: {previewBlog.coverImageAlt}
-                  </p>
-                )}
-              </div>
-            )}
+      {/* Table Footer: Pagination matching screenshot */}
+      <div className="p-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+        <div>
+          Showing {filteredBlogs.length === 0 ? 0 : (currentPage - 1) * pageSize + 1}–
+          {Math.min(currentPage * pageSize, filteredBlogs.length)} of {filteredBlogs.length} articles
+        </div>
 
-            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-slate-700">Primary Author:</span>
-                <span className="font-semibold text-[#111827]">{previewBlog.author} ({previewBlog.authorRole || 'Author'})</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-slate-700">Estimated Reading Time:</span>
-                <span>{previewBlog.estimatedReadingTime || 4} minutes</span>
-              </div>
-              <div className="flex items-start justify-between">
-                <span className="font-bold text-slate-700">Categories:</span>
-                <div className="flex flex-wrap gap-1 justify-end max-w-xs">
-                  {(previewBlog.categories || [previewBlog.category]).map((c, i) => (
-                    <span key={i} className="px-2 py-0.5 rounded bg-[#EAF0FC] text-[#36427D] font-semibold text-[10px]">
-                      {c}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
+        <div className="flex items-center space-x-1">
+          <button
+            disabled={currentPage <= 1}
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-slate-600"
+            title="Previous page"
+          >
+            <ChevronLeft className="w-3.5 h-3.5" />
+          </button>
 
-            {previewBlog.contributors && previewBlog.contributors.length > 0 && (
-              <div>
-                <h4 className="font-bold text-slate-800 mb-2">Contributors & Reviewers:</h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {previewBlog.contributors.map((contrib, idx) => (
-                    <div key={idx} className="p-2.5 rounded-xl border border-slate-200 bg-white flex items-center justify-between">
-                      <span className="font-semibold text-slate-800">{contrib.name}</span>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">
-                        {contrib.role}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+            <button
+              key={page}
+              onClick={() => setCurrentPage(page)}
+              className={`w-7 h-7 rounded-lg text-xs font-semibold transition-all ${currentPage === page
+                  ? 'bg-[#0E1726] text-white shadow-2xs'
+                  : 'border border-slate-200 hover:bg-slate-50 text-slate-700'
+                }`}
+            >
+              {page}
+            </button>
+          ))}
 
-            <div>
-              <h4 className="font-bold text-slate-800 mb-1">Excerpt Summary:</h4>
-              <p className="text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-200">
-                {previewBlog.excerpt}
-              </p>
-            </div>
-
-            <div>
-              <h4 className="font-bold text-slate-800 mb-1">Content Body:</h4>
-              <div className="text-slate-700 bg-white p-3 rounded-xl border border-slate-200 max-h-60 overflow-y-auto whitespace-pre-line">
-                {previewBlog.content}
-              </div>
-            </div>
-
-            {previewBlog.relatedPosts && previewBlog.relatedPosts.length > 0 && (
-              <div>
-                <h4 className="font-bold text-slate-800 mb-1">Linked Related Posts:</h4>
-                <div className="flex flex-wrap gap-1.5">
-                  {previewBlog.relatedPosts.map((rId) => {
-                    const match = blogs.find((b) => b.id === rId);
-                    return (
-                      <span key={rId} className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-medium text-[11px] border border-slate-200">
-                        {match ? match.title : rId}
-                      </span>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-        </Modal>
-      )}
-
-      {/* Delete Confirmation Dialog */}
-      <ConfirmDialog
-        isOpen={deleteDialog.isOpen}
-        onClose={() => setDeleteDialog((prev) => ({ ...prev, isOpen: false }))}
-        onConfirm={deleteDialog.onConfirm}
-        title={deleteDialog.title}
-        description={deleteDialog.description}
-        itemName={deleteDialog.itemName}
-        isLoading={deleteDialog.isLoading}
-      />
+          <button
+            disabled={currentPage >= totalPages}
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-slate-600"
+            title="Next page"
+          >
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </div>
     </div>
+      </div >
+
+  {/* Delete Confirmation Dialog */ }
+  <ConfirmDialog
+    isOpen={deleteDialog.isOpen}
+    onClose={() => setDeleteDialog((prev) => ({ ...prev, isOpen: false }))}
+    onConfirm={deleteDialog.onConfirm}
+    title={deleteDialog.title}
+    description={deleteDialog.description}
+    itemName={deleteDialog.itemName}
+    isLoading={deleteDialog.isLoading}
+  />
+    </div >
   );
 }
