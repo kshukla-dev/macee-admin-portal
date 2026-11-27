@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Topbar } from '@/components/Topbar';
 import { ImagePicker } from '@/components/ImagePicker';
 import { CustomSelect } from '@/components/CustomSelect';
+import { RichTextEditor } from '@/components/RichTextEditor';
 import { formatArticleHtml } from '@/lib/formatArticleHtml';
 import {
   FileText,
@@ -20,6 +21,7 @@ import {
   Sparkles,
   Eye,
   Code,
+  Type,
   Plus,
   Trash2,
   Edit2,
@@ -105,7 +107,27 @@ export function BlogStepForm({ initialData, isEdit = false }: BlogStepFormProps)
   const [isCustomSlug, setIsCustomSlug] = useState(Boolean(initialData?.slug));
   const [excerpt, setExcerpt] = useState(initialData?.excerpt || '');
   const [content, setContent] = useState(initialData?.content || '');
-  const [contentViewMode, setContentViewMode] = useState<'write' | 'preview'>('write');
+  const [contentViewMode, setContentViewMode] = useState<'rich' | 'code' | 'preview'>('rich');
+  const codeTextareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const insertCodeSnippet = (before: string, after = '', placeholderText = 'text') => {
+    const textarea = codeTextareaRef.current;
+    if (!textarea) {
+      setContent((prev) => `${prev}${before}${placeholderText}${after}`);
+      return;
+    }
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selected = content.slice(start, end) || placeholderText;
+    const nextValue = content.slice(0, start) + before + selected + after + content.slice(end);
+    setContent(nextValue);
+    requestAnimationFrame(() => {
+      textarea.focus();
+      const cursorStart = start + before.length;
+      const cursorEnd = cursorStart + selected.length;
+      textarea.setSelectionRange(cursorStart, cursorEnd);
+    });
+  };
 
   // Media
   const [coverImage, setCoverImage] = useState(initialData?.coverImage || '');
@@ -199,7 +221,7 @@ export function BlogStepForm({ initialData, isEdit = false }: BlogStepFormProps)
         }
         setAvailableCategories(loaded);
       })
-      .catch(() => {});
+      .catch(() => { });
     return () => {
       mounted = false;
     };
@@ -236,7 +258,7 @@ export function BlogStepForm({ initialData, isEdit = false }: BlogStepFormProps)
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ oldName, newName: formatted }),
         });
-      } catch {}
+      } catch { }
     } else {
       const existing = availableCategories.find(
         (c) => c.toLowerCase() === formatted.toLowerCase()
@@ -254,7 +276,7 @@ export function BlogStepForm({ initialData, isEdit = false }: BlogStepFormProps)
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name: formatted }),
           });
-        } catch {}
+        } catch { }
       }
     }
 
@@ -280,7 +302,7 @@ export function BlogStepForm({ initialData, isEdit = false }: BlogStepFormProps)
       await fetch(`/api/blog-categories?name=${encodeURIComponent(cat)}`, {
         method: 'DELETE',
       });
-    } catch {}
+    } catch { }
   };
 
   // Helper to generate slug from title
@@ -546,18 +568,18 @@ export function BlogStepForm({ initialData, isEdit = false }: BlogStepFormProps)
                     }
                   }}
                   className={`flex items-center space-x-3 p-3 rounded-xl text-left transition-all ${isCurrent
-                      ? 'bg-rose-50/80 border border-[#E30613]/30 ring-1 ring-[#E30613]/20 shadow-2xs'
-                      : isCompleted
-                        ? 'bg-slate-50 border border-slate-200/80 hover:bg-slate-100/80'
-                        : 'border border-transparent hover:bg-slate-50 opacity-60'
+                    ? 'bg-rose-50/80 border border-[#E30613]/30 ring-1 ring-[#E30613]/20 shadow-2xs'
+                    : isCompleted
+                      ? 'bg-slate-50 border border-slate-200/80 hover:bg-slate-100/80'
+                      : 'border border-transparent hover:bg-slate-50 opacity-60'
                     }`}
                 >
                   <div
                     className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 font-bold text-xs transition-colors ${isCurrent
-                        ? 'bg-[#E30613] text-white shadow-xs'
-                        : isCompleted
-                          ? 'bg-emerald-600 text-white'
-                          : 'bg-slate-100 text-slate-500'
+                      ? 'bg-[#E30613] text-white shadow-xs'
+                      : isCompleted
+                        ? 'bg-emerald-600 text-white'
+                        : 'bg-slate-100 text-slate-500'
                       }`}
                   >
                     {isCompleted ? <Check className="w-4 h-4" /> : s.number}
@@ -677,28 +699,42 @@ export function BlogStepForm({ initialData, isEdit = false }: BlogStepFormProps)
 
                   <div className="flex items-center space-x-3">
                     <span className="text-[11px] text-slate-400 font-mono">
-                      {content.trim() ? content.trim().split(/\s+/).length : 0} words
+                      {(() => {
+                        const plain = content.replace(/<[^>]*>/g, ' ').trim();
+                        return plain ? plain.split(/\s+/).length : 0;
+                      })()}{' '}
+                      words
                     </span>
 
                     {/* Mode Toggle Tabs */}
                     <div className="inline-flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-xs">
                       <button
                         type="button"
-                        onClick={() => setContentViewMode('write')}
-                        className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all cursor-pointer flex items-center space-x-1 ${contentViewMode === 'write'
-                            ? 'bg-white text-slate-900 shadow-2xs font-bold'
-                            : 'text-slate-500 hover:text-slate-900'
+                        onClick={() => setContentViewMode('rich')}
+                        className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all cursor-pointer flex items-center space-x-1 ${contentViewMode === 'rich'
+                          ? 'bg-white text-slate-900 shadow-2xs font-bold'
+                          : 'text-slate-500 hover:text-slate-900'
+                          }`}
+                      >
+                        <span>Text</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setContentViewMode('code')}
+                        className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all cursor-pointer flex items-center space-x-1 ${contentViewMode === 'code'
+                          ? 'bg-white text-slate-900 shadow-2xs font-bold'
+                          : 'text-slate-500 hover:text-slate-900'
                           }`}
                       >
                         <Code className="w-3.5 h-3.5" />
-                        <span>HTML Editor</span>
+                        <span>HTML / Markdown</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => setContentViewMode('preview')}
                         className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all cursor-pointer flex items-center space-x-1 ${contentViewMode === 'preview'
-                            ? 'bg-white text-slate-900 shadow-2xs font-bold'
-                            : 'text-slate-500 hover:text-slate-900'
+                          ? 'bg-white text-slate-900 shadow-2xs font-bold'
+                          : 'text-slate-500 hover:text-slate-900'
                           }`}
                       >
                         <Eye className="w-3.5 h-3.5 text-[#E30613]" />
@@ -708,15 +744,52 @@ export function BlogStepForm({ initialData, isEdit = false }: BlogStepFormProps)
                   </div>
                 </div>
 
-                {contentViewMode === 'write' ? (
-                  <textarea
-                    rows={14}
-                    required
+                {contentViewMode === 'rich' ? (
+                  <RichTextEditor
                     value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    placeholder="Write or paste your article HTML (e.g. <h2>Title</h2>, <p>Paragraph with <strong>bold</strong> text</p>, <ul><li>List items</li></ul>) or Markdown here..."
-                    className="w-full p-4 text-xs font-mono text-slate-800 placeholder-slate-400 rounded-xl border border-slate-200/90 focus:outline-none focus:border-[#E30613] focus:ring-2 focus:ring-[#E30613]/20 shadow-2xs leading-relaxed"
+                    onChange={setContent}
+                    placeholder="Write and format your article content here..."
                   />
+                ) : contentViewMode === 'code' ? (
+                  <div className="rounded-xl border border-slate-200/90 bg-white shadow-2xs overflow-hidden focus-within:border-[#E30613] focus-within:ring-2 focus-within:ring-[#E30613]/20">
+                    {/* Quick Formatting Tag Bar */}
+                    <div className="bg-slate-50/90 border-b border-slate-200/80 px-3 py-2 flex flex-wrap items-center gap-1.5">
+                      <span className="text-[10.5px] font-semibold text-slate-400 mr-1">
+                        Insert Tag:
+                      </span>
+                      {[
+                        { label: 'H2', before: '<h2>', after: '</h2>', sample: 'Section Heading' },
+                        { label: 'H3', before: '<h3>', after: '</h3>', sample: 'Subheading' },
+                        { label: 'P', before: '<p>', after: '</p>', sample: 'Paragraph text' },
+                        { label: 'Bold', before: '<strong>', after: '</strong>', sample: 'bold text' },
+                        { label: 'Italic', before: '<em>', after: '</em>', sample: 'italic text' },
+                        { label: 'Link', before: '<a href="https://">', after: '</a>', sample: 'Link Text' },
+                        { label: 'Quote', before: '<blockquote><p>', after: '</p></blockquote>', sample: 'Quoted text' },
+                        { label: 'UL', before: '<ul>\n  <li>', after: '</li>\n</ul>', sample: 'List item' },
+                        { label: 'OL', before: '<ol>\n  <li>', after: '</li>\n</ol>', sample: 'Step 1' },
+                        { label: 'MD ##', before: '\n## ', after: '\n', sample: 'Markdown Heading' },
+                        { label: 'MD **', before: '**', after: '**', sample: 'bold' },
+                      ].map((item) => (
+                        <button
+                          key={item.label}
+                          type="button"
+                          onClick={() => insertCodeSnippet(item.before, item.after, item.sample)}
+                          className="px-2 py-1 rounded-md bg-white border border-slate-200/90 hover:border-[#E30613] hover:text-[#E30613] text-[11px] font-mono font-semibold text-slate-600 transition-colors cursor-pointer"
+                        >
+                          {item.label}
+                        </button>
+                      ))}
+                    </div>
+                    <textarea
+                      ref={codeTextareaRef}
+                      rows={14}
+                      required
+                      value={content}
+                      onChange={(e) => setContent(e.target.value)}
+                      placeholder="Write or paste your article HTML (e.g. <h2>Title</h2>, <p>Paragraph with <strong>bold</strong> text</p>, <ul><li>List items</li></ul>) or Markdown here..."
+                      className="w-full p-4 text-xs font-mono text-slate-800 placeholder-slate-400 focus:outline-none leading-relaxed resize-y"
+                    />
+                  </div>
                 ) : (
                   <div className="min-h-[350px] p-6 rounded-xl border border-slate-200 bg-white shadow-2xs overflow-y-auto max-h-[500px]">
                     {content.trim() ? (
@@ -918,8 +991,8 @@ export function BlogStepForm({ initialData, isEdit = false }: BlogStepFormProps)
                           }
                         }}
                         className={`p-3.5 rounded-xl border text-xs font-semibold text-left flex items-center justify-between transition-all cursor-pointer ${isSelected
-                            ? 'bg-rose-50/80 border-[#E30613] text-[#b80510] shadow-2xs'
-                            : 'bg-white border-slate-200/90 text-slate-700 hover:border-slate-300'
+                          ? 'bg-rose-50/80 border-[#E30613] text-[#b80510] shadow-2xs'
+                          : 'bg-white border-slate-200/90 text-slate-700 hover:border-slate-300'
                           }`}
                       >
                         <span className="truncate pr-2">{cat}</span>
@@ -1132,8 +1205,8 @@ export function BlogStepForm({ initialData, isEdit = false }: BlogStepFormProps)
                     type="button"
                     onClick={() => setStatus('published')}
                     className={`p-4 rounded-xl border text-left transition-all ${status === 'published'
-                        ? 'bg-emerald-50/80 border-emerald-500 ring-2 ring-emerald-500/20'
-                        : 'bg-white border-slate-200 hover:border-slate-300'
+                      ? 'bg-emerald-50/80 border-emerald-500 ring-2 ring-emerald-500/20'
+                      : 'bg-white border-slate-200 hover:border-slate-300'
                       }`}
                   >
                     <div className="flex items-center justify-between">
@@ -1149,8 +1222,8 @@ export function BlogStepForm({ initialData, isEdit = false }: BlogStepFormProps)
                     type="button"
                     onClick={() => setStatus('draft')}
                     className={`p-4 rounded-xl border text-left transition-all ${status === 'draft'
-                        ? 'bg-amber-50/80 border-amber-500 ring-2 ring-amber-500/20'
-                        : 'bg-white border-slate-200 hover:border-slate-300'
+                      ? 'bg-amber-50/80 border-amber-500 ring-2 ring-amber-500/20'
+                      : 'bg-white border-slate-200 hover:border-slate-300'
                       }`}
                   >
                     <div className="flex items-center justify-between">
