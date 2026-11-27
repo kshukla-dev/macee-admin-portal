@@ -153,7 +153,7 @@ export default function TestimonialsManagementPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-[#F0F2F5]">
       <Topbar
         breadcrumbs={[
           { label: 'Dashboard', href: '/dashboard' },

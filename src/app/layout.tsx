@@ -31,7 +31,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${dmSans.variable} ${dmSerif.variable}`}>
-      <body className={`${dmSans.className} bg-slate-50 text-slate-900 antialiased min-h-screen selection:bg-rose-500/20 selection:text-red-700`}>
+      <body className={`${dmSans.className} bg-[#F0F2F5] text-slate-900 antialiased min-h-screen selection:bg-rose-500/20 selection:text-red-700`}>
         {/* Macee Brand Top Accent Line (Matches Macee Website signature top red bar) */}
         <div className="h-[3px] w-full bg-[#E30613] fixed top-0 left-0 z-50 pointer-events-none" />
         {children}

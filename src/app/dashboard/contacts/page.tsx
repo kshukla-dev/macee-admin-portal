@@ -354,7 +354,7 @@ export default function ContactsManagementPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-[#F0F2F5]">
       {/* Topbar matching exact screenshot breadcrumbs */}
       <Topbar
         breadcrumbs={[
@@ -787,7 +787,7 @@ export default function ContactsManagementPage() {
                 <span className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">
                   MESSAGE
                 </span>
-                <div className="w-full p-4 sm:p-5 rounded-2xl bg-[#F8FAFC] border border-slate-100 text-[14px] text-slate-700 leading-relaxed font-sans">
+                <div className="w-full p-4 sm:p-5 rounded-2xl bg-[#F0F2F5] border border-slate-100 text-[14px] text-slate-700 leading-relaxed font-sans">
                   {selectedContact.message || 'No message content provided.'}
                 </div>
               </div>

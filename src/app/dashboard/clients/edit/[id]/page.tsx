@@ -29,7 +29,7 @@ export default function EditTestimonialPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-8">
+      <div className="min-h-screen bg-[#F0F2F5] flex items-center justify-center p-8">
         <div className="text-center space-y-3">
           <div className="w-10 h-10 border-4 border-[#E30613] border-t-transparent rounded-full animate-spin mx-auto" />
           <p className="text-xs text-slate-500 font-medium">Loading testimonial...</p>
@@ -40,7 +40,7 @@ export default function EditTestimonialPage() {
 
   if (!item) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-8">
+      <div className="min-h-screen bg-[#F0F2F5] flex items-center justify-center p-8">
         <div className="text-center space-y-3 max-w-md bg-white p-8 rounded-2xl border border-slate-100 shadow-2xs">
           <h2 className="text-base font-bold text-slate-900">Testimonial Not Found</h2>
           <p className="text-xs text-slate-500">The testimonial you are trying to edit does not exist or has been removed.</p>

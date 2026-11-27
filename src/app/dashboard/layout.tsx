@@ -16,7 +16,7 @@ export default async function DashboardLayout({
 
   return (
     <SidebarProvider>
-      <div className="flex h-screen bg-[#F4F6FB] overflow-hidden font-sans">
+      <div className="flex h-screen bg-[#F0F2F5] overflow-hidden font-sans">
         {/* Fixed Admin Sidebar */}
         <Sidebar />
 

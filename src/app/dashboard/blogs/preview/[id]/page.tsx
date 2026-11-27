@@ -76,7 +76,7 @@ export default function ArticlePreviewPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC]">
+      <div className="min-h-screen bg-[#F0F2F5]">
         <Topbar
           breadcrumbs={[
             { label: 'Dashboard', href: '/dashboard' },
@@ -96,7 +96,7 @@ export default function ArticlePreviewPage() {
 
   if (!blog) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC]">
+      <div className="min-h-screen bg-[#F0F2F5]">
         <Topbar
           breadcrumbs={[
             { label: 'Dashboard', href: '/dashboard' },
@@ -140,7 +140,7 @@ export default function ArticlePreviewPage() {
     : 'Recent Post';
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-[#F0F2F5]">
       <Topbar backHref="/dashboard/blogs" />
 
       <div className="p-6 sm:p-8 lg:p-10 max-w-[1440px] mx-auto space-y-6">
