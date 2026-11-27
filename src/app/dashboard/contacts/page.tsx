@@ -51,8 +51,8 @@ const STATUS_CONFIG: Record<
 > = {
   new: {
     label: 'New',
-    pill: 'bg-sky-50 text-sky-700 border-sky-200 hover:bg-sky-100/80',
-    dot: 'bg-sky-500',
+    pill: 'bg-rose-50 text-[#E30613] border-rose-200 hover:bg-rose-100/80',
+    dot: 'bg-[#E30613]',
   },
   in_progress: {
     label: 'In Progress',
@@ -105,7 +105,7 @@ function StatusDropdown({
     dot: string;
     hover: string;
   }> = [
-    { value: 'new', label: 'New', dot: 'bg-sky-500', hover: 'hover:bg-sky-50 hover:text-sky-700' },
+    { value: 'new', label: 'New', dot: 'bg-[#E30613]', hover: 'hover:bg-rose-50 hover:text-[#E30613]' },
     { value: 'in_progress', label: 'In Progress', dot: 'bg-amber-500', hover: 'hover:bg-amber-50 hover:text-amber-700' },
     { value: 'converted', label: 'Converted', dot: 'bg-emerald-500', hover: 'hover:bg-emerald-50 hover:text-emerald-700' },
     { value: 'archived', label: 'Archived', dot: 'bg-slate-400', hover: 'hover:bg-slate-100 hover:text-slate-700' },
@@ -607,7 +607,7 @@ export default function ContactsManagementPage() {
                         filteredContacts.length > 0
                       }
                       onChange={handleSelectAll}
-                      className="rounded border-slate-300 text-[#E30613] focus:ring-0 cursor-pointer"
+                      className="rounded border-slate-300 text-[#E30613] accent-[#E30613] focus:ring-0 cursor-pointer"
                     />
                   </th>
                   <th className="py-3 px-4">Name</th>
@@ -648,7 +648,7 @@ export default function ContactsManagementPage() {
                             type="checkbox"
                             checked={isSelected}
                             onChange={() => handleSelectRow(contact.id)}
-                            className="rounded border-slate-300 text-[#E30613] focus:ring-0 cursor-pointer"
+                            className="rounded border-slate-300 text-[#E30613] accent-[#E30613] focus:ring-0 cursor-pointer"
                           />
                         </td>
 

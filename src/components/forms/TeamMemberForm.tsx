@@ -307,7 +307,7 @@ export function TeamMemberForm({ initialData, isEdit = false }: TeamMemberFormPr
                     type="checkbox"
                     checked={active}
                     onChange={(e) => setActive(e.target.checked)}
-                    className="rounded border-slate-300 text-[#E30613] focus:ring-[#E30613] w-4 h-4 cursor-pointer"
+                    className="rounded border-slate-300 accent-[#E30613] text-[#E30613] focus:ring-[#E30613] w-4.5 h-4.5 cursor-pointer"
                   />
                   <span className="text-xs font-semibold text-slate-800">
                     Active & Published on Website

@@ -112,6 +112,13 @@ textarea {
   font-size: 14.5px !important;
 }
 
+/* All Checkboxes and Radios themed to Macee Brand Red */
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: #E30613 !important;
+  cursor: pointer;
+}
+
 label {
   font-size: 13.5px;
 }

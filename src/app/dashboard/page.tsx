@@ -186,7 +186,7 @@ export default function DashboardOverviewPage() {
       countLabel: 'Enquiries',
       subtext: `${stats.newLeads} new awaiting response`,
       status: 'Pipeline Active',
-      statusColor: 'bg-sky-50 text-sky-700 border-sky-200',
+      statusColor: 'bg-[#EAF0FC] text-[#36427D] border-slate-200',
     },
     {
       id: 'mod-team',
@@ -482,7 +482,7 @@ export default function DashboardOverviewPage() {
                         <div className="absolute -top-14 bg-[#0E1726] text-white p-2 rounded-xl text-[10px] shadow-lg whitespace-nowrap z-20 pointer-events-none animate-fadeIn">
                           <p className="font-bold">{item.month} 2026</p>
                           <p className="text-rose-300">Leads: {item.leads} submissions</p>
-                          <p className="text-indigo-200">Articles: {item.articles} published</p>
+                          <p className="text-slate-300">Articles: {item.articles} published</p>
                         </div>
                       )}
 
