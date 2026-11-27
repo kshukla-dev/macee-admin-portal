@@ -149,7 +149,7 @@ export default function ArticlePreviewPage() {
         ]}
       />
 
-      <div className="p-4 sm:p-6 lg:p-8 max-w-[1200px] mx-auto space-y-6">
+      <div className="p-6 sm:p-8 lg:p-10 max-w-[1440px] mx-auto space-y-6">
         {/* Top Control Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white rounded-2xl p-4 sm:px-6 border border-slate-200/80 shadow-2xs">
           <div className="flex items-center space-x-3">

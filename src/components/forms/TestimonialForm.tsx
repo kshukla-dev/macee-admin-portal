@@ -140,7 +140,7 @@ export function TestimonialForm({ initialData, isEdit = false }: TestimonialForm
         ]}
       />
 
-      <div className="px-4 sm:px-6 lg:px-8 py-6 max-w-6xl mx-auto space-y-6">
+      <div className="p-6 sm:p-8 lg:p-10 max-w-[1440px] mx-auto space-y-6">
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-200">
           <div className="flex items-center space-x-3">
