@@ -16,7 +16,6 @@ import {
   Edit2,
   Trash2,
   Eye,
-  CheckCircle2,
   BookOpen,
   Sparkles,
   Users,
@@ -100,7 +99,6 @@ export default function BlogManagementPage() {
 
   // Action Menu & Alerts State
   const [activeActionMenuId, setActiveActionMenuId] = useState<string | null>(null);
-  const [syncAlert, setSyncAlert] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -285,16 +283,6 @@ export default function BlogManagementPage() {
             </div>
           </div>
         </div>
-
-        {/* Sync Toast Alert */}
-        {syncAlert && (
-          <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium flex items-center justify-between shadow-2xs animate-fadeIn">
-            <div className="flex items-center space-x-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span>Article saved and website sync files updated successfully!</span>
-            </div>
-          </div>
-        )}
 
         {/* Tab Filters & Search Bar */}
         <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-2xs flex flex-col md:flex-row md:items-center md:justify-between gap-3">

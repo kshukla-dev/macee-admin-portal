@@ -15,9 +15,7 @@ import {
   ShieldCheck,
   TrendingUp,
   Download,
-  RefreshCw,
   Search,
-  CheckCircle2,
   ArrowRight,
   ChevronRight,
   ExternalLink,
@@ -65,8 +63,6 @@ export default function DashboardOverviewPage() {
 
   const [recentLeads, setRecentLeads] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [syncing, setSyncing] = useState(false);
-  const [syncStatus, setSyncStatus] = useState<any>(null);
   const [timeRange, setTimeRange] = useState<'6m' | 'ytd' | '1y'>('6m');
   const [hoveredMonth, setHoveredMonth] = useState<number | null>(null);
 
@@ -132,19 +128,6 @@ export default function DashboardOverviewPage() {
       console.error(e);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleManualSync = async () => {
-    try {
-      setSyncing(true);
-      const res = await fetch('/api/sync', { method: 'POST' });
-      const data = await res.json();
-      setSyncStatus(data);
-    } catch (e) {
-      alert('Sync failed');
-    } finally {
-      setSyncing(false);
     }
   };
 
@@ -303,29 +286,8 @@ export default function DashboardOverviewPage() {
               <Download className="w-3.5 h-3.5" />
               <span>Export Portal Summary</span>
             </button>
-
-            <button
-              onClick={handleManualSync}
-              disabled={syncing}
-              className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl bg-[#E30613] hover:bg-[#b80510] text-white text-xs font-semibold shadow-xs transition-all"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${syncing ? 'animate-spin' : ''}`} />
-              <span>{syncing ? 'Synchronizing...' : 'Sync All with Website'}</span>
-            </button>
           </div>
         </div>
-
-        {syncStatus && (
-          <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center justify-between shadow-2xs animate-fadeIn">
-            <div className="flex items-center space-x-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              <span>All 5 portal modules synchronized live with macee-_update_contant!</span>
-            </div>
-            <span className="font-mono text-[11px] text-emerald-700">
-              {new Date(syncStatus.timestamp).toLocaleTimeString()}
-            </span>
-          </div>
-        )}
 
         {/* =================================================================
             ROW OF 4 REAL PORTAL METRIC CARDS (Exact Mockup Style)
@@ -533,27 +495,27 @@ export default function DashboardOverviewPage() {
                 </span>
               </div>
               <p className="text-xs text-slate-500 mt-1">
-                Live website content synchronization standing:
+                Live website published content overview:
               </p>
             </div>
 
-            {/* Synchronization Status List */}
+            {/* Published Records Status List */}
             <div className="space-y-2.5">
               <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100/90 text-xs">
                 <span className="text-slate-600 font-medium">Team Profiles:</span>
-                <strong className="text-emerald-600 font-semibold">✓ Synced ({stats.teamCount})</strong>
+                <strong className="text-emerald-600 font-semibold">Active ({stats.teamCount})</strong>
               </div>
               <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100/90 text-xs">
                 <span className="text-slate-600 font-medium">Blog Articles:</span>
-                <strong className="text-emerald-600 font-semibold">✓ Synced ({stats.blogsCount})</strong>
+                <strong className="text-emerald-600 font-semibold">Published ({stats.blogsCount})</strong>
               </div>
               <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100/90 text-xs">
                 <span className="text-slate-600 font-medium">FAQs & Categories:</span>
-                <strong className="text-emerald-600 font-semibold">✓ Synced ({stats.faqsCount})</strong>
+                <strong className="text-emerald-600 font-semibold">Active ({stats.faqsCount})</strong>
               </div>
               <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100/90 text-xs">
                 <span className="text-slate-600 font-medium">Testimonials:</span>
-                <strong className="text-emerald-600 font-semibold">✓ Synced ({stats.clientsCount})</strong>
+                <strong className="text-emerald-600 font-semibold">Active ({stats.clientsCount})</strong>
               </div>
             </div>
 
@@ -580,7 +542,7 @@ export default function DashboardOverviewPage() {
               Portal Modules & Content Management Matrix
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
-              Live status, data record volume, and synchronization standing across all admin options
+              Live status and record volume across all admin options
             </p>
           </div>
 

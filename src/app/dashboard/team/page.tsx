@@ -36,7 +36,6 @@ interface TeamMember {
 export default function TeamManagementPage() {
   const [team, setTeam] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
-  const [syncedAlert, setSyncedAlert] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const pageSize = 6;
@@ -199,12 +198,6 @@ export default function TeamManagementPage() {
             <span>Add Member</span>
           </Link>
         </div>
-
-        {syncedAlert && (
-          <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center justify-between animate-fadeIn">
-            <span>✓ Team profile updated and synced with website!</span>
-          </div>
-        )}
 
         {/* Team Grid */}
         {loading ? (

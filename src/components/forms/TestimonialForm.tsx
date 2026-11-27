@@ -277,11 +277,6 @@ export function TestimonialForm({ initialData, isEdit = false }: TestimonialForm
                   />
                 </div>
               </div>
-
-              {/* Status info */}
-              <div className="pt-4 border-t border-slate-100 text-[11px] text-slate-400">
-                <span>✓ Automatically synchronized with website trust sections</span>
-              </div>
             </div>
           </div>
 

@@ -15,7 +15,6 @@ import {
   Tag,
   Edit2,
   Trash2,
-  CheckCircle2,
   ChevronDown,
   ChevronUp,
   ChevronLeft,
@@ -195,7 +194,7 @@ const SUGGESTED_TAGS_BY_PAGE: Record<string, string[]> = {
     '24 - 48 Hour Recruiter Review',
     'Flexible Hybrid Options',
     'Job Alerts & Open Registration',
-    'Live OTYS Desk Synchronization',
+    'Live OTYS Desk Integration',
   ],
   contact: [
     'Response Within 24 Business Hours',
@@ -213,7 +212,6 @@ export default function FaqManagementPage() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const pageSize = 10;
   const [loading, setLoading] = useState(true);
-  const [syncMessage, setSyncMessage] = useState<string | null>(null);
 
   // Accordion Expand State
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -349,8 +347,6 @@ export default function FaqManagementPage() {
           const data = await res.json();
           if (data.success) {
             setItems((prev) => prev.filter((item) => item.id !== id));
-            setSyncMessage('✓ FAQ deleted and updated on Macee website.');
-            setTimeout(() => setSyncMessage(null), 4000);
             setDeleteDialog((prev) => ({ ...prev, isOpen: false, isLoading: false }));
           } else {
             alert('Failed to delete FAQ');
@@ -376,10 +372,7 @@ export default function FaqManagementPage() {
         body: JSON.stringify({ id: faqId, active: isNowActive }),
       });
       const data = await res.json();
-      if (data.success) {
-        setSyncMessage(`✓ Question status set to ${isNowActive ? 'Active' : 'Inactive'} and synced.`);
-        setTimeout(() => setSyncMessage(null), 3500);
-      } else {
+      if (!data.success) {
         fetchFaqs();
       }
     } catch (e) {
@@ -410,22 +403,9 @@ export default function FaqManagementPage() {
             FAQs
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Manage page-specific FAQs for Home, About Us, Clients, Professionals, Projects, and Contact with instant website sync.
+            Manage page-specific FAQs for Home, About Us, Clients, Professionals, Projects, and Contact.
           </p>
         </div>
-
-        {/* Sync Toast / Banner */}
-        {syncMessage && (
-          <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium flex items-center justify-between shadow-2xs animate-fadeIn">
-            <div className="flex items-center space-x-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span>{syncMessage}</span>
-            </div>
-            <button onClick={() => setSyncMessage(null)} className="text-emerald-700 hover:text-emerald-900 text-xs font-bold px-2 py-0.5">
-              Dismiss
-            </button>
-          </div>
-        )}
 
         {/* PAGE FILTER TABS BAR WITH SCROLL CONTROLS */}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-2xs p-2 relative flex items-center">

@@ -12,7 +12,6 @@ import {
   Plus,
   Trash2,
   Edit2,
-  CheckCircle2,
   Search,
   Sparkles,
   Quote,
@@ -34,7 +33,6 @@ export default function TestimonialsManagementPage() {
   const [clientsData, setClientsData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [syncAlert, setSyncAlert] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const pageSize = 4;
@@ -122,8 +120,6 @@ export default function TestimonialsManagementPage() {
       const data = await res.json();
       if (res.ok && data.success) {
         setClientsData(data.clients || updatedData);
-        setSyncAlert(true);
-        setTimeout(() => setSyncAlert(false), 3000);
       } else {
         alert(data.error || 'Failed to save testimonials data');
       }
@@ -200,16 +196,6 @@ export default function TestimonialsManagementPage() {
             </div>
           </div>
         </div>
-
-        {/* Sync Toast Alert */}
-        {syncAlert && (
-          <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium flex items-center justify-between shadow-2xs animate-fadeIn">
-            <div className="flex items-center space-x-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span>✓ Testimonial changes saved and synchronized with website files!</span>
-            </div>
-          </div>
-        )}
 
         {/* =================================================================
             TOOLBAR (Search Bar on Left + Add Testimonial on Right)
