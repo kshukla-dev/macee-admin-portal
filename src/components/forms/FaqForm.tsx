@@ -328,8 +328,9 @@ export function FaqForm({ initialData, isEdit = false }: FaqFormProps) {
           <div className="flex items-center justify-between pt-2">
 
             <button
+              type="button"
               onClick={() => router.back()}
-              className="inline-flex items-center space-x-1.5 px-6 py-2.5 rounded-xl bg-[#ffffff] text-xs font-bold shadow-xs transition-all disabled:opacity-50"
+              className="inline-flex items-center space-x-1.5 px-6 py-2.5 rounded-xl bg-[#ffffff] text-xs font-bold shadow-xs transition-all disabled:opacity-50 cursor-pointer"
             >
               <span>Back</span>
             </button>

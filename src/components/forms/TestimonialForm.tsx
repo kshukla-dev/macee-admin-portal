@@ -267,12 +267,13 @@ export function TestimonialForm({ initialData, isEdit = false }: TestimonialForm
 
           {/* Form Actions Footer */}
           <div className="flex items-center justify-between pt-2">
-            <Link
-              href="/dashboard/clients"
-              className="text-xs font-semibold text-slate-500 hover:text-slate-800"
+            <button
+              type="button"
+              onClick={() => router.back()}
+              className="inline-flex items-center space-x-1.5 px-6 py-2.5 rounded-xl bg-[#ffffff] text-xs font-bold shadow-xs transition-all disabled:opacity-50 cursor-pointer"
             >
-              ← Back to Certificates
-            </Link>
+              <span>Back</span>
+            </button>
 
             <button
               type="submit"
