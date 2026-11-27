@@ -203,19 +203,7 @@ export function FaqForm({ initialData, isEdit = false }: FaqFormProps) {
                   placeholder="e.g. SNA NEN 4400-1"
                   className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613]"
                 />
-                {/* Suggestions */}
-                <div className="flex flex-wrap gap-1 mt-1.5">
-                  {currentTags.slice(0, 3).map((st) => (
-                    <button
-                      key={st}
-                      type="button"
-                      onClick={() => setFormTag(st)}
-                      className="text-[10px] px-2 py-0.5 rounded bg-slate-100 text-slate-600 hover:bg-slate-200 font-medium"
-                    >
-                      {st}
-                    </button>
-                  ))}
-                </div>
+
               </div>
 
               <div>
@@ -338,12 +326,13 @@ export function FaqForm({ initialData, isEdit = false }: FaqFormProps) {
 
           {/* Form Actions Footer */}
           <div className="flex items-center justify-between pt-2">
-            <Link
-              href="/dashboard/faqs"
-              className="text-xs font-semibold text-slate-500 hover:text-slate-800"
+
+            <button
+              onClick={() => router.back()}
+              className="inline-flex items-center space-x-1.5 px-6 py-2.5 rounded-xl bg-[#ffffff] text-xs font-bold shadow-xs transition-all disabled:opacity-50"
             >
-              ← Back to FAQs
-            </Link>
+              <span>Back</span>
+            </button>
 
             <button
               type="submit"

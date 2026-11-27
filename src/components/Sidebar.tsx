@@ -13,7 +13,7 @@ import {
   Settings,
   LogOut,
   ExternalLink,
-  MessageSquareQuote,
+  Award,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
@@ -100,9 +100,9 @@ export function Sidebar({ className = '' }: SidebarProps) {
       icon: HelpCircle,
     },
     {
-      name: 'Testimonials',
+      name: 'Certificates',
       href: '/dashboard/clients',
-      icon: MessageSquareQuote,
+      icon: Award,
     },
     {
       name: 'System Settings',
@@ -179,7 +179,10 @@ export function Sidebar({ className = '' }: SidebarProps) {
             const isActive =
               item.href === '/dashboard'
                 ? pathname === '/dashboard'
-                : pathname.startsWith(item.href);
+                : pathname.startsWith(item.href) ||
+                  (item.href === '/dashboard/clients' &&
+                    (pathname.startsWith('/dashboard/testimonials') ||
+                      pathname.startsWith('/dashboard/certificates')));
 
             if (isCollapsed) {
               return (

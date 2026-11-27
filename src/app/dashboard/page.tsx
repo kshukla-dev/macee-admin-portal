@@ -27,7 +27,7 @@ import {
   FolderGit2,
   Clock,
   Sparkles,
-  MessageSquareQuote,
+  Award,
 } from 'lucide-react';
 
 interface ModuleSummary {
@@ -215,15 +215,15 @@ export default function DashboardOverviewPage() {
     },
     {
       id: 'mod-clients',
-      name: 'Testimonials',
-      description: 'Client reviews, partner testimonials, and verified accreditations.',
+      name: 'Certificates',
+      description: 'Company certificates, partner accreditations, and verified certifications.',
       href: '/dashboard/clients',
-      icon: MessageSquareQuote,
+      icon: Award,
       iconBg: 'bg-[#EAF0FC]',
       iconColor: 'text-[#36427D]',
       count: stats.clientsCount,
-      countLabel: 'Testimonials',
-      subtext: 'Verified Client Stories',
+      countLabel: 'Certificates',
+      subtext: 'Verified Accreditations',
       status: 'SNA NEN 4400-1',
       statusColor: 'bg-[#F0F3FA] text-[#36427D] border-slate-200',
     },
@@ -514,7 +514,7 @@ export default function DashboardOverviewPage() {
                 <strong className="text-emerald-600 font-semibold">Active ({stats.faqsCount})</strong>
               </div>
               <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100/90 text-xs">
-                <span className="text-slate-600 font-medium">Testimonials:</span>
+                <span className="text-slate-600 font-medium">Certificates:</span>
                 <strong className="text-emerald-600 font-semibold">Active ({stats.clientsCount})</strong>
               </div>
             </div>

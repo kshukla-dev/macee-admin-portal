@@ -8,7 +8,7 @@ import { ImagePicker } from '@/components/ImagePicker';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { SkeletonCertCard } from '@/components/Skeleton';
 import {
-  MessageSquareQuote,
+  Award,
   Plus,
   Trash2,
   Edit2,
@@ -121,10 +121,10 @@ export default function TestimonialsManagementPage() {
       if (res.ok && data.success) {
         setClientsData(data.clients || updatedData);
       } else {
-        alert(data.error || 'Failed to save testimonials data');
+        alert(data.error || 'Failed to save certificates data');
       }
     } catch (e) {
-      alert('Failed to save testimonials data');
+      alert('Failed to save certificates data');
     } finally {
       setSaving(false);
     }
@@ -134,9 +134,9 @@ export default function TestimonialsManagementPage() {
     const item = testimonialsList[index];
     setDeleteDialog({
       isOpen: true,
-      title: 'Delete Testimonial',
-      description: 'Are you sure you want to delete this testimonial? This action cannot be undone and will update the live website.',
-      itemName: item?.title || 'Testimonial',
+      title: 'Delete Certificate',
+      description: 'Are you sure you want to delete this certificate? This action cannot be undone and will update the live website.',
+      itemName: item?.title || 'Certificate',
       isLoading: false,
       onConfirm: async () => {
         setDeleteDialog((prev) => ({ ...prev, isLoading: true }));
@@ -157,9 +157,9 @@ export default function TestimonialsManagementPage() {
       <Topbar
         breadcrumbs={[
           { label: 'Dashboard', href: '/dashboard' },
-          { label: 'Testimonials' },
+          { label: 'Certificates' },
         ]}
-        searchPlaceholder="Search testimonials by client or quote..."
+        searchPlaceholder="Search certificates by title, tag, or accreditation..."
         onSearch={(q) => setSearchQuery(q)}
       />
 
@@ -170,22 +170,22 @@ export default function TestimonialsManagementPage() {
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pb-2 border-b border-slate-200/80">
           <div className="space-y-1">
             <h1 className="text-3xl sm:text-4xl font-serif text-[#111827] tracking-tight">
-              Testimonials
+              Certificates
             </h1>
             <p className="text-xs sm:text-sm text-slate-500">
-              Manage client testimonials, partner quotes, and verified accreditations on macee.com.
+              Manage company certificates, partner accreditations, and verified accreditations on macee.com.
             </p>
           </div>
 
           {/* Right side: KPI Card */}
           <div className="flex items-center space-x-3 sm:space-x-4 shrink-0">
-            {/* Total Testimonials */}
+            {/* Total Certificates */}
             <div className="bg-white rounded-2xl px-4 py-3 sm:px-5 sm:py-3.5 border border-slate-100 shadow-2xs flex items-center space-x-3 sm:space-x-4 min-w-[170px] sm:min-w-[190px]">
               <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
-                <MessageSquareQuote className="w-5 h-5" />
+                <Award className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-[11px] sm:text-xs font-medium text-slate-500">Total Stories</p>
+                <p className="text-[11px] sm:text-xs font-medium text-slate-500">Total Certificates</p>
                 <div className="flex items-baseline space-x-2 mt-0.5">
                   <span className="text-xl sm:text-2xl font-bold text-[#111827] font-sans">
                     {testimonialsList.length}
@@ -198,14 +198,14 @@ export default function TestimonialsManagementPage() {
         </div>
 
         {/* =================================================================
-            TOOLBAR (Search Bar on Left + Add Testimonial on Right)
+            TOOLBAR (Search Bar on Left + Add Certificate on Right)
             ================================================================= */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
           <div className="relative flex-1 max-w-md">
             <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
-              placeholder="Search testimonials by client, tag, or quote..."
+              placeholder="Search certificates by title, tag, or description..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-white border border-slate-200/90 rounded-xl pl-8 pr-3 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#E30613] shadow-2xs"
@@ -217,12 +217,12 @@ export default function TestimonialsManagementPage() {
             className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl bg-[#E30613] hover:bg-[#b80510] text-white text-xs font-semibold shadow-xs transition-all shrink-0"
           >
             <Plus className="w-3.5 h-3.5" />
-            <span>Add Testimonial</span>
+            <span>Add Certificate</span>
           </Link>
         </div>
 
         {/* =================================================================
-            TESTIMONIALS CARDS GRID
+            CERTIFICATES CARDS GRID
             ================================================================= */}
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -232,7 +232,7 @@ export default function TestimonialsManagementPage() {
           </div>
         ) : filteredItems.length === 0 ? (
           <div className="bg-white rounded-2xl border border-slate-100 shadow-2xs p-12 text-center text-slate-400 text-xs">
-            {searchQuery ? 'No testimonials match your search.' : 'No testimonials added yet.'}
+            {searchQuery ? 'No certificates match your search.' : 'No certificates added yet.'}
           </div>
         ) : (
           <>
@@ -267,7 +267,7 @@ export default function TestimonialsManagementPage() {
                             </div>
                           )}
                           <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-[#F0F3FA] text-[#36427D] truncate">
-                            {item.tag || 'Testimonial'}
+                            {item.tag || 'Certificate'}
                           </span>
                         </div>
 
@@ -275,14 +275,14 @@ export default function TestimonialsManagementPage() {
                           <Link
                             href={`/dashboard/clients/edit/${item.id}`}
                             className="p-1.5 rounded-lg text-slate-500 hover:text-[#111827] hover:bg-slate-100 transition-colors"
-                            title="Edit Testimonial"
+                            title="Edit Certificate"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
                           </Link>
                           <button
                             onClick={() => handleDeleteItem(realIndex)}
                             className="p-1.5 rounded-lg text-rose-500 hover:text-rose-700 hover:bg-rose-50 transition-colors"
-                            title="Delete Testimonial"
+                            title="Delete Certificate"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -319,7 +319,7 @@ export default function TestimonialsManagementPage() {
             <div className="bg-white rounded-2xl border border-slate-100 shadow-2xs p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
               <div>
                 Showing {filteredItems.length === 0 ? 0 : (currentPage - 1) * pageSize + 1}–
-                {Math.min(currentPage * pageSize, filteredItems.length)} of {filteredItems.length} testimonials
+                {Math.min(currentPage * pageSize, filteredItems.length)} of {filteredItems.length} certificates
               </div>
 
               <div className="flex items-center space-x-1">

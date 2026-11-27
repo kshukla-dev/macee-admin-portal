@@ -7,10 +7,9 @@ import { Topbar } from '@/components/Topbar';
 import { ImagePicker } from '@/components/ImagePicker';
 import { CustomSelect } from '@/components/CustomSelect';
 import {
-  MessageSquareQuote,
+  Award,
   ArrowLeft,
   Check,
-  Quote,
   AlertCircle,
   Loader2,
 } from 'lucide-react';
@@ -26,11 +25,12 @@ export interface TestimonialItem {
 }
 
 const TAG_OPTIONS = [
-  'Client Testimonial',
-  'Tech Sector Partner',
-  'Compliance Accreditation',
-  'Global Mobility Story',
-  'Employer of Record Client',
+  'Compliance Certification',
+  'Industry Accreditation',
+  'Quality & Safety Standard',
+  'SNA NEN 4400-1',
+  'Tech Sector Certification',
+  'Client Certificate',
 ];
 
 interface TestimonialFormProps {
@@ -46,7 +46,7 @@ export function TestimonialForm({ initialData, isEdit = false }: TestimonialForm
 
   // Form Fields
   const [title, setTitle] = useState(initialData?.title || '');
-  const [tag, setTag] = useState(initialData?.tag || 'Client Testimonial');
+  const [tag, setTag] = useState(initialData?.tag || 'Compliance Certification');
   const [text, setText] = useState(initialData?.text || '');
   const [image, setImage] = useState(
     typeof initialData?.image === 'string'
@@ -67,11 +67,11 @@ export function TestimonialForm({ initialData, isEdit = false }: TestimonialForm
     setError(null);
 
     if (!title.trim()) {
-      setError('Please provide the client or company name.');
+      setError('Please provide the certificate or company name.');
       return;
     }
     if (!text.trim()) {
-      setError('Please provide the testimonial quote or review.');
+      setError('Please provide the certificate description or details.');
       return;
     }
 
@@ -82,7 +82,7 @@ export function TestimonialForm({ initialData, isEdit = false }: TestimonialForm
         : [];
 
       const newItem: TestimonialItem = {
-        id: initialData?.id || `testimonial-${Date.now()}`,
+        id: initialData?.id || `cert-${Date.now()}`,
         title: title.trim(),
         tag: tag.trim() || 'Client Testimonial',
         text: text.trim(),
@@ -139,10 +139,10 @@ export function TestimonialForm({ initialData, isEdit = false }: TestimonialForm
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-200">
           <div>
             <h1 className="text-2xl sm:text-3xl font-serif text-[#111827] tracking-tight">
-              {isEdit ? 'Edit Testimonial' : 'Add New Testimonial'}
+              {isEdit ? 'Edit Certificate' : 'Add New Certificate'}
             </h1>
             <p className="text-xs text-slate-500 mt-0.5">
-              Client reviews, partner quotes, and verified accreditations on macee.com.
+              Official certificates, verified accreditations, and compliance standards on macee.com.
             </p>
           </div>
 
@@ -165,7 +165,7 @@ export function TestimonialForm({ initialData, isEdit = false }: TestimonialForm
               ) : (
                 <Check className="w-4 h-4" />
               )}
-              <span>{saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Save Testimonial'}</span>
+              <span>{saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Save Certificate'}</span>
             </button>
           </div>
         </div>
@@ -183,19 +183,19 @@ export function TestimonialForm({ initialData, isEdit = false }: TestimonialForm
             {/* Left 2 Cols: Content Info */}
             <div className="md:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-2xs p-6 sm:p-7 space-y-5">
               <h3 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3">
-                Client & Review Details
+                Certificate Details
               </h3>
 
               <div>
                 <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                  Client / Company Name *
+                  Certificate / Standard / Company Name *
                 </label>
                 <input
                   type="text"
                   required
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="e.g. Booking.com / ASML Enterprise Desk"
+                  placeholder="e.g. SNA NEN 4400-1 / ISO 9001 / ASML Certified Partner"
                   className="w-full p-3 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-[#E30613] shadow-2xs"
                 />
               </div>
@@ -213,14 +213,14 @@ export function TestimonialForm({ initialData, isEdit = false }: TestimonialForm
 
               <div>
                 <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                  Testimonial Quote / Story *
+                  Certificate Description / Scope *
                 </label>
                 <textarea
                   rows={6}
                   required
                   value={text}
                   onChange={(e) => setText(e.target.value)}
-                  placeholder="Paste the verified client testimonial or partner quote..."
+                  placeholder="Paste the verified certificate details, scope, or accreditation description..."
                   className="w-full p-3.5 text-xs rounded-xl border border-slate-200 text-slate-800 focus:outline-none focus:border-[#E30613] shadow-2xs leading-relaxed"
                 />
               </div>
@@ -230,7 +230,7 @@ export function TestimonialForm({ initialData, isEdit = false }: TestimonialForm
             <div className="bg-white rounded-2xl border border-slate-100 shadow-2xs p-6 space-y-5 flex flex-col justify-between">
               <div>
                 <h3 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">
-                  Company Logo / Badge
+                  Certificate Logo / Badge
                 </h3>
 
                 {/* Preview Box */}
@@ -246,8 +246,8 @@ export function TestimonialForm({ initialData, isEdit = false }: TestimonialForm
                     />
                   ) : (
                     <div className="text-center text-slate-400">
-                      <Quote className="w-8 h-8 mx-auto mb-1 opacity-50" />
-                      <span className="text-[11px]">No logo uploaded</span>
+                      <Award className="w-8 h-8 mx-auto mb-1 opacity-50" />
+                      <span className="text-[11px]">No logo / badge uploaded</span>
                     </div>
                   )}
                 </div>
@@ -271,7 +271,7 @@ export function TestimonialForm({ initialData, isEdit = false }: TestimonialForm
               href="/dashboard/clients"
               className="text-xs font-semibold text-slate-500 hover:text-slate-800"
             >
-              ← Back to Testimonials
+              ← Back to Certificates
             </Link>
 
             <button
@@ -284,7 +284,7 @@ export function TestimonialForm({ initialData, isEdit = false }: TestimonialForm
               ) : (
                 <Check className="w-4 h-4" />
               )}
-              <span>{saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Save Testimonial'}</span>
+              <span>{saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Save Certificate'}</span>
             </button>
           </div>
         </form>
