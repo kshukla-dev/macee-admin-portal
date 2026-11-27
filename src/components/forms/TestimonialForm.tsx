@@ -10,7 +10,6 @@ import {
   MessageSquareQuote,
   ArrowLeft,
   Check,
-  Star,
   Quote,
   AlertCircle,
 } from 'lucide-react';
@@ -53,7 +52,6 @@ export function TestimonialForm({ initialData, isEdit = false }: TestimonialForm
       ? initialData.image
       : (initialData?.image as any)?.src || ''
   );
-  const [accent, setAccent] = useState<boolean>(Boolean(initialData?.accent));
 
   // Load clients data to update certifications list
   useEffect(() => {
@@ -88,7 +86,7 @@ export function TestimonialForm({ initialData, isEdit = false }: TestimonialForm
         tag: tag.trim() || 'Client Testimonial',
         text: text.trim(),
         image: image.trim(),
-        accent,
+        accent: false,
         order: initialData?.order || 1,
       };
 
@@ -235,27 +233,6 @@ export function TestimonialForm({ initialData, isEdit = false }: TestimonialForm
                   placeholder="Paste the verified client testimonial or partner quote..."
                   className="w-full p-3.5 text-xs rounded-xl border border-slate-200 text-slate-800 focus:outline-none focus:border-[#E30613] shadow-2xs leading-relaxed"
                 />
-              </div>
-
-              {/* Featured Highlight Checkbox */}
-              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80">
-                <label className="flex items-center space-x-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={accent}
-                    onChange={(e) => setAccent(e.target.checked)}
-                    className="rounded border-slate-300 text-[#E30613] focus:ring-[#E30613] w-4 h-4 cursor-pointer"
-                  />
-                  <div>
-                    <span className="text-xs font-bold text-slate-900 block flex items-center gap-1.5">
-                      <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                      <span>Mark as Featured Story</span>
-                    </span>
-                    <span className="text-[11px] text-slate-500 block">
-                      Featured testimonials receive an accent highlight border and badge on the website.
-                    </span>
-                  </div>
-                </label>
               </div>
             </div>
 

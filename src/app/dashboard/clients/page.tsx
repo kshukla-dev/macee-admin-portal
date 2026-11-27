@@ -16,7 +16,6 @@ import {
   Search,
   Sparkles,
   Quote,
-  Star,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
@@ -111,10 +110,6 @@ export default function TestimonialsManagementPage() {
     return filteredItems.slice(start, start + pageSize);
   }, [filteredItems, currentPage, pageSize]);
 
-  const featuredCount = useMemo(() => {
-    return testimonialsList.filter((i) => i.accent).length;
-  }, [testimonialsList]);
-
   const handleSaveAll = async (updatedData: any) => {
     try {
       setSaving(true);
@@ -179,9 +174,9 @@ export default function TestimonialsManagementPage() {
             </p>
           </div>
 
-          {/* Right side: 2 KPI Cards in same header line */}
+          {/* Right side: KPI Card */}
           <div className="flex items-center space-x-3 sm:space-x-4 shrink-0">
-            {/* Card 1: Total Testimonials */}
+            {/* Total Testimonials */}
             <div className="bg-white rounded-2xl px-4 py-3 sm:px-5 sm:py-3.5 border border-slate-100 shadow-2xs flex items-center space-x-3 sm:space-x-4 min-w-[170px] sm:min-w-[190px]">
               <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#EAF0FC] text-[#36427D] flex items-center justify-center shrink-0">
                 <MessageSquareQuote className="w-5 h-5" />
@@ -193,21 +188,6 @@ export default function TestimonialsManagementPage() {
                     {testimonialsList.length}
                   </span>
                   <span className="text-[10px] sm:text-xs font-semibold text-emerald-600">Active</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Card 2: Featured */}
-            <div className="bg-white rounded-2xl px-4 py-3 sm:px-5 sm:py-3.5 border border-slate-100 shadow-2xs flex items-center space-x-3 sm:space-x-4 min-w-[170px] sm:min-w-[190px]">
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
-                <Star className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-[11px] sm:text-xs font-medium text-slate-500">Featured</p>
-                <div className="mt-0.5">
-                  <span className="text-xl sm:text-2xl font-bold text-[#111827] font-sans">
-                    {featuredCount}
-                  </span>
                 </div>
               </div>
             </div>
@@ -270,11 +250,7 @@ export default function TestimonialsManagementPage() {
                 return (
                   <div
                     key={item.id || realIndex}
-                    className={`bg-white rounded-2xl p-6 border shadow-2xs transition-all relative flex flex-col justify-between ${
-                      item.accent
-                        ? 'border-[#E30613]/50 ring-1 ring-[#E30613]/20'
-                        : 'border-slate-100'
-                    }`}
+                    className="bg-white rounded-2xl p-6 border border-slate-100 shadow-2xs transition-all relative flex flex-col justify-between"
                   >
                     <div>
                       {/* Top Header: Logo, Tag & Action Buttons */}
@@ -321,13 +297,8 @@ export default function TestimonialsManagementPage() {
                       </div>
 
                       {/* Client / Title */}
-                      <h4 className="text-base font-bold text-[#111827] mt-3.5 font-sans flex items-center gap-1.5">
-                        <span>{item.title}</span>
-                        {item.accent && (
-                          <span className="text-[10px] font-semibold text-[#E30613] bg-rose-50 px-2 py-0.5 rounded-md shrink-0">
-                            Featured
-                          </span>
-                        )}
+                      <h4 className="text-base font-bold text-[#111827] mt-3.5 font-sans">
+                        {item.title}
                       </h4>
 
                       {/* Testimonial Quote */}
