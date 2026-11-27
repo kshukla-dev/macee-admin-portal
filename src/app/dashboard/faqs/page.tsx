@@ -364,24 +364,27 @@ export default function FaqManagementPage() {
     });
   };
 
-  const handleToggleActive = async (item: FaqItem) => {
+  const handleStatusChange = async (faqId: string, newStatus: string) => {
+    const isNowActive = newStatus === 'active';
     try {
-      const updatedStatus = item.active === false ? true : false;
+      setItems((prev) =>
+        prev.map((i) => (i.id === faqId ? { ...i, active: isNowActive } : i))
+      );
       const res = await fetch('/api/faqs', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: item.id, active: updatedStatus }),
+        body: JSON.stringify({ id: faqId, active: isNowActive }),
       });
       const data = await res.json();
       if (data.success) {
-        setItems((prev) =>
-          prev.map((i) => (i.id === item.id ? { ...i, active: updatedStatus } : i))
-        );
-        setSyncMessage(`✓ Question status set to ${updatedStatus ? 'Active' : 'Inactive'} and synced.`);
+        setSyncMessage(`✓ Question status set to ${isNowActive ? 'Active' : 'Inactive'} and synced.`);
         setTimeout(() => setSyncMessage(null), 3500);
+      } else {
+        fetchFaqs();
       }
     } catch (e) {
-      alert('Failed to update status');
+      console.error('Failed to update status:', e);
+      fetchFaqs();
     }
   };
 
@@ -631,12 +634,7 @@ export default function FaqManagementPage() {
                             status={item.active !== false ? 'active' : 'inactive'}
                             preset="active"
                             align="right"
-                            onChange={async (newStatus) => {
-                              const targetActive = newStatus === 'active';
-                              if (targetActive !== (item.active !== false)) {
-                                handleToggleActive(item);
-                              }
-                            }}
+                            onChange={(newStatus) => handleStatusChange(item.id, newStatus)}
                             title="Change Question Status"
                           />
 

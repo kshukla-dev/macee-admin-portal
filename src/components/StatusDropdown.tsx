@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { ChevronDown, Check } from 'lucide-react';
+import { ChevronDown, Check, Loader2 } from 'lucide-react';
 
 export interface StatusOption {
   value: string;
@@ -136,6 +136,7 @@ export function StatusDropdown({
   title = 'Change Status',
 }: StatusDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const norm = (status || '').toLowerCase().trim();
@@ -167,10 +168,18 @@ export function StatusDropdown({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isOpen]);
 
-  const handleSelect = (newStatus: string) => {
-    if (disabled || !onChange) return;
-    onChange(newStatus);
-    setIsOpen(false);
+  const handleSelect = async (newStatus: string) => {
+    if (disabled || !onChange || isUpdating) return;
+    try {
+      setIsUpdating(true);
+      setIsOpen(false);
+      const minDelay = new Promise((resolve) => setTimeout(resolve, 300));
+      await Promise.all([onChange(newStatus), minDelay]);
+    } catch (err) {
+      console.error('Status update failed:', err);
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   const canEdit = !disabled && Boolean(onChange);
@@ -179,20 +188,24 @@ export function StatusDropdown({
     <div ref={containerRef} className={`relative inline-block text-left ${className}`}>
       <button
         type="button"
-        disabled={!canEdit}
-        onClick={() => canEdit && setIsOpen((prev) => !prev)}
+        disabled={!canEdit || isUpdating}
+        onClick={() => canEdit && !isUpdating && setIsOpen((prev) => !prev)}
         className={`inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-semibold border transition-all ${
-          canEdit ? 'cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#E30613]/25' : 'cursor-default'
+          canEdit && !isUpdating ? 'cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#E30613]/25' : 'cursor-default opacity-85'
         } ${currentConfig.pill}`}
-        title={canEdit ? title : currentConfig.label}
+        title={canEdit ? (isUpdating ? 'Updating...' : title) : currentConfig.label}
       >
         <span>{currentConfig.label}</span>
-        {canEdit && (
-          <ChevronDown
-            className={`w-3 h-3 transition-transform duration-150 shrink-0 ${
-              isOpen ? 'rotate-180' : ''
-            }`}
-          />
+        {isUpdating ? (
+          <Loader2 className="w-3 h-3 transition-transform duration-150 shrink-0 animate-spin" />
+        ) : (
+          canEdit && (
+            <ChevronDown
+              className={`w-3 h-3 transition-transform duration-150 shrink-0 ${
+                isOpen ? 'rotate-180' : ''
+              }`}
+            />
+          )
         )}
       </button>
 

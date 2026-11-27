@@ -23,6 +23,7 @@ import {
   Calendar,
   AlertCircle,
   ExternalLink,
+  Loader2,
 } from 'lucide-react';
 
 export interface BlogContributor {
@@ -388,7 +389,11 @@ export function BlogStepForm({ initialData, isEdit = false }: BlogStepFormProps)
               onClick={() => handleSaveArticle('draft')}
               className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-all disabled:opacity-50"
             >
-              <Save className="w-3.5 h-3.5 text-slate-400" />
+              {saving ? (
+                <Loader2 className="w-3.5 h-3.5 text-slate-400 animate-spin" />
+              ) : (
+                <Save className="w-3.5 h-3.5 text-slate-400" />
+              )}
               <span>Save as Draft</span>
             </button>
 
@@ -398,7 +403,11 @@ export function BlogStepForm({ initialData, isEdit = false }: BlogStepFormProps)
               onClick={() => handleSaveArticle()}
               className="inline-flex items-center space-x-1.5 px-5 py-2.5 rounded-xl bg-[#E30613] hover:bg-[#b80510] text-white text-xs font-semibold shadow-xs transition-all disabled:opacity-50"
             >
-              <Check className="w-4 h-4" />
+              {saving ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Check className="w-4 h-4" />
+              )}
               <span>{saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Publish Article'}</span>
             </button>
           </div>
@@ -944,7 +953,11 @@ export function BlogStepForm({ initialData, isEdit = false }: BlogStepFormProps)
                   onClick={() => handleSaveArticle()}
                   className="inline-flex items-center space-x-1.5 px-6 py-2.5 rounded-xl bg-[#E30613] hover:bg-[#b80510] text-white text-xs font-bold shadow-xs transition-all disabled:opacity-50"
                 >
-                  <Check className="w-4 h-4" />
+                  {saving ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Check className="w-4 h-4" />
+                  )}
                   <span>{saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Publish Article'}</span>
                 </button>
               )}

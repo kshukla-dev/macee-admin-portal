@@ -54,6 +54,7 @@ export default function TestimonialsManagementPage() {
     title: string;
     description: string;
     itemName?: string;
+    isLoading?: boolean;
     onConfirm: () => void | Promise<void>;
   }>({
     isOpen: false,
@@ -140,11 +141,17 @@ export default function TestimonialsManagementPage() {
       title: 'Delete Testimonial',
       description: 'Are you sure you want to delete this testimonial? This action cannot be undone and will update the live website.',
       itemName: item?.title || 'Testimonial',
-      onConfirm: () => {
-        const updatedList = testimonialsList.filter((_, i) => i !== index);
-        const updatedData = { ...clientsData, certifications: updatedList };
-        handleSaveAll(updatedData);
-        setDeleteDialog((prev) => ({ ...prev, isOpen: false }));
+      isLoading: false,
+      onConfirm: async () => {
+        setDeleteDialog((prev) => ({ ...prev, isLoading: true }));
+        try {
+          const updatedList = testimonialsList.filter((_, i) => i !== index);
+          const updatedData = { ...clientsData, certifications: updatedList };
+          await handleSaveAll(updatedData);
+          setDeleteDialog((prev) => ({ ...prev, isOpen: false, isLoading: false }));
+        } catch {
+          setDeleteDialog((prev) => ({ ...prev, isLoading: false }));
+        }
       },
     });
   };
@@ -374,6 +381,7 @@ export default function TestimonialsManagementPage() {
           title={deleteDialog.title}
           description={deleteDialog.description}
           itemName={deleteDialog.itemName}
+          isLoading={deleteDialog.isLoading}
         />
       </div>
     </div>

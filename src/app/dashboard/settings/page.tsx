@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Topbar } from '@/components/Topbar';
-import { Eye, EyeOff, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 
 export default function SecuritySettingsPage() {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -189,9 +189,16 @@ export default function SecuritySettingsPage() {
               <button
                 type="submit"
                 disabled={saving}
-                className="px-8 py-3 rounded-full bg-[#E30613] hover:bg-[#b80510] text-white text-xs sm:text-sm font-semibold shadow-xs transition-all disabled:opacity-50 cursor-pointer"
+                className="px-8 py-3 rounded-full bg-[#E30613] hover:bg-[#b80510] text-white text-xs sm:text-sm font-semibold shadow-xs transition-all disabled:opacity-50 cursor-pointer inline-flex items-center gap-2"
               >
-                {saving ? 'Saving...' : 'Save'}
+                {saving ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin shrink-0" />
+                    <span>Saving...</span>
+                  </>
+                ) : (
+                  <span>Save Password</span>
+                )}
               </button>
             </div>
           </form>

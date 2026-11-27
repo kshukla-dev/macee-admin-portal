@@ -13,6 +13,7 @@ import {
   ShieldCheck,
   Building2,
   Sparkles,
+  Loader2,
 } from 'lucide-react';
 
 export default function LoginPage() {
@@ -190,11 +191,12 @@ export default function LoginPage() {
               className="w-full mt-2 py-3 px-4 rounded-xl bg-[#E30613] hover:bg-[#b80510] text-white font-semibold text-xs transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 font-heading tracking-wide"
             >
               {loading ? (
-                <span>Authenticating...</span>
-              ) : (
                 <>
-                  <span>Sign In</span>
+                  <Loader2 className="w-4 h-4 animate-spin shrink-0" />
+                  <span>Authenticating...</span>
                 </>
+              ) : (
+                <span>Sign In</span>
               )}
             </button>
           </form>

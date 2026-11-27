@@ -17,6 +17,7 @@ import {
   Briefcase,
   AlertCircle,
   Save,
+  Loader2,
 } from 'lucide-react';
 
 export interface TeamMember {
@@ -156,7 +157,11 @@ export function TeamMemberForm({ initialData, isEdit = false }: TeamMemberFormPr
               onClick={handleSubmit}
               className="inline-flex items-center space-x-1.5 px-5 py-2.5 rounded-xl bg-[#E30613] hover:bg-[#b80510] text-white text-xs font-semibold shadow-xs transition-all disabled:opacity-50"
             >
-              <Check className="w-4 h-4" />
+              {saving ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Check className="w-4 h-4" />
+              )}
               <span>{saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Save Member'}</span>
             </button>
           </div>
@@ -331,7 +336,11 @@ export function TeamMemberForm({ initialData, isEdit = false }: TeamMemberFormPr
               disabled={saving}
               className="inline-flex items-center space-x-1.5 px-6 py-2.5 rounded-xl bg-[#E30613] hover:bg-[#b80510] text-white text-xs font-bold shadow-xs transition-all disabled:opacity-50"
             >
-              <Check className="w-4 h-4" />
+              {saving ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Check className="w-4 h-4" />
+              )}
               <span>{saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Save Member'}</span>
             </button>
           </div>

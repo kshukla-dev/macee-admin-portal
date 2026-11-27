@@ -12,6 +12,7 @@ import {
   Check,
   Quote,
   AlertCircle,
+  Loader2,
 } from 'lucide-react';
 
 export interface TestimonialItem {
@@ -174,7 +175,11 @@ export function TestimonialForm({ initialData, isEdit = false }: TestimonialForm
               onClick={handleSubmit}
               className="inline-flex items-center space-x-1.5 px-5 py-2.5 rounded-xl bg-[#E30613] hover:bg-[#b80510] text-white text-xs font-semibold shadow-xs transition-all disabled:opacity-50"
             >
-              <Check className="w-4 h-4" />
+              {saving ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Check className="w-4 h-4" />
+              )}
               <span>{saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Save Testimonial'}</span>
             </button>
           </div>
@@ -294,7 +299,11 @@ export function TestimonialForm({ initialData, isEdit = false }: TestimonialForm
               disabled={saving}
               className="inline-flex items-center space-x-1.5 px-6 py-2.5 rounded-xl bg-[#E30613] hover:bg-[#b80510] text-white text-xs font-bold shadow-xs transition-all disabled:opacity-50"
             >
-              <Check className="w-4 h-4" />
+              {saving ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Check className="w-4 h-4" />
+              )}
               <span>{saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Save Testimonial'}</span>
             </button>
           </div>
