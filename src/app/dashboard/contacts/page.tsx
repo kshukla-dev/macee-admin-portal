@@ -6,6 +6,7 @@ import { Modal } from '@/components/Modal';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { SkeletonTableRow } from '@/components/Skeleton';
 import { CustomSelect } from '@/components/CustomSelect';
+import { StatusDropdown } from '@/components/StatusDropdown';
 import {
   Users2,
   Mail,
@@ -43,114 +44,6 @@ interface Contact {
   status: 'new' | 'in_progress' | 'converted' | 'archived';
   submittedAt: string;
   notes?: string;
-}
-
-const STATUS_CONFIG: Record<
-  Contact['status'],
-  { label: string; pill: string; dot: string }
-> = {
-  new: {
-    label: 'New',
-    pill: 'bg-rose-50 text-[#E30613] border-rose-200 hover:bg-rose-100/80',
-    dot: 'bg-[#E30613]',
-  },
-  in_progress: {
-    label: 'In Progress',
-    pill: 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100/80',
-    dot: 'bg-amber-500',
-  },
-  converted: {
-    label: 'Converted',
-    pill: 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100/80',
-    dot: 'bg-emerald-500',
-  },
-  archived: {
-    label: 'Archived',
-    pill: 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200/80',
-    dot: 'bg-slate-400',
-  },
-};
-
-function StatusDropdown({
-  status,
-  onChange,
-}: {
-  status: Contact['status'];
-  onChange: (newStatus: Contact['status']) => void;
-}) {
-  const [isOpen, setIsOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const config = STATUS_CONFIG[status] || STATUS_CONFIG.new;
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isOpen]);
-
-  const handleSelect = (newStatus: Contact['status']) => {
-    onChange(newStatus);
-    setIsOpen(false);
-  };
-
-  const options: Array<{
-    value: Contact['status'];
-    label: string;
-    dot: string;
-    hover: string;
-  }> = [
-    { value: 'new', label: 'New', dot: 'bg-[#E30613]', hover: 'hover:bg-rose-50 hover:text-[#E30613]' },
-    { value: 'in_progress', label: 'In Progress', dot: 'bg-amber-500', hover: 'hover:bg-amber-50 hover:text-amber-700' },
-    { value: 'converted', label: 'Converted', dot: 'bg-emerald-500', hover: 'hover:bg-emerald-50 hover:text-emerald-700' },
-    { value: 'archived', label: 'Archived', dot: 'bg-slate-400', hover: 'hover:bg-slate-100 hover:text-slate-700' },
-  ];
-
-  return (
-    <div ref={containerRef} className="relative inline-block text-left">
-      <button
-        type="button"
-        onClick={() => setIsOpen((prev) => !prev)}
-        className={`inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-semibold border transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#E30613]/25 ${config.pill}`}
-        title="Change Lead Status"
-      >
-        <span>{config.label}</span>
-        <ChevronDown
-          className={`w-3 h-3 transition-transform duration-150 ${isOpen ? 'rotate-180' : ''}`}
-        />
-      </button>
-
-      {isOpen && (
-        <div className="absolute left-0 top-full mt-1.5 w-36 bg-white rounded-xl shadow-xl border border-slate-100 py-1.5 z-50 animate-fadeIn">
-          {options.map((opt) => {
-            const isSelected = opt.value === status;
-            return (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => handleSelect(opt.value)}
-                className={`w-full px-3 py-1.5 text-xs text-left flex items-center justify-between transition-colors ${
-                  isSelected
-                    ? 'font-bold bg-slate-50 text-slate-900'
-                    : `text-slate-700 ${opt.hover}`
-                }`}
-              >
-                <div className="flex items-center space-x-2">
-                  <span>{opt.label}</span>
-                </div>
-                {isSelected && <Check className="w-3.5 h-3.5 text-[#E30613]" />}
-              </button>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
 }
 
 export default function ContactsManagementPage() {
@@ -694,7 +587,9 @@ export default function ContactsManagementPage() {
                         <td className="py-3 px-4 whitespace-nowrap">
                           <StatusDropdown
                             status={contact.status}
-                            onChange={(newStatus) => handleStatusChange(contact.id, newStatus)}
+                            preset="lead"
+                            onChange={(newStatus) => handleStatusChange(contact.id, newStatus as Contact['status'])}
+                            title="Change Lead Status"
                           />
                         </td>
 

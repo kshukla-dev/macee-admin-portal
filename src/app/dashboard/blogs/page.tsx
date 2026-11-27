@@ -7,6 +7,7 @@ import { Modal } from '@/components/Modal';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { SkeletonTableRow } from '@/components/Skeleton';
 import { CustomSelect } from '@/components/CustomSelect';
+import { StatusDropdown } from '@/components/StatusDropdown';
 import {
   FileText,
   Plus,
@@ -208,6 +209,26 @@ export default function BlogManagementPage() {
 
   const publishedCount = blogs.filter((b) => b.status === 'published').length;
   const draftCount = blogs.filter((b) => b.status === 'draft').length;
+
+  const handleStatusChange = async (blogId: string, newStatus: string) => {
+    try {
+      setBlogs((prev) =>
+        prev.map((b) =>
+          b.id === blogId ? { ...b, status: newStatus as 'published' | 'draft' } : b
+        )
+      );
+      const res = await fetch('/api/blogs', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: blogId, status: newStatus }),
+      });
+      if (!res.ok) {
+        fetchData();
+      }
+    } catch {
+      fetchData();
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
@@ -412,15 +433,12 @@ export default function BlogManagementPage() {
 
                         {/* Status */}
                         <td className="py-3.5 px-4 whitespace-nowrap">
-                          {blog.status === 'published' ? (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                              Published
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
-                              Draft
-                            </span>
-                          )}
+                          <StatusDropdown
+                            status={blog.status}
+                            preset="blog"
+                            onChange={(newStatus) => handleStatusChange(blog.id, newStatus)}
+                            title="Change Article Status"
+                          />
                         </td>
 
                         {/* Actions: 3-dot dropdown menu */}

@@ -7,6 +7,7 @@ import { Modal } from '@/components/Modal';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { SkeletonAccordion } from '@/components/Skeleton';
 import { CustomSelect } from '@/components/CustomSelect';
+import { StatusDropdown } from '@/components/StatusDropdown';
 import {
   HelpCircle,
   Plus,
@@ -625,17 +626,19 @@ export default function FaqManagementPage() {
                         </button>
 
                         {/* Right: Actions */}
-                        <div className="flex items-center space-x-1 shrink-0 pt-1">
-                          <button
-                            onClick={() => handleToggleActive(item)}
-                            className={`text-xs font-semibold px-2.5 py-1 rounded-lg transition-colors ${item.active !== false
-                              ? 'text-slate-500 hover:text-amber-600 hover:bg-amber-50'
-                              : 'text-emerald-600 hover:bg-emerald-50'
-                              }`}
-                            title={item.active !== false ? 'Deactivate Question' : 'Activate Question'}
-                          >
-                            {item.active !== false ? 'Deactivate' : 'Publish'}
-                          </button>
+                        <div className="flex items-center space-x-2 shrink-0 pt-1">
+                          <StatusDropdown
+                            status={item.active !== false ? 'active' : 'inactive'}
+                            preset="active"
+                            align="right"
+                            onChange={async (newStatus) => {
+                              const targetActive = newStatus === 'active';
+                              if (targetActive !== (item.active !== false)) {
+                                handleToggleActive(item);
+                              }
+                            }}
+                            title="Change Question Status"
+                          />
 
                           <Link
                             href={`/dashboard/faqs/edit/${item.id}`}
