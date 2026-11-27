@@ -6,10 +6,8 @@ import {
   ChevronDown,
   User,
   LogOut,
-  Menu,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useSidebar } from '@/context/SidebarContext';
 
 interface TopbarProps {
   breadcrumbs?: { label: string; href?: string }[];
@@ -22,7 +20,6 @@ export function Topbar({
   actionButton,
 }: TopbarProps) {
   const router = useRouter();
-  const { toggleSidebar, isCollapsed } = useSidebar();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -32,20 +29,7 @@ export function Topbar({
   };
 
   return (
-    <header className="h-16 bg-white border-b border-slate-100 px-4 sm:px-6 lg:px-8 flex items-center justify-between sticky top-0 z-30">
-      {/* Left: Hamburger Menu Button (Sidebar Toggle) */}
-      <div className="flex items-center space-x-3">
-        <button
-          type="button"
-          onClick={toggleSidebar}
-          title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          className="p-2 rounded-xl text-slate-600 hover:text-[#111827] hover:bg-slate-100 border border-slate-200/80 shadow-2xs transition-all cursor-pointer flex items-center justify-center group"
-        >
-          <Menu className="w-5 h-5 text-slate-600 group-hover:text-[#111827]" />
-        </button>
-      </div>
-
+    <header className="h-16 bg-white border-b border-slate-100 px-4 sm:px-6 lg:px-8 flex items-center justify-end sticky top-0 z-30">
       {/* Right: User Profile Dropdown + Action Button */}
       <div className="flex items-center space-x-3 sm:space-x-4">
         {/* User Profile (Avatar circle with Macee logo + dropdown arrow) */}

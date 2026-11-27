@@ -14,6 +14,8 @@ import {
   LogOut,
   ExternalLink,
   MessageSquareQuote,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { useSidebar } from '@/context/SidebarContext';
 
@@ -63,7 +65,7 @@ function CollapsedTooltip({
 export function Sidebar({ className = '' }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { isCollapsed } = useSidebar();
+  const { isCollapsed, toggleSidebar } = useSidebar();
 
   const handleLogout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' });
@@ -114,20 +116,43 @@ export function Sidebar({ className = '' }: SidebarProps) {
       className={`relative bg-[#0E1726] text-slate-300 flex flex-col justify-between shrink-0 select-none z-40 border-r border-slate-800/60 transition-all duration-300 ease-in-out ${isCollapsed ? 'w-20' : 'w-72'
         } ${className}`}
     >
+      {/* Floating Center Expand Button (When Collapsed: Click to Open / Expand) */}
+      {isCollapsed && (
+        <button
+          type="button"
+          onClick={toggleSidebar}
+          title="Open sidebar"
+          aria-label="Open sidebar"
+          className="absolute -right-3.5 top-1/2 -translate-y-1/2 z-50 w-7 h-7 rounded-full bg-[#0E1726] border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800 hover:border-[#E30613] hover:scale-110 shadow-lg flex items-center justify-center transition-all cursor-pointer group"
+        >
+          <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-[#E30613] transition-colors" />
+        </button>
+      )}
       <div>
         {/* Brand Header */}
         <div
-          className={`h-16 flex items-center border-b border-slate-800/40 transition-all ${isCollapsed ? 'justify-center px-2' : 'px-5 sm:px-6'
+          className={`h-16 flex items-center border-b border-slate-800/40 transition-all ${isCollapsed ? 'justify-center px-2' : 'justify-between px-5 sm:px-6'
             }`}
         >
           {!isCollapsed ? (
-            <Link href="/dashboard" className="flex items-center group py-1 focus:outline-none">
-              <img
-                src="/images/macee-logo-white.png"
-                alt="Macee External Workforce Solutions"
-                className="h-9 sm:h-10 w-auto max-w-[170px] object-contain drop-shadow-sm group-hover:opacity-90 transition-opacity"
-              />
-            </Link>
+            <>
+              <Link href="/dashboard" className="flex items-center group py-1 focus:outline-none">
+                <img
+                  src="/images/macee-logo-white.png"
+                  alt="Macee External Workforce Solutions"
+                  className="h-9 sm:h-10 w-auto max-w-[170px] object-contain drop-shadow-sm group-hover:opacity-90 transition-opacity"
+                />
+              </Link>
+              <button
+                type="button"
+                onClick={toggleSidebar}
+                title="Collapse sidebar"
+                aria-label="Collapse sidebar"
+                className="w-7 h-7 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white border border-slate-700/60 flex items-center justify-center transition-all cursor-pointer shadow-2xs"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+            </>
           ) : (
             <CollapsedTooltip text="Dashboard">
               <Link
