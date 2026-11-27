@@ -6,10 +6,13 @@ import {
   ChevronDown,
   User,
   LogOut,
+  ArrowLeft,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface TopbarProps {
+  backHref?: string;
+  onBack?: () => void;
   breadcrumbs?: { label: string; href?: string }[];
   searchPlaceholder?: string;
   onSearch?: (query: string) => void;
@@ -17,10 +20,16 @@ interface TopbarProps {
 }
 
 export function Topbar({
+  backHref,
+  onBack,
+  breadcrumbs,
   actionButton,
 }: TopbarProps) {
   const router = useRouter();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+
+  // Back button only renders when backHref or onBack is explicitly passed (e.g. Add, Edit, or Preview pages)
+  const resolvedBackHref = backHref;
 
   const handleLogout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' });
@@ -29,7 +38,30 @@ export function Topbar({
   };
 
   return (
-    <header className="h-16 bg-white border-b border-slate-100 px-4 sm:px-6 lg:px-8 flex items-center justify-end sticky top-0 z-30">
+    <header className="h-16 bg-white border-b border-slate-100 px-4 sm:px-6 lg:px-8 flex items-center justify-between sticky top-0 z-30">
+      {/* Left: Back Button (For subpages, forms, and preview pages) */}
+      <div className="flex items-center">
+        {resolvedBackHref ? (
+          <Link
+            href={resolvedBackHref}
+            title="Go back"
+            aria-label="Go back"
+            className="w-9 h-9 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-600 hover:text-[#111827] shadow-2xs flex items-center justify-center transition-all cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </Link>
+        ) : onBack ? (
+          <button
+            type="button"
+            onClick={onBack}
+            title="Go back"
+            aria-label="Go back"
+            className="w-9 h-9 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-600 hover:text-[#111827] shadow-2xs flex items-center justify-center transition-all cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </button>
+        ) : null}
+      </div>
       {/* Right: User Profile Dropdown + Action Button */}
       <div className="flex items-center space-x-3 sm:space-x-4">
         {/* User Profile (Avatar circle with Macee logo + dropdown arrow) */}

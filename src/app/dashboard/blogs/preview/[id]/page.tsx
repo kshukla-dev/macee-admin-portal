@@ -141,28 +141,12 @@ export default function ArticlePreviewPage() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
-      <Topbar
-        breadcrumbs={[
-          { label: 'Dashboard', href: '/dashboard' },
-          { label: 'Articles & Blogs', href: '/dashboard/blogs' },
-          { label: blog.title },
-        ]}
-      />
+      <Topbar backHref="/dashboard/blogs" />
 
       <div className="p-6 sm:p-8 lg:p-10 max-w-[1440px] mx-auto space-y-6">
         {/* Top Control Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white rounded-2xl p-4 sm:px-6 border border-slate-200/80 shadow-2xs">
           <div className="flex items-center space-x-3">
-            <Link
-              href="/dashboard/blogs"
-              className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold transition-all"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Back to Articles</span>
-            </Link>
-
-            <div className="h-4 w-px bg-slate-200" />
-
             <div className="flex items-center space-x-2">
               <span className="text-xs text-slate-500 font-medium hidden sm:inline">Status:</span>
               <StatusDropdown

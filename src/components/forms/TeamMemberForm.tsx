@@ -114,33 +114,18 @@ export function TeamMemberForm({ initialData, isEdit = false }: TeamMemberFormPr
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
-      <Topbar
-        breadcrumbs={[
-          { label: 'Dashboard', href: '/dashboard' },
-          { label: 'Team Profiles', href: '/dashboard/team' },
-          { label: isEdit ? 'Edit Member' : 'Add Member' },
-        ]}
-      />
+      <Topbar backHref="/dashboard/team" />
 
       <div className="p-6 sm:p-8 lg:p-10 max-w-[1440px] mx-auto space-y-6">
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-200">
-          <div className="flex items-center space-x-3">
-            <Link
-              href="/dashboard/team"
-              className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-[#111827] hover:border-slate-300 shadow-2xs transition-all"
-              title="Back to Team"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Link>
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-serif text-[#111827] tracking-tight">
-                {isEdit ? 'Edit Team Member' : 'Add New Team Member'}
-              </h1>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Profiles and credentials published on the Macee public About Us team showcase.
-              </p>
-            </div>
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-serif text-[#111827] tracking-tight">
+              {isEdit ? 'Edit Team Member' : 'Add New Team Member'}
+            </h1>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Profiles and credentials published on the Macee public About Us team showcase.
+            </p>
           </div>
 
           <div className="flex items-center space-x-2.5">

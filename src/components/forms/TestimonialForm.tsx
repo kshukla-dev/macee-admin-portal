@@ -132,33 +132,18 @@ export function TestimonialForm({ initialData, isEdit = false }: TestimonialForm
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
-      <Topbar
-        breadcrumbs={[
-          { label: 'Dashboard', href: '/dashboard' },
-          { label: 'Testimonials', href: '/dashboard/clients' },
-          { label: isEdit ? 'Edit Testimonial' : 'Add Testimonial' },
-        ]}
-      />
+      <Topbar backHref="/dashboard/clients" />
 
       <div className="p-6 sm:p-8 lg:p-10 max-w-[1440px] mx-auto space-y-6">
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-200">
-          <div className="flex items-center space-x-3">
-            <Link
-              href="/dashboard/clients"
-              className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-[#111827] hover:border-slate-300 shadow-2xs transition-all"
-              title="Back to Testimonials"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Link>
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-serif text-[#111827] tracking-tight">
-                {isEdit ? 'Edit Testimonial' : 'Add New Testimonial'}
-              </h1>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Client reviews, partner quotes, and verified accreditations on macee.com.
-              </p>
-            </div>
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-serif text-[#111827] tracking-tight">
+              {isEdit ? 'Edit Testimonial' : 'Add New Testimonial'}
+            </h1>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Client reviews, partner quotes, and verified accreditations on macee.com.
+            </p>
           </div>
 
           <div className="flex items-center space-x-2.5">

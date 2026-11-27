@@ -356,33 +356,18 @@ export function BlogStepForm({ initialData, isEdit = false }: BlogStepFormProps)
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
-      <Topbar
-        breadcrumbs={[
-          { label: 'Dashboard', href: '/dashboard' },
-          { label: 'Articles & Blogs', href: '/dashboard/blogs' },
-          { label: isEdit ? 'Edit Article' : 'Create Article' },
-        ]}
-      />
+      <Topbar backHref="/dashboard/blogs" />
 
       <div className="p-6 sm:p-8 lg:p-10 max-w-[1440px] mx-auto space-y-6">
-        {/* Top Header with Back Button and Quick Actions */}
+        {/* Top Header with Quick Actions */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-200">
-          <div className="flex items-center space-x-3">
-            <Link
-              href="/dashboard/blogs"
-              className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-[#111827] hover:border-slate-300 shadow-2xs transition-all"
-              title="Back to Articles"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Link>
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-serif text-[#111827] tracking-tight">
-                {isEdit ? 'Edit Article' : 'Create New Article'}
-              </h1>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Thought leadership articles, compliance news, and labor market guides for macee.com
-              </p>
-            </div>
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-serif text-[#111827] tracking-tight">
+              {isEdit ? 'Edit Article' : 'Create New Article'}
+            </h1>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Thought leadership articles, compliance news, and labor market guides for macee.com
+            </p>
           </div>
 
           <div className="flex items-center space-x-2.5">
