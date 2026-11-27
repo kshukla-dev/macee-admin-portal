@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Topbar } from '@/components/Topbar';
 import { ImagePicker } from '@/components/ImagePicker';
-import { CustomSelect } from '@/components/CustomSelect';
+import { CustomSelect, SelectOption } from '@/components/CustomSelect';
 import {
   Users2,
   ArrowLeft,
@@ -18,6 +18,8 @@ import {
   AlertCircle,
   Save,
   Loader2,
+  Plus,
+  X,
 } from 'lucide-react';
 
 export interface TeamMember {
@@ -38,12 +40,22 @@ interface TeamMemberFormProps {
   isEdit?: boolean;
 }
 
-const DESK_OPTIONS = [
+const DEFAULT_DESK_OPTIONS = [
   'Management',
   'Consultants',
   'Recruitment',
   'Operations',
 ];
+
+const ADD_CUSTOM_DESK_VALUE = '__ADD_CUSTOM_DESK__';
+
+/**
+ * Formats department/desk input into Title Case as the user types,
+ * capitalizing the first letter of each word while preserving acronyms.
+ */
+function formatDepartmentTitleCase(value: string): string {
+  return value.replace(/(^|\s|[&/\-])([a-z])/g, (_, sep, char) => sep + char.toUpperCase());
+}
 
 export function TeamMemberForm({ initialData, isEdit = false }: TeamMemberFormProps) {
   const router = useRouter();
@@ -54,6 +66,19 @@ export function TeamMemberForm({ initialData, isEdit = false }: TeamMemberFormPr
   const [name, setName] = useState(initialData?.name || '');
   const [role, setRole] = useState(initialData?.role || '');
   const [desk, setDesk] = useState(initialData?.desk || 'Management');
+  const [deskOptions, setDeskOptions] = useState<string[]>(() => {
+    const initial = [...DEFAULT_DESK_OPTIONS];
+    if (
+      initialData?.desk &&
+      !initial.some((opt) => opt.toLowerCase() === initialData.desk!.toLowerCase())
+    ) {
+      initial.push(initialData.desk);
+    }
+    return initial;
+  });
+  const [isAddingCustomDesk, setIsAddingCustomDesk] = useState(false);
+  const [editingDeskOriginal, setEditingDeskOriginal] = useState<string | null>(null);
+  const [customDeskInput, setCustomDeskInput] = useState('');
   const [email, setEmail] = useState(initialData?.email || '');
   const [phone, setPhone] = useState(initialData?.phone || '');
   const [linkedin, setLinkedin] = useState(initialData?.linkedin || '');
@@ -62,6 +87,113 @@ export function TeamMemberForm({ initialData, isEdit = false }: TeamMemberFormPr
   const [active, setActive] = useState<boolean>(
     initialData?.active !== undefined ? initialData.active : true
   );
+
+  // Load persisted departments from /api/departments
+  useEffect(() => {
+    let mounted = true;
+    fetch('/api/departments')
+      .then((res) => res.json())
+      .then((data) => {
+        if (!mounted || !Array.isArray(data.departments)) return;
+        const loaded: string[] = [...data.departments];
+        if (
+          initialData?.desk &&
+          !loaded.some((opt) => opt.toLowerCase() === initialData.desk!.toLowerCase())
+        ) {
+          loaded.push(initialData.desk);
+        }
+        setDeskOptions(loaded);
+      })
+      .catch(() => {});
+    return () => {
+      mounted = false;
+    };
+  }, [initialData?.desk]);
+
+  const handleSaveCustomDesk = async () => {
+    const formatted = formatDepartmentTitleCase(customDeskInput.trim());
+    if (!formatted) return;
+
+    if (editingDeskOriginal) {
+      const oldName = editingDeskOriginal;
+      const hasNewAlready = deskOptions.some(
+        (opt) => opt.toLowerCase() === formatted.toLowerCase() && opt.toLowerCase() !== oldName.toLowerCase()
+      );
+      const updated = deskOptions
+        .map((opt) => (opt.toLowerCase() === oldName.toLowerCase() ? (hasNewAlready ? null : formatted) : opt))
+        .filter((opt): opt is string => Boolean(opt));
+
+      setDeskOptions(updated);
+      if (desk.toLowerCase() === oldName.toLowerCase()) {
+        setDesk(formatted);
+      }
+
+      try {
+        await fetch('/api/departments', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ oldName, newName: formatted }),
+        });
+      } catch {}
+    } else {
+      const existing = deskOptions.find(
+        (opt) => opt.toLowerCase() === formatted.toLowerCase()
+      );
+      if (existing) {
+        setDesk(existing);
+      } else {
+        setDeskOptions((prev) => [...prev, formatted]);
+        setDesk(formatted);
+        try {
+          await fetch('/api/departments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: formatted }),
+          });
+        } catch {}
+      }
+    }
+
+    setCustomDeskInput('');
+    setEditingDeskOriginal(null);
+    setIsAddingCustomDesk(false);
+  };
+
+  const handleEditDeskOption = (value: string) => {
+    setEditingDeskOriginal(value);
+    setCustomDeskInput(value);
+    setIsAddingCustomDesk(true);
+  };
+
+  const handleDeleteDeskOption = async (value: string) => {
+    const updated = deskOptions.filter((opt) => opt.toLowerCase() !== value.toLowerCase());
+    setDeskOptions(updated);
+    if (desk.toLowerCase() === value.toLowerCase()) {
+      setDesk(updated[0] || '');
+    }
+    try {
+      await fetch(`/api/departments?name=${encodeURIComponent(value)}`, {
+        method: 'DELETE',
+      });
+    } catch {}
+  };
+
+  const isDefaultDesk = (opt: string) =>
+    DEFAULT_DESK_OPTIONS.some((def) => def.toLowerCase() === opt.toLowerCase());
+
+  const selectDeskOptions: SelectOption[] = [
+    ...deskOptions.map((opt) => ({
+      value: opt,
+      label: opt,
+      hideActions: isDefaultDesk(opt),
+    })),
+    {
+      value: ADD_CUSTOM_DESK_VALUE,
+      label: 'Add New Department...',
+      icon: <Plus className="w-3.5 h-3.5 text-[#E30613]" />,
+      hideActions: true,
+    },
+  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,11 +210,15 @@ export function TeamMemberForm({ initialData, isEdit = false }: TeamMemberFormPr
 
     try {
       setSaving(true);
+      const resolvedDesk =
+        isAddingCustomDesk && customDeskInput.trim()
+          ? formatDepartmentTitleCase(customDeskInput.trim())
+          : desk.trim() || 'Management';
       const payload = {
         id: initialData?.id || undefined,
         name: name.trim(),
         role: role.trim(),
-        desk: desk.trim() || 'Management',
+        desk: resolvedDesk,
         email: email.trim(),
         phone: phone.trim(),
         linkedin: linkedin.trim(),
@@ -198,15 +334,90 @@ export function TeamMemberForm({ initialData, isEdit = false }: TeamMemberFormPr
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                    Department / Desk
-                  </label>
-                  <CustomSelect
-                    value={desk}
-                    onChange={(val) => setDesk(val)}
-                    options={DESK_OPTIONS}
-                    placeholder="Select Department..."
-                  />
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="block text-xs font-bold text-slate-800">
+                      Department / Desk
+                    </label>
+                    {!isAddingCustomDesk && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsAddingCustomDesk(true);
+                          setCustomDeskInput('');
+                        }}
+                        className="inline-flex items-center space-x-1 text-[11px] font-semibold text-[#E30613] hover:text-[#b80510] transition-colors cursor-pointer"
+                      >
+                        <Plus className="w-3 h-3" />
+                        <span>Add New</span>
+                      </button>
+                    )}
+                  </div>
+
+                  {isAddingCustomDesk ? (
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="text"
+                        autoFocus
+                        value={customDeskInput}
+                        onChange={(e) =>
+                          setCustomDeskInput(formatDepartmentTitleCase(e.target.value))
+                        }
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleSaveCustomDesk();
+                          } else if (e.key === 'Escape') {
+                            e.preventDefault();
+                            setIsAddingCustomDesk(false);
+                            setEditingDeskOriginal(null);
+                            setCustomDeskInput('');
+                          }
+                        }}
+                        placeholder={
+                          editingDeskOriginal ? 'Rename department...' : 'e.g. Human Resources'
+                        }
+                        className="flex-1 p-2.5 text-xs rounded-xl border border-[#E30613] focus:outline-none focus:ring-2 focus:ring-[#E30613]/25 shadow-2xs"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleSaveCustomDesk}
+                        disabled={!customDeskInput.trim()}
+                        className="px-3 py-2.5 rounded-xl bg-[#E30613] hover:bg-[#b80510] text-white text-xs font-semibold shadow-2xs transition-all disabled:opacity-40 cursor-pointer shrink-0"
+                      >
+                        {editingDeskOriginal ? 'Save' : 'Add'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsAddingCustomDesk(false);
+                          setEditingDeskOriginal(null);
+                          setCustomDeskInput('');
+                        }}
+                        title="Cancel"
+                        aria-label="Cancel department edit"
+                        className="p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-700 transition-all cursor-pointer shrink-0"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <CustomSelect
+                      value={desk}
+                      onChange={(val) => {
+                        if (val === ADD_CUSTOM_DESK_VALUE) {
+                          setEditingDeskOriginal(null);
+                          setIsAddingCustomDesk(true);
+                          setCustomDeskInput('');
+                        } else {
+                          setDesk(val);
+                        }
+                      }}
+                      options={selectDeskOptions}
+                      placeholder="Select Department..."
+                      onEditOption={handleEditDeskOption}
+                      onDeleteOption={handleDeleteDeskOption}
+                    />
+                  )}
                 </div>
               </div>
 

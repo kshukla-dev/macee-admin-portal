@@ -22,6 +22,8 @@ import {
   Code,
   Plus,
   Trash2,
+  Edit2,
+  X,
   Calendar,
   AlertCircle,
   ExternalLink,
@@ -66,13 +68,17 @@ interface TeamMember {
   image?: string;
 }
 
-const CATEGORIES = [
+const DEFAULT_CATEGORIES = [
   'Compliance & Legal',
   'Immigration & Visas',
   'Workforce Strategy',
   'Market Insights',
   'Recruitment Best Practices',
 ];
+
+function formatCategoryTitleCase(value: string): string {
+  return value.replace(/(^|\s|[&/\-])([a-z])/g, (_, sep, char) => sep + char.toUpperCase());
+}
 
 const CONTRIBUTOR_ROLES: Array<'Author' | 'Reviewer' | 'Editor' | 'Contributor'> = [
   'Author',
@@ -100,7 +106,7 @@ export function BlogStepForm({ initialData, isEdit = false }: BlogStepFormProps)
   const [excerpt, setExcerpt] = useState(initialData?.excerpt || '');
   const [content, setContent] = useState(initialData?.content || '');
   const [contentViewMode, setContentViewMode] = useState<'write' | 'preview'>('write');
-  
+
   // Media
   const [coverImage, setCoverImage] = useState(initialData?.coverImage || '');
   const [coverImageAlt, setCoverImageAlt] = useState(initialData?.coverImageAlt || '');
@@ -109,12 +115,29 @@ export function BlogStepForm({ initialData, isEdit = false }: BlogStepFormProps)
   );
 
   // Categories & Tags
+  const [availableCategories, setAvailableCategories] = useState<string[]>(() => {
+    const initial = [...DEFAULT_CATEGORIES];
+    const existing = Array.isArray(initialData?.categories)
+      ? initialData.categories
+      : initialData?.category
+        ? [initialData.category]
+        : [];
+    for (const c of existing) {
+      if (c && !initial.some((item) => item.toLowerCase() === c.toLowerCase())) {
+        initial.push(c);
+      }
+    }
+    return initial;
+  });
+  const [isAddingCustomCategory, setIsAddingCustomCategory] = useState(false);
+  const [editingCategoryOriginal, setEditingCategoryOriginal] = useState<string | null>(null);
+  const [customCategoryInput, setCustomCategoryInput] = useState('');
   const [categories, setCategories] = useState<string[]>(
     initialData?.categories && initialData.categories.length > 0
       ? initialData.categories
       : initialData?.category
-      ? [initialData.category]
-      : ['Compliance & Legal']
+        ? [initialData.category]
+        : ['Compliance & Legal']
   );
   const [tags, setTags] = useState<string>(
     Array.isArray(initialData?.tags) ? initialData.tags.join(', ') : ''
@@ -155,6 +178,110 @@ export function BlogStepForm({ initialData, isEdit = false }: BlogStepFormProps)
       })
       .catch((e) => console.error(e));
   }, []);
+
+  // Load persisted topic categories from /api/blog-categories
+  useEffect(() => {
+    let mounted = true;
+    fetch('/api/blog-categories')
+      .then((res) => res.json())
+      .then((data) => {
+        if (!mounted || !Array.isArray(data.categories)) return;
+        const loaded: string[] = [...data.categories];
+        const existing = Array.isArray(initialData?.categories)
+          ? initialData.categories
+          : initialData?.category
+            ? [initialData.category]
+            : [];
+        for (const c of existing) {
+          if (c && !loaded.some((item) => item.toLowerCase() === c.toLowerCase())) {
+            loaded.push(c);
+          }
+        }
+        setAvailableCategories(loaded);
+      })
+      .catch(() => {});
+    return () => {
+      mounted = false;
+    };
+  }, [initialData?.categories, initialData?.category]);
+
+  const isDefaultCategory = (cat: string) =>
+    DEFAULT_CATEGORIES.some((def) => def.toLowerCase() === cat.toLowerCase());
+
+  const handleSaveCustomCategory = async () => {
+    const formatted = formatCategoryTitleCase(customCategoryInput.trim());
+    if (!formatted) return;
+
+    if (editingCategoryOriginal) {
+      const oldName = editingCategoryOriginal;
+      const hasNewAlready = availableCategories.some(
+        (c) => c.toLowerCase() === formatted.toLowerCase() && c.toLowerCase() !== oldName.toLowerCase()
+      );
+      const updated = availableCategories
+        .map((c) => (c.toLowerCase() === oldName.toLowerCase() ? (hasNewAlready ? null : formatted) : c))
+        .filter((c): c is string => Boolean(c));
+
+      setAvailableCategories(updated);
+      setCategories((prev) =>
+        Array.from(
+          new Set(
+            prev.map((c) => (c.toLowerCase() === oldName.toLowerCase() ? formatted : c))
+          )
+        )
+      );
+
+      try {
+        await fetch('/api/blog-categories', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ oldName, newName: formatted }),
+        });
+      } catch {}
+    } else {
+      const existing = availableCategories.find(
+        (c) => c.toLowerCase() === formatted.toLowerCase()
+      );
+      if (existing) {
+        if (!categories.includes(existing)) {
+          setCategories((prev) => [...prev, existing]);
+        }
+      } else {
+        setAvailableCategories((prev) => [...prev, formatted]);
+        setCategories((prev) => [...prev, formatted]);
+        try {
+          await fetch('/api/blog-categories', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: formatted }),
+          });
+        } catch {}
+      }
+    }
+
+    setCustomCategoryInput('');
+    setEditingCategoryOriginal(null);
+    setIsAddingCustomCategory(false);
+  };
+
+  const handleEditCategoryOption = (cat: string) => {
+    setEditingCategoryOriginal(cat);
+    setCustomCategoryInput(cat);
+    setIsAddingCustomCategory(true);
+  };
+
+  const handleDeleteCategoryOption = async (cat: string) => {
+    setAvailableCategories((prev) =>
+      prev.filter((c) => c.toLowerCase() !== cat.toLowerCase())
+    );
+    setCategories((prev) =>
+      prev.filter((c) => c.toLowerCase() !== cat.toLowerCase())
+    );
+    try {
+      await fetch(`/api/blog-categories?name=${encodeURIComponent(cat)}`, {
+        method: 'DELETE',
+      });
+    } catch {}
+  };
 
   // Helper to generate slug from title
   const generateSlug = (text: string) => {
@@ -418,30 +545,27 @@ export function BlogStepForm({ initialData, isEdit = false }: BlogStepFormProps)
                       setCurrentStep(s.number);
                     }
                   }}
-                  className={`flex items-center space-x-3 p-3 rounded-xl text-left transition-all ${
-                    isCurrent
+                  className={`flex items-center space-x-3 p-3 rounded-xl text-left transition-all ${isCurrent
                       ? 'bg-rose-50/80 border border-[#E30613]/30 ring-1 ring-[#E30613]/20 shadow-2xs'
                       : isCompleted
-                      ? 'bg-slate-50 border border-slate-200/80 hover:bg-slate-100/80'
-                      : 'border border-transparent hover:bg-slate-50 opacity-60'
-                  }`}
+                        ? 'bg-slate-50 border border-slate-200/80 hover:bg-slate-100/80'
+                        : 'border border-transparent hover:bg-slate-50 opacity-60'
+                    }`}
                 >
                   <div
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 font-bold text-xs transition-colors ${
-                      isCurrent
+                    className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 font-bold text-xs transition-colors ${isCurrent
                         ? 'bg-[#E30613] text-white shadow-xs'
                         : isCompleted
-                        ? 'bg-emerald-600 text-white'
-                        : 'bg-slate-100 text-slate-500'
-                    }`}
+                          ? 'bg-emerald-600 text-white'
+                          : 'bg-slate-100 text-slate-500'
+                      }`}
                   >
                     {isCompleted ? <Check className="w-4 h-4" /> : s.number}
                   </div>
                   <div className="min-w-0">
                     <p
-                      className={`text-xs font-bold truncate ${
-                        isCurrent ? 'text-[#E30613]' : 'text-slate-800'
-                      }`}
+                      className={`text-xs font-bold truncate ${isCurrent ? 'text-[#E30613]' : 'text-slate-800'
+                        }`}
                     >
                       {s.title}
                     </p>
@@ -561,11 +685,10 @@ export function BlogStepForm({ initialData, isEdit = false }: BlogStepFormProps)
                       <button
                         type="button"
                         onClick={() => setContentViewMode('write')}
-                        className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all cursor-pointer flex items-center space-x-1 ${
-                          contentViewMode === 'write'
+                        className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all cursor-pointer flex items-center space-x-1 ${contentViewMode === 'write'
                             ? 'bg-white text-slate-900 shadow-2xs font-bold'
                             : 'text-slate-500 hover:text-slate-900'
-                        }`}
+                          }`}
                       >
                         <Code className="w-3.5 h-3.5" />
                         <span>HTML Editor</span>
@@ -573,11 +696,10 @@ export function BlogStepForm({ initialData, isEdit = false }: BlogStepFormProps)
                       <button
                         type="button"
                         onClick={() => setContentViewMode('preview')}
-                        className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all cursor-pointer flex items-center space-x-1 ${
-                          contentViewMode === 'preview'
+                        className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all cursor-pointer flex items-center space-x-1 ${contentViewMode === 'preview'
                             ? 'bg-white text-slate-900 shadow-2xs font-bold'
                             : 'text-slate-500 hover:text-slate-900'
-                        }`}
+                          }`}
                       >
                         <Eye className="w-3.5 h-3.5 text-[#E30613]" />
                         <span>Live Preview</span>
@@ -708,26 +830,131 @@ export function BlogStepForm({ initialData, isEdit = false }: BlogStepFormProps)
 
               {/* Categories */}
               <div>
-                <label className="block text-xs font-bold text-slate-800 mb-2">
-                  Topic Categories * (Select one or more)
-                </label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-xs font-bold text-slate-800">
+                    Topic Categories * (Select one or more)
+                  </label>
+                  {!isAddingCustomCategory && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingCategoryOriginal(null);
+                        setIsAddingCustomCategory(true);
+                        setCustomCategoryInput('');
+                      }}
+                      className="inline-flex items-center space-x-1 text-[11px] font-semibold text-[#E30613] hover:text-[#b80510] transition-colors cursor-pointer"
+                    >
+                      <Plus className="w-3 h-3" />
+                      <span>Add New</span>
+                    </button>
+                  )}
+                </div>
+
+                {isAddingCustomCategory && (
+                  <div className="flex items-center space-x-2 mb-3">
+                    <input
+                      type="text"
+                      autoFocus
+                      value={customCategoryInput}
+                      onChange={(e) =>
+                        setCustomCategoryInput(formatCategoryTitleCase(e.target.value))
+                      }
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleSaveCustomCategory();
+                        } else if (e.key === 'Escape') {
+                          e.preventDefault();
+                          setIsAddingCustomCategory(false);
+                          setEditingCategoryOriginal(null);
+                          setCustomCategoryInput('');
+                        }
+                      }}
+                      placeholder={
+                        editingCategoryOriginal
+                          ? 'Rename category...'
+                          : 'e.g. Global Mobility & Tax'
+                      }
+                      className="flex-1 p-2.5 text-xs rounded-xl border border-[#E30613] bg-white focus:outline-none focus:ring-2 focus:ring-[#E30613]/25 shadow-2xs"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleSaveCustomCategory}
+                      disabled={!customCategoryInput.trim()}
+                      className="px-3.5 py-2.5 rounded-xl bg-[#E30613] hover:bg-[#b80510] text-white text-xs font-semibold shadow-2xs transition-all disabled:opacity-40 cursor-pointer shrink-0"
+                    >
+                      {editingCategoryOriginal ? 'Save' : 'Add'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsAddingCustomCategory(false);
+                        setEditingCategoryOriginal(null);
+                        setCustomCategoryInput('');
+                      }}
+                      title="Cancel"
+                      aria-label="Cancel category edit"
+                      className="p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-700 transition-all cursor-pointer shrink-0"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  {CATEGORIES.map((cat) => {
+                  {availableCategories.map((cat) => {
                     const isSelected = categories.includes(cat);
+                    const isCustom = !isDefaultCategory(cat);
                     return (
-                      <button
+                      <div
                         key={cat}
-                        type="button"
+                        role="button"
+                        tabIndex={0}
                         onClick={() => handleToggleCategory(cat)}
-                        className={`p-3.5 rounded-xl border text-xs font-semibold text-left flex items-center justify-between transition-all ${
-                          isSelected
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            handleToggleCategory(cat);
+                          }
+                        }}
+                        className={`p-3.5 rounded-xl border text-xs font-semibold text-left flex items-center justify-between transition-all cursor-pointer ${isSelected
                             ? 'bg-rose-50/80 border-[#E30613] text-[#b80510] shadow-2xs'
                             : 'bg-white border-slate-200/90 text-slate-700 hover:border-slate-300'
-                        }`}
+                          }`}
                       >
-                        <span>{cat}</span>
-                        {isSelected && <Check className="w-4 h-4 text-[#E30613]" />}
-                      </button>
+                        <span className="truncate pr-2">{cat}</span>
+                        <div className="flex items-center space-x-1 shrink-0">
+                          {isSelected && <Check className="w-4 h-4 text-[#E30613]" />}
+                          {isCustom && (
+                            <>
+                              <button
+                                type="button"
+                                title={`Edit ${cat}`}
+                                aria-label={`Edit ${cat}`}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleEditCategoryOption(cat);
+                                }}
+                                className="p-1 rounded-md text-slate-400 hover:text-[#111827] hover:bg-slate-200/70 transition-colors cursor-pointer"
+                              >
+                                <Edit2 className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                title={`Remove ${cat}`}
+                                aria-label={`Remove ${cat}`}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteCategoryOption(cat);
+                                }}
+                                className="p-1 rounded-md text-slate-400 hover:text-[#E30613] hover:bg-rose-100/80 transition-colors cursor-pointer"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </div>
                     );
                   })}
                 </div>
@@ -904,14 +1131,13 @@ export function BlogStepForm({ initialData, isEdit = false }: BlogStepFormProps)
                   <button
                     type="button"
                     onClick={() => setStatus('published')}
-                    className={`p-4 rounded-xl border text-left transition-all ${
-                      status === 'published'
+                    className={`p-4 rounded-xl border text-left transition-all ${status === 'published'
                         ? 'bg-emerald-50/80 border-emerald-500 ring-2 ring-emerald-500/20'
                         : 'bg-white border-slate-200 hover:border-slate-300'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-emerald-800">● Published (Live)</span>
+                      <span className="text-xs font-bold text-emerald-800">Published (Live)</span>
                       {status === 'published' && <Check className="w-4 h-4 text-emerald-600" />}
                     </div>
                     <p className="text-[11px] text-slate-500 mt-1">
@@ -922,14 +1148,13 @@ export function BlogStepForm({ initialData, isEdit = false }: BlogStepFormProps)
                   <button
                     type="button"
                     onClick={() => setStatus('draft')}
-                    className={`p-4 rounded-xl border text-left transition-all ${
-                      status === 'draft'
+                    className={`p-4 rounded-xl border text-left transition-all ${status === 'draft'
                         ? 'bg-amber-50/80 border-amber-500 ring-2 ring-amber-500/20'
                         : 'bg-white border-slate-200 hover:border-slate-300'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-amber-800">● Draft (Private)</span>
+                      <span className="text-xs font-bold text-amber-800">Draft (Private)</span>
                       {status === 'draft' && <Check className="w-4 h-4 text-amber-600" />}
                     </div>
                     <p className="text-[11px] text-slate-500 mt-1">

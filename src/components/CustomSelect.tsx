@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useId } from 'react';
-import { ChevronDown, Check } from 'lucide-react';
+import { ChevronDown, Check, Edit2, Trash2 } from 'lucide-react';
 
 export interface SelectOption {
   value: string;
   label: string;
   icon?: React.ReactNode;
   disabled?: boolean;
+  hideActions?: boolean;
 }
 
 export interface CustomSelectProps {
@@ -24,6 +25,8 @@ export interface CustomSelectProps {
   id?: string;
   name?: string;
   'aria-label'?: string;
+  onEditOption?: (value: string) => void;
+  onDeleteOption?: (value: string) => void;
 }
 
 export function CustomSelect({
@@ -40,6 +43,8 @@ export function CustomSelect({
   id,
   name,
   'aria-label': ariaLabel,
+  onEditOption,
+  onDeleteOption,
 }: CustomSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState<number>(-1);
@@ -258,14 +263,45 @@ export function CustomSelect({
                     : 'text-slate-700 hover:bg-slate-50'
                 }`}
               >
-                <div className="flex items-center space-x-2 truncate">
+                <div className="flex items-center space-x-2 truncate min-w-0 flex-1">
                   {opt.icon && <span className="shrink-0">{opt.icon}</span>}
                   <span className="truncate">{opt.label}</span>
                 </div>
 
-                {isSelected && (
-                  <Check className="w-3.5 h-3.5 text-[#E30613] shrink-0 ml-2" />
-                )}
+                <div className="flex items-center space-x-1 shrink-0 ml-2">
+                  {isSelected && (
+                    <Check className="w-3.5 h-3.5 text-[#E30613] shrink-0" />
+                  )}
+                  {!opt.hideActions && !opt.disabled && onEditOption && (
+                    <button
+                      type="button"
+                      title={`Edit ${opt.label}`}
+                      aria-label={`Edit ${opt.label}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsOpen(false);
+                        onEditOption(opt.value);
+                      }}
+                      className="p-1 rounded-md text-slate-400 hover:text-[#111827] hover:bg-slate-200/70 transition-colors cursor-pointer"
+                    >
+                      <Edit2 className="w-3 h-3" />
+                    </button>
+                  )}
+                  {!opt.hideActions && !opt.disabled && onDeleteOption && (
+                    <button
+                      type="button"
+                      title={`Remove ${opt.label}`}
+                      aria-label={`Remove ${opt.label}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDeleteOption(opt.value);
+                      }}
+                      className="p-1 rounded-md text-slate-400 hover:text-[#E30613] hover:bg-rose-100/80 transition-colors cursor-pointer"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  )}
+                </div>
               </li>
             );
           })}
