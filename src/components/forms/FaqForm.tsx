@@ -264,24 +264,22 @@ export function FaqForm({ initialData, isEdit = false }: FaqFormProps) {
               <button
                 type="button"
                 onClick={() => setTab('en')}
-                className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-bold flex items-center justify-center space-x-2 transition-all ${
-                  tab === 'en'
-                    ? 'bg-white text-[#111827] shadow-2xs border border-slate-200/80'
-                    : 'text-slate-500 hover:text-slate-800'
-                }`}
+                className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-bold flex items-center justify-center space-x-2 transition-all ${tab === 'en'
+                  ? 'bg-white text-[#111827] shadow-2xs border border-slate-200/80'
+                  : 'text-slate-500 hover:text-slate-800'
+                  }`}
               >
-                <span>🇬🇧 English Content (Default)</span>
+                <span>English Content (Default)</span>
               </button>
               <button
                 type="button"
                 onClick={() => setTab('nl')}
-                className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-bold flex items-center justify-center space-x-2 transition-all ${
-                  tab === 'nl'
-                    ? 'bg-white text-[#111827] shadow-2xs border border-slate-200/80'
-                    : 'text-slate-500 hover:text-slate-800'
-                }`}
+                className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-bold flex items-center justify-center space-x-2 transition-all ${tab === 'nl'
+                  ? 'bg-white text-[#111827] shadow-2xs border border-slate-200/80'
+                  : 'text-slate-500 hover:text-slate-800'
+                  }`}
               >
-                <span>🇳🇱 Nederlands (Dutch Translation)</span>
+                <span>Nederlands (Dutch Translation)</span>
               </button>
             </div>
 
@@ -290,7 +288,7 @@ export function FaqForm({ initialData, isEdit = false }: FaqFormProps) {
                 <>
                   <div>
                     <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                      Question (English) *
+                      Question *
                     </label>
                     <input
                       type="text"
@@ -304,7 +302,7 @@ export function FaqForm({ initialData, isEdit = false }: FaqFormProps) {
 
                   <div>
                     <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                      Answer (English) *
+                      Answer *
                     </label>
                     <textarea
                       rows={6}
@@ -320,7 +318,7 @@ export function FaqForm({ initialData, isEdit = false }: FaqFormProps) {
                 <>
                   <div>
                     <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                      Vraag (Nederlands / Dutch Question)
+                      Vraag
                     </label>
                     <input
                       type="text"
@@ -333,7 +331,7 @@ export function FaqForm({ initialData, isEdit = false }: FaqFormProps) {
 
                   <div>
                     <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                      Antwoord (Nederlands / Dutch Answer)
+                      Antwoord
                     </label>
                     <textarea
                       rows={6}
