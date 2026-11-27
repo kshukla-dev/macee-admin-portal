@@ -225,34 +225,23 @@ export function Sidebar({ className = '' }: SidebarProps) {
 
       {/* Bottom Footer */}
       {!isCollapsed ? (
-        <div className="p-6 sm:p-7 border-t border-slate-800/40">
-          <div className="space-y-1">
-            <p className="text-xs font-bold tracking-[0.25em] text-slate-400 uppercase font-heading">
-              M A C E E
-            </p>
-            <p className="text-xs text-slate-500 font-serif italic">
-              Workforce Solutions. Worldwide.
-            </p>
-          </div>
-
-          <div className="mt-4 pt-3 border-t border-slate-800/50 flex items-center justify-between">
-            <a
-              href="http://localhost:3000"
-              target="_blank"
-              rel="noreferrer"
-              className="text-xs text-slate-400 hover:text-white flex items-center space-x-2 transition-colors font-medium"
-            >
-              <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
-              <span>Open Website</span>
-            </a>
-            <button
-              onClick={handleLogout}
-              title="Log out"
-              className="p-1.5 rounded-lg text-slate-500 hover:text-[#E30613] hover:bg-slate-800/50 transition-colors cursor-pointer"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
-          </div>
+        <div className="p-4 px-6 border-t border-slate-800/40 flex items-center justify-between">
+          <a
+            href="http://localhost:3000"
+            target="_blank"
+            rel="noreferrer"
+            className="text-xs text-slate-400 hover:text-white flex items-center space-x-2 transition-colors font-medium"
+          >
+            <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
+            <span>Open Website</span>
+          </a>
+          <button
+            onClick={handleLogout}
+            title="Log out"
+            className="p-1.5 rounded-lg text-slate-500 hover:text-[#E30613] hover:bg-slate-800/50 transition-colors cursor-pointer"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
         </div>
       ) : (
         <div className="p-3 border-t border-slate-800/40 flex flex-col items-center space-y-2">
